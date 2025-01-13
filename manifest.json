@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Sidebar Extension",
+  "version": "1.0",
+  "description": "A simple sidebar extension",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["styles.css"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "action": {
+    "default_title": "Toggle Sidebar"
+  }
+}
