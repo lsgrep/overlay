@@ -10,6 +10,9 @@ const SYSTEM_PROMPT = `You are a helpful AI assistant. You provide clear, accura
 // Store conversation history for each tab
 const tabConversations = new Map();
 
+// Store context for each tab
+const tabContexts = new Map();
+
 let isVisible = false;
 let currentModel = 'phi4';  // Default model, but will be updated by user selection
 
@@ -21,6 +24,13 @@ function updateCurrentModel(model) {
 
 async function chatWithOllama(messages, tabId) {
     try {
+        // Add context to the conversation if available
+        const context = tabContexts.get(tabId);
+        if (context && messages.length > 0 && messages[messages.length - 1].role === 'user') {
+            const userMessage = messages[messages.length - 1];
+            userMessage.content = `Given this context from the current webpage:\n${context}\n\nUser question: ${userMessage.content}`;
+        }
+
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
@@ -121,6 +131,16 @@ function getConversationHistory(tabId) {
     return tabConversations.get(tabId);
 }
 
+function updateContext(tabId, context) {
+    tabContexts.set(tabId, context);
+    // Update the system message with the new context
+    const history = getConversationHistory(tabId);
+    history[0] = {
+        role: 'system',
+        content: `${SYSTEM_PROMPT}\n\nCurrent page context:\n${context}`
+    };
+}
+
 // Handle extension icon clicks
 chrome.action.onClicked.addListener((tab) => {
     console.log('Extension icon clicked');
@@ -213,6 +233,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === 'updateModel') {
         updateCurrentModel(request.model);
+        sendResponse({ success: true });
+        return false;
+    }
+
+    if (request.action === 'updateContext') {
+        updateContext(sender.tab.id, request.context);
         sendResponse({ success: true });
         return false;
     }

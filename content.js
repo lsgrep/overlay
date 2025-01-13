@@ -103,6 +103,24 @@ function populateModelDropdown(models) {
     }
 }
 
+function getPageContent() {
+    // Get the main content of the page
+    const content = document.body.innerText;
+    return content.trim();
+}
+
+async function updateContext(content) {
+    try {
+        await chrome.runtime.sendMessage({
+            action: 'updateContext',
+            context: content
+        });
+        console.log('Context updated successfully');
+    } catch (error) {
+        console.error('Error updating context:', error);
+    }
+}
+
 function createSidebar() {
     console.log('Creating sidebar');
     
@@ -141,6 +159,11 @@ function createSidebar() {
         <div class="sidebar-header">
             <h2>Local Chat</h2>
             <div class="header-buttons">
+                <button id="get-content" title="Get page content" class="context-inactive">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                </button>
                 <button id="reset-chat" title="Reset conversation">
                     <svg viewBox="0 0 24 24" width="20" height="20">
                         <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
@@ -182,6 +205,7 @@ function createSidebar() {
     const chatMessages = sidebar.querySelector('.chat-messages');
     const chatInput = sidebar.querySelector('.chat-input');
     const sendButton = sidebar.querySelector('.send-button');
+    const getContentButton = sidebar.querySelector('#get-content');
 
     // Function to send message
     async function sendMessage() {
@@ -245,6 +269,36 @@ function createSidebar() {
     document.getElementById('close-sidebar').addEventListener('click', () => {
         console.log('Close button clicked');
         toggleSidebar(false);
+    });
+
+    // Add click handler for get content button
+    getContentButton.addEventListener('click', async () => {
+        const pageContent = getPageContent();
+        
+        // Toggle context state
+        const isActive = getContentButton.classList.toggle('context-active');
+        getContentButton.classList.remove('context-inactive');
+        
+        if (isActive) {
+            // Update context in background script
+            await updateContext(pageContent);
+            
+            // Add visual feedback
+            const message = createMessageElement('Page content added as context for future messages.', false);
+            message.classList.add('system-message');
+            chatMessages.appendChild(message);
+        } else {
+            // Clear context
+            await updateContext('');
+            getContentButton.classList.add('context-inactive');
+            
+            // Add visual feedback
+            const message = createMessageElement('Page context removed.', false);
+            message.classList.add('system-message');
+            chatMessages.appendChild(message);
+        }
+        
+        scrollToBottom(chatMessages);
     });
 
     // Handle scroll synchronization
