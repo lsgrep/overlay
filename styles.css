@@ -1,9 +1,16 @@
 #chrome-extension-container {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     width: 100% !important;
-    min-height: 100vh !important;
+    height: 100% !important;
     display: grid !important;
     grid-template-columns: 1fr 0 !important;
     transition: grid-template-columns 0.3s ease-in-out !important;
+    z-index: 2147483646 !important;
+    pointer-events: none !important;
 }
 
 #chrome-extension-container.sidebar-visible {
@@ -11,13 +18,20 @@
 }
 
 #chrome-extension-wrapper {
+    position: relative !important;
     width: 100% !important;
-    min-height: 100vh !important;
-    overflow-x: hidden !important;
+    height: 100% !important;
+    overflow: auto !important;
+    pointer-events: auto !important;
+}
+
+#chrome-extension-wrapper > * {
+    width: 100% !important;
 }
 
 #chrome-extension-sidebar {
-    height: 100vh !important;
+    position: relative !important;
+    height: 100% !important;
     background-color: white !important;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2) !important;
     z-index: 2147483647 !important;
@@ -25,15 +39,13 @@
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    transition: width 0.3s ease-in-out !important;
+    pointer-events: auto !important;
 }
 
 .sidebar-header {
     padding: 15px !important;
-    background-color: #f5f5f5 !important;
-    border-bottom: 1px solid #ddd !important;
+    background-color: #f8f9fa !important;
+    border-bottom: 1px solid #e9ecef !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -50,90 +62,131 @@
     font-weight: 500 !important;
 }
 
-.task-list {
+.chat-container {
+    flex: 1 1 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100% - 130px) !important;
+    background-color: #fff !important;
+}
+
+.chat-messages {
     flex: 1 1 auto !important;
     overflow-y: auto !important;
-    padding: 8px 0 !important;
-    scrollbar-width: thin !important;
-    scrollbar-color: #888 #f1f1f1 !important;
-}
-
-.task-list::-webkit-scrollbar {
-    width: 6px !important;
-}
-
-.task-list::-webkit-scrollbar-track {
-    background: #f1f1f1 !important;
-}
-
-.task-list::-webkit-scrollbar-thumb {
-    background: #888 !important;
-    border-radius: 3px !important;
-}
-
-.task-list::-webkit-scrollbar-thumb:hover {
-    background: #555 !important;
-}
-
-.task-item {
-    padding: 12px 16px !important;
+    padding: 16px !important;
     display: flex !important;
-    align-items: flex-start !important;
-    border-bottom: 1px solid #e9ecef !important;
+    flex-direction: column !important;
+    gap: 16px !important;
 }
 
-.task-checkbox {
-    width: 18px !important;
-    height: 18px !important;
-    border: 2px solid #adb5bd !important;
-    border-radius: 50% !important;
-    margin-right: 12px !important;
-    margin-top: 2px !important;
-    flex-shrink: 0 !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
+.message {
+    display: flex !important;
+    flex-direction: column !important;
+    max-width: 85% !important;
+    gap: 4px !important;
 }
 
-.task-checkbox:hover {
-    border-color: #0d6efd !important;
+.message.user {
+    align-self: flex-end !important;
 }
 
-.task-content {
-    flex-grow: 1 !important;
+.message.assistant {
+    align-self: flex-start !important;
 }
 
-.task-title {
-    margin: 0 !important;
-    color: #212529 !important;
+.message-content {
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
     font-size: 14px !important;
     line-height: 1.5 !important;
+    word-wrap: break-word !important;
 }
 
-.task-link {
-    color: #0d6efd !important;
-    font-size: 12px !important;
-    text-decoration: none !important;
-    display: block !important;
-    margin-top: 4px !important;
+.message.user .message-content {
+    background-color: #0d6efd !important;
+    color: white !important;
+    border-bottom-right-radius: 4px !important;
 }
 
-.task-link:hover {
-    text-decoration: underline !important;
+.message.assistant .message-content {
+    background-color: #f1f3f5 !important;
+    color: #212529 !important;
+    border-bottom-left-radius: 4px !important;
 }
 
-.completed-section {
-    padding: 16px !important;
-    border-top: 1px solid #e9ecef !important;
+.message-time {
+    font-size: 11px !important;
     color: #6c757d !important;
-    cursor: pointer !important;
-    background: #f8f9fa !important;
-    flex-shrink: 0 !important;
-    font-size: 14px !important;
-    user-select: none !important;
+    margin: 0 4px !important;
 }
 
-.completed-section:hover {
-    background: #e9ecef !important;
+.message.user .message-time {
+    align-self: flex-end !important;
+}
+
+.message.assistant .message-time {
+    align-self: flex-start !important;
+}
+
+.chat-input-container {
+    flex-shrink: 0 !important;
+    padding: 16px !important;
+    background-color: #fff !important;
+    border-top: 1px solid #e9ecef !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 1 !important;
+}
+
+.chat-input-wrapper {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: flex-end !important;
+}
+
+.chat-input {
+    flex: 1 !important;
+    min-height: 40px !important;
+    max-height: 120px !important;
+    padding: 8px 12px !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 20px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    resize: none !important;
+    outline: none !important;
+    font-family: inherit !important;
+    background-color: #f8f9fa !important;
+}
+
+.chat-input:focus {
+    border-color: #0d6efd !important;
+    background-color: #fff !important;
+}
+
+.send-button {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background-color: #0d6efd !important;
+    border: none !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.send-button:hover {
+    background-color: #0b5ed7 !important;
+}
+
+.send-button svg {
+    width: 20px !important;
+    height: 20px !important;
+    fill: currentColor !important;
 }
 
 #close-sidebar {
