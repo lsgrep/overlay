@@ -23,7 +23,7 @@ async function chatWithOllama(messages, tabId) {
             body: JSON.stringify({
                 model: MODEL,
                 messages: messages,
-                stream: true
+                stream:true
             })
         });
 
