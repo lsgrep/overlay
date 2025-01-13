@@ -1,4 +1,6 @@
-console.log('Content script loaded - v7');
+console.log('Content script loaded - v9');
+
+let chatWorker = null;
 
 function formatTime(date) {
     return date.toLocaleTimeString('en-US', { 
@@ -66,13 +68,20 @@ function createSidebar() {
     // Add sidebar content
     sidebar.innerHTML = `
         <div class="sidebar-header">
-            <h2>Chat Assistant</h2>
-            <button id="close-sidebar">×</button>
+            <h2>Local Chat</h2>
+            <div class="header-buttons">
+                <button id="reset-chat" title="Reset conversation">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    </svg>
+                </button>
+                <button id="close-sidebar">×</button>
+            </div>
         </div>
         <div class="chat-container">
             <div class="chat-messages">
                 <div class="message assistant">
-                    <div class="message-content">Hello! How can I help you today?</div>
+                    <div class="message-content">Hello! I'm your Llama2-powered AI assistant. How can I help you today?</div>
                     <div class="message-time">${formatTime(new Date())}</div>
                 </div>
             </div>
@@ -99,20 +108,33 @@ function createSidebar() {
     const sendButton = sidebar.querySelector('.send-button');
 
     // Function to send message
-    function sendMessage() {
+    async function sendMessage() {
         const text = chatInput.value.trim();
         if (text) {
             // Add user message
             chatMessages.appendChild(createMessageElement(text, true));
             chatInput.value = '';
+            chatInput.style.height = 'auto';
             scrollToBottom(chatMessages);
 
-            // Simulate assistant response
-            setTimeout(() => {
-                const response = "I'm a chat assistant. I can help you with various tasks. What would you like to know?";
-                chatMessages.appendChild(createMessageElement(response, false));
-                scrollToBottom(chatMessages);
-            }, 1000);
+            // Show typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant typing';
+            typingDiv.innerHTML = '<div class="message-content">Typing...</div>';
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom(chatMessages);
+
+            try {
+                // Send message to background script
+                chrome.runtime.sendMessage({
+                    action: 'chat',
+                    message: text
+                });
+            } catch (error) {
+                console.error('Error sending message:', error);
+                typingDiv.remove();
+                chatMessages.appendChild(createMessageElement('Error: Failed to send message', false));
+            }
         }
     }
 
@@ -130,6 +152,17 @@ function createSidebar() {
     chatInput.addEventListener('input', () => {
         chatInput.style.height = 'auto';
         chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+    });
+
+    // Reset chat button handler
+    document.getElementById('reset-chat').addEventListener('click', () => {
+        // Clear chat messages except the first one
+        while (chatMessages.childNodes.length > 1) {
+            chatMessages.removeChild(chatMessages.lastChild);
+        }
+        
+        // Reset conversation in background script
+        chrome.runtime.sendMessage({ action: 'resetChat' });
     });
 
     // Close button handler
@@ -156,9 +189,6 @@ function createSidebar() {
 
     // Set initial scroll position
     wrapper.scrollTop = window.scrollY;
-
-    // Set initial state
-    toggleSidebar(true);
 }
 
 function toggleSidebar(show) {
@@ -205,10 +235,52 @@ function initialize() {
 // Start initialization
 initialize();
 
-// Listen for toggle messages
+// Listen for messages from background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Message received:', request);
+    
     if (request.action === 'toggleSidebar') {
         toggleSidebar(request.state);
+    }
+    
+    const chatMessages = document.querySelector('.chat-messages');
+    if (!chatMessages) return;
+
+    if (request.action === 'chatStart') {
+        // Create a new message element for streaming response
+        const streamingMessage = createMessageElement('', false);
+        streamingMessage.classList.add('streaming');
+        chatMessages.appendChild(streamingMessage);
+        scrollToBottom(chatMessages);
+    }
+    
+    if (request.action === 'chatToken') {
+        // Update the streaming message content
+        const streamingMessage = chatMessages.querySelector('.streaming');
+        if (streamingMessage) {
+            const content = streamingMessage.querySelector('.message-content');
+            content.textContent += request.message;
+            scrollToBottom(chatMessages);
+        }
+    }
+    
+    if (request.action === 'chatComplete') {
+        // Remove streaming class from message
+        const streamingMessage = chatMessages.querySelector('.streaming');
+        if (streamingMessage) {
+            streamingMessage.classList.remove('streaming');
+        }
+    }
+    
+    if (request.action === 'chatError') {
+        // Remove any streaming message
+        const streamingMessage = chatMessages.querySelector('.streaming');
+        if (streamingMessage) {
+            streamingMessage.remove();
+        }
+        
+        // Add error message
+        chatMessages.appendChild(createMessageElement(request.message, false));
+        scrollToBottom(chatMessages);
     }
 });

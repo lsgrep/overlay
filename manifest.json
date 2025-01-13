@@ -2,16 +2,19 @@
   "manifest_version": 3,
   "name": "Sidebar Extension",
   "version": "1.0",
-  "description": "A simple sidebar extension",
+  "description": "A simple sidebar extension with Ollama chat",
   "permissions": [
     "activeTab",
-    "scripting"
+    "scripting",
+    "webRequest"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "*://localhost/*",
+    "*://127.0.0.1/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -24,5 +27,11 @@
   ],
   "action": {
     "default_title": "Toggle Sidebar"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["chat-worker.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

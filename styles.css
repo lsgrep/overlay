@@ -128,6 +128,33 @@
     align-self: flex-start !important;
 }
 
+.message.typing .message-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.message.typing .message-content::after {
+    content: "..." !important;
+    animation: typing 1.4s infinite !important;
+}
+
+@keyframes typing {
+    0%, 20% { content: "." !important; }
+    40% { content: ".." !important; }
+    60%, 100% { content: "..." !important; }
+}
+
+.message.streaming .message-content {
+    border-right: 2px solid #666 !important;
+    animation: blink 1s step-end infinite !important;
+}
+
+@keyframes blink {
+    0%, 100% { border-color: transparent !important; }
+    50% { border-color: #666 !important; }
+}
+
 .chat-input-container {
     flex-shrink: 0 !important;
     padding: 16px !important;
@@ -206,4 +233,32 @@
 
 #close-sidebar:hover {
     color: #333 !important;
+}
+
+.header-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+#reset-chat {
+    background: none !important;
+    border: none !important;
+    padding: 4px !important;
+    cursor: pointer !important;
+    color: #666 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    transition: background-color 0.2s ease !important;
+}
+
+#reset-chat:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: #333 !important;
+}
+
+#reset-chat svg {
+    fill: currentColor !important;
 }
