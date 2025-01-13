@@ -1,6 +1,5 @@
 console.log('Background script loaded');
 
-const MODEL = 'phi4';  // Using phi4 as it's more commonly available
 const API_URL = 'http://localhost:11434/api/chat';
 const SYSTEM_PROMPT = `You are a helpful AI assistant. You provide clear, accurate, and concise responses. Your answers should be:
 - Direct and to the point
@@ -12,6 +11,13 @@ const SYSTEM_PROMPT = `You are a helpful AI assistant. You provide clear, accura
 const tabConversations = new Map();
 
 let isVisible = false;
+let currentModel = 'phi4';  // Default model, but will be updated by user selection
+
+// Add function to update current model
+function updateCurrentModel(model) {
+    console.log('Updating current model to:', model);
+    currentModel = model;
+}
 
 async function chatWithOllama(messages, tabId) {
     try {
@@ -21,9 +27,9 @@ async function chatWithOllama(messages, tabId) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: MODEL,
+                model: currentModel, // Use the current selected model
                 messages: messages,
-                stream:true
+                stream: true
             })
         });
 
@@ -85,6 +91,23 @@ async function chatWithOllama(messages, tabId) {
             throw new Error('Could not connect to Ollama. Make sure Ollama is running with: ollama run phi4');
         }
         throw error;
+    }
+}
+
+async function fetchOllamaModels() {
+    try {
+        const response = await fetch('http://localhost:11434/v1/models', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        const data = await response.json();
+        console.log('Fetched models from Ollama:', data);
+        return data.data || [];
+    } catch (error) {
+        console.error('Error fetching Ollama models:', error);
+        return [];
     }
 }
 
@@ -173,5 +196,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
         
         return true;
+    }
+
+    if (request.action === 'fetchModels') {
+        fetchOllamaModels()
+            .then(models => {
+                console.log('Sending models to content script:', models);
+                sendResponse({ models: models });
+            })
+            .catch(error => {
+                console.error('Error in fetchModels:', error);
+                sendResponse({ models: [] });
+            });
+        return true; // Will respond asynchronously
+    }
+
+    if (request.action === 'updateModel') {
+        updateCurrentModel(request.model);
+        sendResponse({ success: true });
+        return false;
     }
 });

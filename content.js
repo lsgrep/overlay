@@ -32,6 +32,77 @@ function scrollToBottom(element) {
     element.scrollTop = element.scrollHeight;
 }
 
+async function fetchModels() {
+    try {
+        console.log('Requesting models from background script...');
+        // Send a message to the background script to fetch models
+        const response = await chrome.runtime.sendMessage({
+            action: 'fetchModels'
+        });
+        console.log('Received models from background:', response);
+        return response.models || [];
+    } catch (error) {
+        console.error('Error fetching models:', error);
+        return [];
+    }
+}
+
+function populateModelDropdown(models) {
+    console.log('Populating dropdown with models:', models);
+    const modelSelect = document.getElementById('modelSelect');
+    if (!modelSelect) {
+        console.error('Model select element not found');
+        return;
+    }
+
+    modelSelect.innerHTML = '';
+    
+    // Sort models alphabetically
+    models.sort((a, b) => a.id.localeCompare(b.id));
+    
+    models.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model.id;
+        // Clean up the model name for display (remove :latest if present)
+        const displayName = model.id.replace(':latest', '');
+        option.textContent = displayName;
+        modelSelect.appendChild(option);
+        console.log('Added model option:', displayName);
+    });
+
+    // Add event listener for model selection
+    modelSelect.addEventListener('change', async function() {
+        const selectedModel = this.value;
+        console.log('Selected model:', selectedModel);
+        localStorage.setItem('selectedModel', selectedModel);
+        
+        // Notify background script of model change
+        try {
+            await chrome.runtime.sendMessage({
+                action: 'updateModel',
+                model: selectedModel
+            });
+            console.log('Model updated in background script');
+        } catch (error) {
+            console.error('Error updating model in background:', error);
+        }
+    });
+
+    // Restore previously selected model if any
+    const savedModel = localStorage.getItem('selectedModel');
+    if (savedModel) {
+        modelSelect.value = savedModel;
+        console.log('Restored saved model:', savedModel);
+        // Also update the background script with the restored model
+        chrome.runtime.sendMessage({
+            action: 'updateModel',
+            model: savedModel
+        }).catch(error => {
+            console.error('Error updating restored model:', error);
+        });
+    }
+}
+
 function createSidebar() {
     console.log('Creating sidebar');
     
@@ -77,6 +148,11 @@ function createSidebar() {
                 </button>
                 <button id="close-sidebar">×</button>
             </div>
+        </div>
+        <div class="model-selector">
+            <select id="modelSelect" class="model-dropdown">
+                <option value="">Loading models...</option>
+            </select>
         </div>
         <div class="chat-container">
             <div class="chat-messages">
@@ -208,17 +284,17 @@ function toggleSidebar(show) {
 }
 
 // Initialize the sidebar
-function initialize() {
-    console.log('Initializing sidebar');
+async function initialize() {
+    console.log('Initializing sidebar...');
     if (document.body) {
-        createSidebar();
+        await setupSidebar();
         
         // Watch for dynamic content changes
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
+        const observer = new MutationObserver(async (mutations) => {
+            mutations.forEach(async (mutation) => {
                 if (mutation.type === 'childList' && !document.getElementById('chrome-extension-container')) {
                     console.log('Page content changed, reinitializing sidebar');
-                    createSidebar();
+                    await setupSidebar();
                 }
             });
         });
@@ -228,8 +304,19 @@ function initialize() {
             subtree: true
         });
     } else {
-        document.addEventListener('DOMContentLoaded', createSidebar);
+        document.addEventListener('DOMContentLoaded', setupSidebar);
     }
+}
+
+// Separate setup function to handle both initial creation and recreation
+async function setupSidebar() {
+    createSidebar();
+    
+    // Fetch and populate models
+    console.log('Fetching models after sidebar creation...');
+    const models = await fetchModels();
+    console.log('Models fetched, populating dropdown...', models);
+    populateModelDropdown(models);
 }
 
 // Start initialization

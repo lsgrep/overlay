@@ -262,3 +262,28 @@
 #reset-chat svg {
     fill: currentColor !important;
 }
+
+.model-selector {
+    padding: 10px 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.model-dropdown {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+}
+
+.model-dropdown:hover {
+    border-color: #888;
+}
+
+.model-dropdown:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
