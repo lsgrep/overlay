@@ -76,6 +76,13 @@ function populateModelDropdown(models) {
         console.log('Selected model:', selectedModel);
         localStorage.setItem('selectedModel', selectedModel);
         
+        // Add system message about model change
+        const chatMessages = document.querySelector('.chat-messages');
+        const message = createMessageElement(`Switched to ${selectedModel} model`, false);
+        message.classList.add('system-message');
+        chatMessages.appendChild(message);
+        scrollToBottom(chatMessages);
+        
         // Notify background script of model change
         try {
             await chrome.runtime.sendMessage({
@@ -180,7 +187,7 @@ function createSidebar() {
         <div class="chat-container">
             <div class="chat-messages">
                 <div class="message assistant">
-                    <div class="message-content">Hello! I'm your Llama2-powered AI assistant. How can I help you today?</div>
+                    <div class="message-content">Hello! I'm your Phi-powered AI assistant. How can I help you today?</div>
                     <div class="message-time">${formatTime(new Date())}</div>
                 </div>
             </div>

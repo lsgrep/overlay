@@ -94,6 +94,20 @@
     align-self: flex-start !important;
 }
 
+.message.system-message {
+    align-self: center !important;
+    max-width: 100% !important;
+}
+
+.message.system-message .message-content {
+    background-color: #e9ecef !important;
+    color: #6c757d !important;
+    font-style: italic !important;
+    padding: 4px 12px !important;
+    border-radius: 16px !important;
+    font-size: 12px !important;
+}
+
 .message-content {
     padding: 8px 12px !important;
     border-radius: 12px !important;
