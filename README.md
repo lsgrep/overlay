@@ -21,7 +21,7 @@ A Chrome extension that adds a chat sidebar powered by [Ollama](https://ollama.a
 
 1. Clone this repository:
    ```bash
-   git clone [your-repo-url]
+   git clone git@github.com:lsgrep/chrome-extension-ollama-chat.git
    ```
 
 2. Load the extension in Chrome:
