@@ -232,6 +232,16 @@ function createSidebar() {
             scrollToBottom(chatMessages);
 
             try {
+                // Get page content and update context
+                const pageContent = getPageContent();
+                await updateContext(pageContent);
+                
+                // Add context notification
+                const contextMessage = createMessageElement('Page content added as context.', false);
+                contextMessage.classList.add('system-message');
+                chatMessages.appendChild(contextMessage);
+                scrollToBottom(chatMessages);
+
                 // Send message to background script
                 chrome.runtime.sendMessage({
                     action: 'chat',
@@ -373,6 +383,20 @@ async function initialize() {
 async function setupSidebar() {
     createSidebar();
     
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .system-message {
+            opacity: 0.7;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+        .system-message .message-content {
+            color: #666;
+        }
+    `;
+    document.head.appendChild(style);
+
     // Fetch and populate models
     console.log('Fetching models after sidebar creation...');
     const models = await fetchModels();
