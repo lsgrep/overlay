@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Sidebar Extension",
+  "name": "Local Ollama Chat",
   "version": "1.0",
   "description": "A simple sidebar extension with Ollama chat",
   "permissions": [
@@ -30,6 +30,7 @@
   },
   "web_accessible_resources": [
     {
+      "resources": [],
       "matches": ["<all_urls>"]
     }
   ]
