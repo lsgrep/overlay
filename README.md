@@ -32,7 +32,7 @@ A Chrome extension that adds a chat sidebar powered by [Ollama](https://ollama.a
 
 3. Make sure Ollama is running with your desired model:
    ```bash
-   ollama run phi4
+    OLLAMA_ORIGINS=chrome-extension://* ollama serve
    ```
 
 ## Usage
@@ -70,8 +70,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - Built with [Ollama](https://ollama.ai/)
 - Inspired by the need for private, local AI chat interactions
-
-Start the server with the following command
-
-```
-OLLAMA_ORIGINS=chrome-extension://* ollama serve
