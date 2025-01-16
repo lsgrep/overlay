@@ -2,7 +2,7 @@
 
 A Chrome extension that adds a chat sidebar powered by [Ollama](https://ollama.ai/), allowing you to interact with AI models locally while browsing the web.
 
-![Local Ollama Chat Screenshot](https://raw.githubusercontent.com/lsgrep/chrome-extension-ollama-chat/refs/heads/main/screenshot.png?token=GHSAT0AAAAAACQJXM2YUBAWAJFX2TBVE5SUZ4HZLTQ)
+![Local Ollama Chat Screenshot](https://raw.githubusercontent.com/lsgrep/chrome-extension-ollama-chat/refs/heads/main/screenshot.png)
 
 ## Features
 
