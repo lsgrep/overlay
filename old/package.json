@@ -1,0 +1,6 @@
+{
+  "name": "chrome-extension-chat",
+  "version": "1.0.0",
+  "description": "Chrome extension with Ollama chat integration",
+  "type": "module"
+}
