@@ -9,7 +9,7 @@ const tabConversations = new Map<number, Array<{ role: string; content: string }
 const tabContexts = new Map<number, string>();
 
 let isVisible = false;
-export let currentModel = 'phi4';  // Default model, but will be updated by user selection
+let currentModel = 'phi4';  // Default model
 
 // Add function to update current model
 function updateCurrentModel(model: string) {

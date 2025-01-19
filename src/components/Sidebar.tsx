@@ -14,7 +14,7 @@ interface Model {
 export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
   const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
   const [models, setModels] = useState<Model[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [selectedModel, setSelectedModel] = useState<string>('phi4');
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [currentResponse, setCurrentResponse] = useState('');
