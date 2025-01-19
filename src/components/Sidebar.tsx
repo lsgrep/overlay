@@ -166,7 +166,7 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
   };
 
   return (
-    <div id="chrome-extension-sidebar">
+    <div id="chrome-extension-sidebar" className={isVisible ? 'visible' : ''}>
       <div className="sidebar-header">
         <h2>Local Chat</h2>
         <div className="header-buttons">
