@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './Sidebar.css';
 import { getPageContent } from '../main';
+import ReactMarkdown from 'react-markdown';
 
 interface SidebarProps {
   isVisible: boolean;
@@ -57,20 +58,6 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
-    }
-  };
-
-  const fetchModels = async () => {
-    try {
-      console.log('Requesting models from background script...');
-      const response = await chrome.runtime.sendMessage({
-        action: 'fetchModels'
-      });
-      console.log('Received models from background:', response);
-      return response.models || [];
-    } catch (error) {
-      console.error('Error fetching models:', error);
-      return [];
     }
   };
 
@@ -164,6 +151,20 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     });
   }, []);
 
+  const fetchModels = async () => {
+    try {
+      console.log('Requesting models from background script...');
+      const response = await chrome.runtime.sendMessage({
+        action: 'fetchModels'
+      });
+      console.log('Received models from background:', response);
+      return response.models || [];
+    } catch (error) {
+      console.error('Error fetching models:', error);
+      return [];
+    }
+  };
+
   return (
     <div id="chrome-extension-sidebar">
       <div className="sidebar-header">
@@ -205,7 +206,9 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
       <div className="chat-messages" ref={chatMessagesRef}>
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.role === 'user' ? 'user' : msg.role === 'assistant' ? 'assistant' : 'system'}`}>
-            <div className="message-content">{msg.content}</div>
+            <div className="message-content">
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            </div>
             <div className="message-time">
               {new Date().toLocaleTimeString('en-US', { 
                 hour: 'numeric', 
@@ -217,7 +220,9 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
         ))}
         {isTyping && currentResponse && (
           <div className="message assistant">
-            <div className="message-content">{currentResponse}</div>
+            <div className="message-content">
+              <ReactMarkdown>{currentResponse}</ReactMarkdown>
+            </div>
           </div>
         )}
       </div>
