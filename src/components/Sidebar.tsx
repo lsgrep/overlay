@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import './Sidebar.css';
 
+interface Model {
+  id: string;
+}
+
 interface SidebarProps {
   isVisible: boolean;
   onClose: () => void;
@@ -8,6 +12,8 @@ interface SidebarProps {
 
 export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
   const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
+  const [models, setModels] = useState<Model[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string>('');
   const chatMessagesRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState('');
 
@@ -31,6 +37,59 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
       handleSendMessage();
     }
   };
+
+  const fetchModels = async () => {
+    try {
+      console.log('Requesting models from background script...');
+      const response = await chrome.runtime.sendMessage({
+        action: 'fetchModels'
+      });
+      console.log('Received models from background:', response);
+      return response.models || [];
+    } catch (error) {
+      console.error('Error fetching models:', error);
+      return [];
+    }
+  };
+
+  const handleModelChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedModel = event.target.value;
+    console.log('Selected model:', selectedModel);
+    localStorage.setItem('selectedModel', selectedModel);
+    setSelectedModel(selectedModel);
+    
+    // Add system message about model change
+    setMessages(prev => [...prev, { 
+      text: `Switched to ${selectedModel} model`, 
+      isUser: false 
+    }]);
+    
+    // Notify background script of model change
+    try {
+      await chrome.runtime.sendMessage({
+        action: 'updateModel',
+        model: selectedModel
+      });
+      console.log('Model updated in background script');
+    } catch (error) {
+      console.error('Error updating model in background:', error);
+    }
+  };
+
+  // Fetch models on mount
+  useEffect(() => {
+    const loadModels = async () => {
+      const fetchedModels = await fetchModels();
+      setModels(fetchedModels);
+      
+      // Restore previously selected model if any
+      const savedModel = localStorage.getItem('selectedModel');
+      if (savedModel) {
+        setSelectedModel(savedModel);
+      }
+    };
+    loadModels();
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -61,6 +120,25 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
           </button>
           <button onClick={onClose}>×</button>
         </div>
+      </div>
+      
+      <div className="model-selector">
+        <select 
+          id="modelSelect" 
+          className="model-dropdown"
+          value={selectedModel}
+          onChange={handleModelChange}
+        >
+          {models.length === 0 ? (
+            <option value="">Loading models...</option>
+          ) : (
+            models.map(model => (
+              <option key={model.id} value={model.id}>
+                {model.id.replace(':latest', '')}
+              </option>
+            ))
+          )}
+        </select>
       </div>
       
       <div className="chat-messages" ref={chatMessagesRef}>
