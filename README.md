@@ -92,4 +92,6 @@ The extension will be rebuilt automatically when you make changes.
 
 ## License
 
-MIT License - feel free to use and modify as needed!
+[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)
+
+This project is licensed under the WTFPL - Do What the Fuck You Want to Public License. See the [LICENSE](LICENSE) file for details.
