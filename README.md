@@ -2,6 +2,8 @@
 
 A Chrome extension that adds a sleek sidebar interface for chatting with local LLMs using Ollama. Built with React, TypeScript, and Vite.
 
+![Overlay Sidebar Screenshot](https://raw.githubusercontent.com/lsgrep/chrome-extension-ollama-chat/refs/heads/master/screenshot.png)
+
 ## Features
 
 - 🚀 Smooth sidebar integration with any webpage
@@ -23,7 +25,6 @@ A Chrome extension that adds a sleek sidebar interface for chatting with local L
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd overlay
 ```
 
 2. Install dependencies:
@@ -41,6 +42,16 @@ npm run build
    - Enable "Developer mode"
    - Click "Load unpacked"
    - Select the `dist` directory from the project
+
+5. Start Ollama with CORS enabled:
+```bash
+OLLAMA_ORIGINS=chrome-extension://* ollama serve
+```
+
+6. Pull a model (if you haven't already):
+```bash
+ollama pull phi4
+```
 
 ## Development
 
