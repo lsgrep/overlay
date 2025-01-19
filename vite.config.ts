@@ -5,5 +5,20 @@ import manifest from './manifest.json'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), crx({ manifest })],
+  plugins: [
+    react(),
+    crx({ manifest }),
+  ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'src/main.tsx',
+      },
+      output: {
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]'
+      }
+    }
+  }
 })

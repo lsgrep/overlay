@@ -1,6 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "CRXJS React Vite Example",
+  "name": "Overlay Sidebar Extension",
   "version": "1.0.0",
-  "action": { "default_popup": "index.html" }
+  "description": "A sidebar overlay extension",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "src/background.tsx"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/main.tsx"]
+    }
+  ],
+  "action": {
+    "default_title": "Toggle Sidebar"
+  }
 }

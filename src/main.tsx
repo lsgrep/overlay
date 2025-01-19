@@ -1,10 +1,15 @@
-import { StrictMode } from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
+import App from './App'
 import './index.css'
-import App from './App.tsx'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+// Create root element and append to body
+const root = document.createElement('div');
+root.id = 'crx-root';
+document.body.appendChild(root);
+
+createRoot(root).render(
+  <React.StrictMode>
     <App />
-  </StrictMode>,
+  </React.StrictMode>,
 )

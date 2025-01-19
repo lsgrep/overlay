@@ -1,8 +1,6 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+#crx-root {
+  position: relative;
+  z-index: 2147483645;
 }
 
 .logo {
@@ -42,4 +40,29 @@
 
 .read-the-docs {
   color: #64748b;
+}
+
+.app-container {
+  padding: 1rem;
+}
+
+.toggle-sidebar-btn {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  z-index: 2147483645;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  color: #1a365d;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: #f8fafc;
+  border-color: #0066cc;
 }
