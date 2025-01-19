@@ -1,22 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import './Sidebar.css';
 
-interface Model {
-  id: string;
-}
-
-interface Message {
-  role: string;
-  content: string;
-}
-
 interface SidebarProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
+interface Model {
+  id: string;
+}
+
 export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
-  const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('');
   const [inputValue, setInputValue] = useState('');
@@ -30,43 +25,71 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     }
   };
 
-  const handleSendMessage = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!inputValue.trim()) return;
 
-    const userMessage = inputValue;
+    // Get current page content from the actual webpage, not our extension
+    const getPageContent = () => {
+      // Get the article content if it exists
+      const article = document.querySelector('article');
+      if (article) return article.textContent || '';
+
+      // Get the main content if it exists
+      const main = document.querySelector('main');
+      if (main) return main.textContent || '';
+
+      // Get all paragraph text if no article/main
+      const paragraphs = Array.from(document.querySelectorAll('p'));
+      if (paragraphs.length > 0) {
+        return paragraphs.map(p => p.textContent).join('\n');
+      }
+
+      // Fallback to body text, excluding scripts and styles
+      const body = document.body;
+      const clone = body.cloneNode(true) as HTMLElement;
+      
+      // Remove our extension's elements
+      const extensionEl = clone.querySelector('#chrome-extension-container');
+      if (extensionEl) {
+        extensionEl.remove();
+      }
+      
+      // Remove scripts and styles
+      const scripts = clone.getElementsByTagName('script');
+      const styles = clone.getElementsByTagName('style');
+      while (scripts[0]) scripts[0].parentNode?.removeChild(scripts[0]);
+      while (styles[0]) styles[0].parentNode?.removeChild(styles[0]);
+      
+      return clone.textContent || '';
+    };
+
+    const content = getPageContent();
+    chrome.runtime.sendMessage({ 
+      action: 'updateContext', 
+      context: content 
+    });
+
+    const newMessage = { role: 'user', content: inputValue };
+    setMessages(prev => [...prev, newMessage]);
     setInputValue('');
-    setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
+    setIsTyping(true);
 
     try {
-      // Convert messages to Ollama format
-      const ollamaMessages: Message[] = [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        ...messages.map(msg => ({
-          role: msg.isUser ? 'user' : 'assistant',
-          content: msg.text
-        })),
-        { role: 'user', content: userMessage }
-      ];
-
-      // Send chat request
       chrome.runtime.sendMessage({
         action: 'chat',
-        messages: ollamaMessages
+        messages: [...messages, newMessage]
       });
-
     } catch (error) {
       console.error('Error sending message:', error);
-      setMessages(prev => [...prev, { 
-        text: 'Error: Failed to send message. Please try again.', 
-        isUser: false 
-      }]);
+      setIsTyping(false);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSubmit(e);
     }
   };
 
@@ -91,10 +114,11 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     setSelectedModel(selectedModel);
     
     // Add system message about model change
-    setMessages(prev => [...prev, { 
-      text: `Switched to ${selectedModel} model`, 
-      isUser: false 
-    }]);
+    const systemMessage = { 
+      role: 'system', 
+      content: `Switched to ${selectedModel} model` 
+    };
+    setMessages(prev => [...prev, systemMessage]);
     
     // Notify background script of model change
     try {
@@ -120,12 +144,12 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
       }
       else if (message.action === 'chatComplete') {
         setIsTyping(false);
-        setMessages(prev => [...prev, { text: message.message, isUser: false }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: message.message }]);
         setCurrentResponse('');
       }
       else if (message.action === 'chatError') {
         setIsTyping(false);
-        setMessages(prev => [...prev, { text: `Error: ${message.error}`, isUser: false }]);
+        setMessages(prev => [...prev, { role: 'system', content: `Error: ${message.error}` }]);
         setCurrentResponse('');
       }
     };
@@ -168,10 +192,7 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
   useEffect(() => {
     chrome.runtime.sendMessage({ action: 'getHistory' }, (response) => {
       if (response?.history) {
-        setMessages(response.history.map((msg: Message) => ({
-          text: msg.content,
-          isUser: msg.role === 'user'
-        })));
+        setMessages(response.history);
       }
     });
   }, []);
@@ -216,8 +237,8 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
       
       <div className="chat-messages" ref={chatMessagesRef}>
         {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.isUser ? 'user' : 'assistant'}`}>
-            <div className="message-content">{msg.text}</div>
+          <div key={index} className={`message ${msg.role === 'user' ? 'user' : msg.role === 'assistant' ? 'assistant' : 'system'}`}>
+            <div className="message-content">{msg.content}</div>
             <div className="message-time">
               {new Date().toLocaleTimeString('en-US', { 
                 hour: 'numeric', 
@@ -235,22 +256,24 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
       </div>
 
       <div className="chat-input-container">
-        <textarea
-          className="chat-input"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
-        />
-        <button 
-          className="send-button" 
-          onClick={handleSendMessage}
-          disabled={!inputValue.trim()}
-        >
-          <svg viewBox="0 0 24 24" width="24" height="24">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-        </button>
+        <form onSubmit={handleSubmit}>
+          <textarea
+            className="chat-input"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message..."
+          />
+          <button 
+            className="send-button" 
+            type="submit"
+            disabled={!inputValue.trim()}
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -125,58 +125,65 @@
 }
 
 .chat-input-container {
-    padding: 16px !important;
-    background-color: #ffffff !important;
-    border-top: 1px solid #e2e8f0 !important;
-    display: flex !important;
-    gap: 8px !important;
-    align-items: flex-end !important;
+  padding: 10px;
+  border-top: 1px solid #e0e0e0;
+  background: white;
+}
+
+.chat-input-container form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .chat-input {
-    flex: 1 !important;
-    min-height: 40px !important;
-    max-height: 120px !important;
-    padding: 8px 12px !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-    resize: none !important;
-    overflow-y: auto !important;
-    font-family: inherit !important;
-    background-color: #ffffff !important;
-    color: #1a365d !important;
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px;
+  resize: none;
+  min-height: 40px;
+  max-height: 120px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: inherit !important;
+  background-color: #ffffff !important;
+  color: #1a365d !important;
 }
 
 .chat-input:focus {
-    border-color: #0066cc !important;
-    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2) !important;
-    outline: none !important;
+  border-color: #0066cc !important;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2) !important;
+  outline: none !important;
 }
 
 .send-button {
-    background: none !important;
-    border: none !important;
-    padding: 8px !important;
-    cursor: pointer !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 4px !important;
+  background: #1a73e8;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
 }
 
 .send-button:hover {
-    background-color: #e9ecef !important;
+  background: #1557b0;
 }
 
 .send-button:disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 .send-button svg {
-    fill: #0066cc !important;
+  fill: white;
+  width: 24px;
+  height: 24px;
 }
 
 .model-selector {
