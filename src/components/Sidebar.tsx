@@ -5,6 +5,11 @@ interface Model {
   id: string;
 }
 
+interface Message {
+  role: string;
+  content: string;
+}
+
 interface SidebarProps {
   isVisible: boolean;
   onClose: () => void;
@@ -14,8 +19,10 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
   const [messages, setMessages] = useState<Array<{ text: string; isUser: boolean }>>([]);
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('');
-  const chatMessagesRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentResponse, setCurrentResponse] = useState('');
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     if (chatMessagesRef.current) {
@@ -23,11 +30,36 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     }
   };
 
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      setMessages(prev => [...prev, { text: inputValue, isUser: true }]);
-      setInputValue('');
-      // TODO: Add API call to handle chat response
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage = inputValue;
+    setInputValue('');
+    setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
+
+    try {
+      // Convert messages to Ollama format
+      const ollamaMessages: Message[] = [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        ...messages.map(msg => ({
+          role: msg.isUser ? 'user' : 'assistant',
+          content: msg.text
+        })),
+        { role: 'user', content: userMessage }
+      ];
+
+      // Send chat request
+      chrome.runtime.sendMessage({
+        action: 'chat',
+        messages: ollamaMessages
+      });
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setMessages(prev => [...prev, { 
+        text: 'Error: Failed to send message. Please try again.', 
+        isUser: false 
+      }]);
     }
   };
 
@@ -76,6 +108,34 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     }
   };
 
+  // Handle chat messages from background script
+  useEffect(() => {
+    const messageListener = (message: any) => {
+      if (message.action === 'chatStart') {
+        setIsTyping(true);
+        setCurrentResponse('');
+      }
+      else if (message.action === 'chatToken') {
+        setCurrentResponse(prev => prev + message.message);
+      }
+      else if (message.action === 'chatComplete') {
+        setIsTyping(false);
+        setMessages(prev => [...prev, { text: message.message, isUser: false }]);
+        setCurrentResponse('');
+      }
+      else if (message.action === 'chatError') {
+        setIsTyping(false);
+        setMessages(prev => [...prev, { text: `Error: ${message.error}`, isUser: false }]);
+        setCurrentResponse('');
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(messageListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []);
+
   // Fetch models on mount
   useEffect(() => {
     const loadModels = async () => {
@@ -91,9 +151,10 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     loadModels();
   }, []);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, currentResponse]);
 
   // Update body margin when sidebar visibility changes
   useEffect(() => {
@@ -102,6 +163,18 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
       document.body.style.marginRight = '0';
     };
   }, [isVisible]);
+
+  // Load conversation history
+  useEffect(() => {
+    chrome.runtime.sendMessage({ action: 'getHistory' }, (response) => {
+      if (response?.history) {
+        setMessages(response.history.map((msg: Message) => ({
+          text: msg.content,
+          isUser: msg.role === 'user'
+        })));
+      }
+    });
+  }, []);
 
   return (
     <div id="chrome-extension-sidebar">
@@ -134,7 +207,7 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
           ) : (
             models.map(model => (
               <option key={model.id} value={model.id}>
-                {model.id.replace(':latest', '')}
+                {model.id}
               </option>
             ))
           )}
@@ -154,6 +227,11 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
             </div>
           </div>
         ))}
+        {isTyping && currentResponse && (
+          <div className="message assistant">
+            <div className="message-content">{currentResponse}</div>
+          </div>
+        )}
       </div>
 
       <div className="chat-input-container">
