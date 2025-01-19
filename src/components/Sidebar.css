@@ -13,7 +13,7 @@
 }
 
 #chrome-extension-container.sidebar-visible {
-    grid-template-columns: 1fr 300px !important;
+    grid-template-columns: 1fr 400px !important;
 }
 
 #chrome-extension-wrapper {
@@ -28,7 +28,7 @@
     top: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
-    width: 320px !important;
+    width: 400px !important;
     background: #fff !important;
     border-left: 1px solid #e9ecef !important;
     display: flex !important;
