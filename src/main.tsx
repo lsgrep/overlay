@@ -4,7 +4,7 @@ import App from './App'
 import './index.css'
 
 // Function to get the main content of the page
-function getPageContent() {
+export function getPageContent() {
   // Get the article content if it exists
   const article = document.querySelector('article');
   if (article) return article.textContent || '';
@@ -63,6 +63,13 @@ createRoot(root).render(
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === 'toggleSidebar') {
+    const content = getPageContent();
+    // Send the page content as context
+    chrome.runtime.sendMessage({ 
+      action: 'updateContext', 
+      context: content 
+    });
+  } else if (message.action === 'getPageContent') {
     const content = getPageContent();
     // Send the page content as context
     chrome.runtime.sendMessage({ 

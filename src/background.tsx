@@ -234,3 +234,15 @@ chrome.action.onClicked.addListener(async (tab: chrome.tabs.Tab) => {
         }
     }
 });
+
+// Handle tab activation to update context
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    try {
+        // Request content update from the new active tab
+        await chrome.tabs.sendMessage(activeInfo.tabId, { 
+            action: 'getPageContent' 
+        });
+    } catch (error) {
+        console.error('Error requesting page content:', error);
+    }
+});

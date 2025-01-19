@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './Sidebar.css';
+import { getPageContent } from '../main';
 
 interface SidebarProps {
   isVisible: boolean;
@@ -29,41 +30,7 @@ export const Sidebar = ({ isVisible, onClose }: SidebarProps) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
 
-    // Get current page content from the actual webpage, not our extension
-    const getPageContent = () => {
-      // Get the article content if it exists
-      const article = document.querySelector('article');
-      if (article) return article.textContent || '';
-
-      // Get the main content if it exists
-      const main = document.querySelector('main');
-      if (main) return main.textContent || '';
-
-      // Get all paragraph text if no article/main
-      const paragraphs = Array.from(document.querySelectorAll('p'));
-      if (paragraphs.length > 0) {
-        return paragraphs.map(p => p.textContent).join('\n');
-      }
-
-      // Fallback to body text, excluding scripts and styles
-      const body = document.body;
-      const clone = body.cloneNode(true) as HTMLElement;
-      
-      // Remove our extension's elements
-      const extensionEl = clone.querySelector('#chrome-extension-container');
-      if (extensionEl) {
-        extensionEl.remove();
-      }
-      
-      // Remove scripts and styles
-      const scripts = clone.getElementsByTagName('script');
-      const styles = clone.getElementsByTagName('style');
-      while (scripts[0]) scripts[0].parentNode?.removeChild(scripts[0]);
-      while (styles[0]) styles[0].parentNode?.removeChild(styles[0]);
-      
-      return clone.textContent || '';
-    };
-
+    // Get current page content before sending each message
     const content = getPageContent();
     chrome.runtime.sendMessage({ 
       action: 'updateContext', 
