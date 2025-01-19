@@ -10,7 +10,6 @@
     grid-template-columns: 1fr 0 !important;
     transition: grid-template-columns 0.3s ease-in-out !important;
     z-index: 2147483646 !important;
-    pointer-events: none !important;
 }
 
 #chrome-extension-container.sidebar-visible {
@@ -18,28 +17,20 @@
 }
 
 #chrome-extension-wrapper {
-    position: relative !important;
+    min-height: 100vh !important;
     width: 100% !important;
-    height: 100% !important;
-    overflow: auto !important;
-    pointer-events: auto !important;
-}
-
-#chrome-extension-wrapper > * {
-    width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
 }
 
 #chrome-extension-sidebar {
-    position: relative !important;
-    height: 100% !important;
-    background-color: #ffffff !important;
+    height: 100vh !important;
+    background: white !important;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2) !important;
-    z-index: 2147483647 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
     display: flex !important;
     flex-direction: column !important;
-    overflow: hidden !important;
-    pointer-events: auto !important;
+    z-index: 2147483647 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
 }
 
 .sidebar-header {
@@ -85,12 +76,6 @@
 
 .header-buttons button:hover svg {
     fill: #1a365d !important;
-}
-
-#close-sidebar {
-    font-size: 24px !important;
-    line-height: 1 !important;
-    color: #64748b !important;
 }
 
 .chat-messages {
@@ -140,17 +125,16 @@
 }
 
 .chat-input-container {
-    flex-shrink: 0 !important;
     padding: 16px !important;
     background-color: #ffffff !important;
     border-top: 1px solid #e2e8f0 !important;
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 1 !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: flex-end !important;
 }
 
 .chat-input {
-    width: 100% !important;
+    flex: 1 !important;
     min-height: 40px !important;
     max-height: 120px !important;
     padding: 8px 12px !important;
@@ -169,4 +153,28 @@
     border-color: #0066cc !important;
     box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2) !important;
     outline: none !important;
+}
+
+.send-button {
+    background: none !important;
+    border: none !important;
+    padding: 8px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+}
+
+.send-button:hover {
+    background-color: #e9ecef !important;
+}
+
+.send-button:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+.send-button svg {
+    fill: #0066cc !important;
 }
