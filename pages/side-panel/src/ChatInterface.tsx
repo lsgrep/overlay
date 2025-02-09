@@ -9,14 +9,12 @@ interface Message {
 interface ChatInterfaceProps {
   selectedModel: string;
   isLight: boolean;
-  title?: string;
-  url?: string;
-  pageContent?: string;
+  mode: 'interactive' | 'conversational';
 }
 
 const API_URL = 'http://localhost:11434/api/chat';
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, title, url, pageContent }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, mode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,22 +36,43 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
     // Create the display message (without page content)
     const displayMessage: Message = { role: 'user', content: input };
     setMessages(prev => [...prev, displayMessage]);
-
-    // Create the full context for Ollama (including page content)
-    let context = '';
-    if (title || url) {
-      context += `Current page: ${title || ''} ${url ? `(${url})` : ''}\n\n`;
-    }
-    if (pageContent) {
-      context += `Page content:\n${pageContent}\n\n`;
-    }
-    // Send the full context to Ollama
-    const userMessage: Message = { role: 'user', content: `${context}${input}` };
     setInput('');
     setIsLoading(true);
     setError(null);
 
     try {
+      // Get current tab and its content
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      let currentContent = '';
+      if (tab?.id) {
+        const [result] = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => document.body.innerText,
+        });
+        if (result?.result) {
+          currentContent = result.result;
+        }
+      }
+
+      // Create the full context for Ollama
+      let context = '';
+      if (tab?.title || tab?.url) {
+        context += `Current page: ${tab.title || ''} ${tab.url ? `(${tab.url})` : ''}\n\n`;
+      }
+      if (currentContent) {
+        context += `Page content:\n${currentContent}\n\n`;
+      }
+
+      // Add mode-specific context
+      if (mode === 'interactive') {
+        context += `You are in interactive mode. You can help manipulate and interact with the page. Feel free to suggest actions like clicking buttons, filling forms, or navigating.\n\n`;
+      } else {
+        context += `You are in conversational mode. Please focus on answering questions about the page content without suggesting interactive actions.\n\n`;
+      }
+
+      // Send the full context to Ollama
+      const userMessage: Message = { role: 'user', content: `${context}${input}` };
+
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {

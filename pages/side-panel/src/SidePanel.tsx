@@ -19,41 +19,14 @@ interface OllamaResponse {
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
-  const [url, setUrl] = useState('');
-  const [title, setTitle] = useState('');
-  const [pageContent, setPageContent] = useState('');
+
   const [models, setModels] = useState<OllamaModel[]>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
 
   useEffect(() => {
-    // Get current tab info
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      if (tabs[0]) {
-        const tab = tabs[0];
-        setUrl(tab.url || '');
-        setTitle(tab.title || '');
-
-        // Get page content
-        if (tab.id) {
-          chrome.scripting
-            .executeScript({
-              target: { tabId: tab.id },
-              func: () => document.body.innerText,
-            })
-            .then(result => {
-              if (result && result[0] && result[0].result) {
-                setPageContent(result[0].result);
-              }
-            })
-            .catch(error => {
-              console.error('Error getting page content:', error);
-            });
-        }
-      }
-    });
-
     // Fetch Ollama models
     const fetchModels = async () => {
       try {
@@ -83,41 +56,54 @@ const SidePanel = () => {
           <ThemeToggle />
         </div>
 
-        <div className="flex items-center space-x-2">
-          <select
-            value={selectedModel}
-            onChange={e => setSelectedModel(e.target.value)}
-            disabled={loading}
-            className={`flex-1 p-2 rounded border ${isLight ? 'bg-white border-gray-200 text-gray-900' : 'bg-gray-700 border-gray-600 text-white'}`}>
-            {loading ? (
-              <option>Loading models...</option>
-            ) : error ? (
-              <option>Error loading models</option>
-            ) : (
-              models.map(model => (
-                <option key={model.id} value={model.id}>
-                  {model.id}
-                </option>
-              ))
-            )}
-          </select>
-          <button
-            onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
-            className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
-            title="Browse Ollama Models">
-            📚
-          </button>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center space-x-2">
+            <select
+              value={selectedModel}
+              onChange={e => setSelectedModel(e.target.value)}
+              disabled={loading}
+              className={`flex-1 p-2 rounded border ${isLight ? 'bg-white border-gray-200 text-gray-900' : 'bg-gray-700 border-gray-600 text-white'}`}>
+              {loading ? (
+                <option>Loading models...</option>
+              ) : error ? (
+                <option>Error loading models</option>
+              ) : (
+                models.map(model => (
+                  <option key={model.id} value={model.id}>
+                    {model.id}
+                  </option>
+                ))
+              )}
+            </select>
+            <button
+              onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
+              className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
+              title="Browse Ollama Models">
+              📚
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <span className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>Mode:</span>
+            <div
+              className={`flex items-center gap-2 p-1 rounded-lg border ${isLight ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'}`}>
+              <button
+                onClick={() => setMode('conversational')}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? (isLight ? 'bg-white shadow-sm' : 'bg-gray-700') : ''}`}>
+                Conversational
+              </button>
+              <button
+                onClick={() => setMode('interactive')}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? (isLight ? 'bg-white shadow-sm' : 'bg-gray-700') : ''}`}>
+                Interactive
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
       <div className="flex-1 overflow-hidden">
-        <ChatInterface
-          selectedModel={selectedModel}
-          isLight={isLight}
-          title={title}
-          url={url}
-          pageContent={pageContent}
-        />
+        <ChatInterface selectedModel={selectedModel} isLight={isLight} mode={mode} />
       </div>
     </div>
   );
