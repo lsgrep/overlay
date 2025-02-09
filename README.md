@@ -61,6 +61,10 @@ overlay2/
 - pnpm
 - Chrome browser
 
+
+## Based on
+- [Chrome Extension Boilerplate](https://github.com/lsgrep/chrome-extension-boilerplate)
+
 ## License
 
 MIT
