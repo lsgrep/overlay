@@ -6,6 +6,20 @@ interface Message {
   content: string;
 }
 
+interface TaskStep {
+  description: string;
+  action: 'click' | 'type' | 'navigate' | 'wait' | 'extract';
+  target?: string;
+  value?: string;
+  selector?: string;
+}
+
+interface TaskPlan {
+  goal: string;
+  steps: TaskStep[];
+  estimated_time: string;
+}
+
 interface ChatInterfaceProps {
   selectedModel: string;
   isLight: boolean;
@@ -63,26 +77,48 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
         context += `Page content:\n${currentContent}\n\n`;
       }
 
-      // Add mode-specific context
+      // Add mode-specific context and format
+      let requestBody: any = {
+        model: selectedModel,
+        messages: [...messages, { role: 'user', content: `${context}${input}` }],
+        stream: true,
+      };
+
       if (mode === 'interactive') {
-        context += `You are in interactive mode. You can help manipulate and interact with the page. Feel free to suggest actions like clicking buttons, filling forms, or navigating.\n\n`;
+        context += `You are in interactive mode. You will help manipulate and interact with the page by providing a structured plan. Please analyze the task and break it down into clear steps.\n\n`;
+        requestBody.format = {
+          type: 'object',
+          properties: {
+            goal: { type: 'string' },
+            steps: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  description: { type: 'string' },
+                  action: { type: 'string', enum: ['click', 'type', 'navigate', 'wait', 'extract'] },
+                  target: { type: 'string', optional: true },
+                  value: { type: 'string', optional: true },
+                  selector: { type: 'string', optional: true },
+                },
+                required: ['description', 'action'],
+              },
+            },
+            estimated_time: { type: 'string' },
+          },
+          required: ['goal', 'steps', 'estimated_time'],
+        };
       } else {
         context += `You are in conversational mode. Please focus on answering questions about the page content without suggesting interactive actions.\n\n`;
       }
 
-      // Send the full context to Ollama
-      const userMessage: Message = { role: 'user', content: `${context}${input}` };
-
+      // Send the request to Ollama
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: selectedModel,
-          messages: [...messages, userMessage],
-          stream: true,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -146,7 +182,56 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
               {message.role === 'user' ? 'You' : 'Assistant'}
             </div>
             <div className={isLight ? 'text-gray-800' : 'text-gray-100'}>
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+              {mode === 'interactive' && message.role === 'assistant' ? (
+                <div className="space-y-2">
+                  {(() => {
+                    try {
+                      // Try to parse as JSON first
+                      const plan: TaskPlan = JSON.parse(message.content);
+                      return (
+                        <>
+                          <div className="font-medium">{plan.goal}</div>
+                          <div className="text-xs text-gray-500">Estimated time: {plan.estimated_time}</div>
+                          <div className="space-y-2">
+                            {plan.steps.map((step, i) => (
+                              <div
+                                key={i}
+                                className="flex items-start space-x-2 p-2 rounded bg-opacity-50 bg-gray-100 dark:bg-gray-800">
+                                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
+                                  {i + 1}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-sm">{step.description}</div>
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    Action: {step.action}
+                                    {step.target && <span className="ml-2">Target: {step.target}</span>}
+                                    {step.value && <span className="ml-2">Value: {step.value}</span>}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      );
+                    } catch (e) {
+                      // If not a valid TaskPlan JSON, try to format as regular JSON
+                      try {
+                        const json = JSON.parse(message.content);
+                        return (
+                          <pre className="whitespace-pre-wrap overflow-x-auto p-2 rounded bg-gray-100 dark:bg-gray-800 text-sm">
+                            {JSON.stringify(json, null, 2)}
+                          </pre>
+                        );
+                      } catch (e2) {
+                        // If not JSON at all, render as markdown
+                        return <ReactMarkdown>{message.content}</ReactMarkdown>;
+                      }
+                    }
+                  })()}
+                </div>
+              ) : (
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              )}
             </div>
           </div>
         ))}
