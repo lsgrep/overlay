@@ -9,11 +9,14 @@ interface Message {
 interface ChatInterfaceProps {
   selectedModel: string;
   isLight: boolean;
+  title?: string;
+  url?: string;
+  pageContent?: string;
 }
 
 const API_URL = 'http://localhost:11434/api/chat';
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, title, url, pageContent }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -32,8 +35,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: input };
-    setMessages(prev => [...prev, userMessage]);
+    // Create the display message (without page content)
+    const displayMessage: Message = { role: 'user', content: input };
+    setMessages(prev => [...prev, displayMessage]);
+
+    // Create the full context for Ollama (including page content)
+    let context = '';
+    if (title || url) {
+      context += `Current page: ${title || ''} ${url ? `(${url})` : ''}\n\n`;
+    }
+    if (pageContent) {
+      context += `Page content:\n${pageContent}\n\n`;
+    }
+    // Send the full context to Ollama
+    const userMessage: Message = { role: 'user', content: `${context}${input}` };
     setInput('');
     setIsLoading(true);
     setError(null);

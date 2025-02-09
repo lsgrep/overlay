@@ -21,6 +21,7 @@ const SidePanel = () => {
   const isLight = theme === 'light';
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
+  const [pageContent, setPageContent] = useState('');
   const [models, setModels] = useState<OllamaModel[]>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,8 +31,26 @@ const SidePanel = () => {
     // Get current tab info
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       if (tabs[0]) {
-        setUrl(tabs[0].url || '');
-        setTitle(tabs[0].title || '');
+        const tab = tabs[0];
+        setUrl(tab.url || '');
+        setTitle(tab.title || '');
+
+        // Get page content
+        if (tab.id) {
+          chrome.scripting
+            .executeScript({
+              target: { tabId: tab.id },
+              func: () => document.body.innerText,
+            })
+            .then(result => {
+              if (result && result[0] && result[0].result) {
+                setPageContent(result[0].result);
+              }
+            })
+            .catch(error => {
+              console.error('Error getting page content:', error);
+            });
+        }
       }
     });
 
@@ -92,7 +111,13 @@ const SidePanel = () => {
       </header>
 
       <div className="flex-1 overflow-hidden">
-        <ChatInterface selectedModel={selectedModel} isLight={isLight} />
+        <ChatInterface
+          selectedModel={selectedModel}
+          isLight={isLight}
+          title={title}
+          url={url}
+          pageContent={pageContent}
+        />
       </div>
     </div>
   );
