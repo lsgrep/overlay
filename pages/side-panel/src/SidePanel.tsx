@@ -52,7 +52,7 @@ const SidePanel = () => {
     <div className={`flex flex-col h-screen ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
       <header className={`p-4 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
         <div className="flex items-center justify-between mb-4">
-          <h1 className={`text-lg font-semibold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>Ollama Chat</h1>
+          <h1 className={`text-lg font-semibold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>Overlay</h1>
           <ThemeToggle />
         </div>
 
