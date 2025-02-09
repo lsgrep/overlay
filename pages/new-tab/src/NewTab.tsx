@@ -4,29 +4,72 @@ import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
 import { Button } from '@extension/ui';
 import { t } from '@extension/i18n';
+import { useState, useEffect } from 'react';
+import rumiData from './rumi.json';
 
 const NewTab = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
-  const logo = isLight ? 'new-tab/logo_horizontal.svg' : 'new-tab/logo_horizontal_dark.svg';
-  const goGithubSite = () =>
-    chrome.tabs.create({ url: 'https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite' });
+  const [randomQuote, setRandomQuote] = useState({ quote: '', category: '' });
 
-  console.log(t('hello', 'World'));
+  useEffect(() => {
+    const categories = Object.keys(rumiData.categories);
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    const categoryQuotes = rumiData.categories[randomCategory].quotes;
+    const randomQuoteText = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
+
+    setRandomQuote({
+      quote: randomQuoteText,
+      category: rumiData.categories[randomCategory].name,
+    });
+  }, []);
   return (
-    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-        <button onClick={goGithubSite}>
-          <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        </button>
-        <p>
-          Edit <code>pages/new-tab/src/NewTab.tsx</code>
-        </p>
-        <h6>The color of this paragraph is defined using SASS.</h6>
-        <Button className="mt-4" onClick={exampleThemeStorage.toggle} theme={theme}>
-          {t('toggleTheme')}
+    <div
+      className={`min-h-screen flex items-center justify-center overflow-hidden ${isLight ? 'bg-gradient-to-br from-blue-50 to-purple-50' : 'bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900'}`}>
+      {/* Background pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div
+          className={`absolute -inset-[10px] opacity-30 ${isLight ? 'bg-[radial-gradient(circle_at_center,_#4f46e520_1px,_transparent_1px)] [background-size:24px_24px]' : 'bg-[radial-gradient(circle_at_center,_#6366f120_1px,_transparent_1px)] [background-size:24px_24px]'}`}
+        />
+      </div>
+
+      {/* Main container */}
+      <div className="max-w-3xl mx-auto p-16 text-center relative rounded-2xl shadow-2xl backdrop-blur-sm ${isLight ? 'bg-white/30' : 'bg-gray-800/30'}">
+        <span className={`absolute top-0 left-0 text-8xl font-serif ${isLight ? 'text-gray-200' : 'text-gray-700'}`}>
+          "
+        </span>
+        <span
+          className={`absolute bottom-0 right-0 text-8xl font-serif ${isLight ? 'text-gray-200' : 'text-gray-700'}`}>
+          "
+        </span>
+
+        <div className={`relative z-10 ${isLight ? 'text-gray-800' : 'text-gray-200'}`}>
+          <blockquote className="text-3xl font-serif italic mb-8 leading-relaxed px-12">
+            <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+              {randomQuote.quote}
+            </span>
+          </blockquote>
+          <div className="flex flex-col items-center space-y-4">
+            <div className="flex items-center space-x-4">
+              <div className={`w-12 h-0.5 ${isLight ? 'bg-indigo-200' : 'bg-indigo-700'}`} />
+              <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-purple-300' : 'bg-purple-600'}`} />
+              <div className={`w-12 h-0.5 ${isLight ? 'bg-purple-200' : 'bg-purple-700'}`} />
+            </div>
+            <p
+              className={`text-sm uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+              {randomQuote.category}
+            </p>
+          </div>
+        </div>
+        <Button
+          className={`mt-12 transition-all duration-300 hover:scale-110 rounded-full p-3
+            ${isLight ? 'bg-white/50 hover:bg-white/80' : 'bg-gray-800/50 hover:bg-gray-800/80'}
+            backdrop-blur-sm shadow-lg hover:shadow-xl`}
+          onClick={exampleThemeStorage.toggle}
+          theme={theme}>
+          {isLight ? '🌙' : '☀️'}
         </Button>
-      </header>
+      </div>
     </div>
   );
 };
