@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
+import { performSearch } from './utils/search';
 
 interface Message {
   role: string;
@@ -70,12 +71,53 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
       }
 
       // Create the full context for Ollama
-      let context = '';
+      let context = `
+You are an AI assistant that helps users interact with web pages. When appropriate, generate a task plan with specific actions. Use these actions:
+- 'search': Perform a Google search (requires query parameter)
+- 'click': Click on an element (requires target selector)
+- 'type': Type text into a form field (requires target selector and value)
+- 'navigate': Navigate to a URL (requires target URL)
+- 'wait': Wait for a specific condition or time
+- 'extract': Extract information from the page
+
+Example response format:
+{
+  "goal": "Search for a specific topic",
+  "steps": [
+    {
+      "description": "Search on Google",
+      "action": "search",
+      "query": "your search query"
+    },
+    {
+      "description": "Extract search results",
+      "action": "extract",
+      "target": ".g"
+    }
+  ],
+  "estimated_time": "10 seconds"
+}
+
+`;
       if (tab?.title || tab?.url) {
         context += `Current page: ${tab.title || ''} ${tab.url ? `(${tab.url})` : ''}\n\n`;
       }
       if (currentContent) {
         context += `Page content:\n${currentContent}\n\n`;
+      }
+
+      if (mode === 'interactive') {
+        context += `You are in interactive mode. Generate a task plan with specific steps to help the user achieve their goal. Include specific selectors and actions that can be automated.
+
+If the user's request seems like a search query, use the 'search' action as the first step.
+
+Current page URL: ${window.location.href}
+
+`;
+      } else {
+        context += `You are in conversational mode. Focus on answering questions about the page content without suggesting interactive actions.
+
+`;
       }
 
       // Add mode-specific context and format
