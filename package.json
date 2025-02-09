@@ -1,7 +1,7 @@
 {
-  "name": "chrome-extension-boilerplate-react-vite",
+  "name": "Overlay",
   "version": "0.3.6",
-  "description": "chrome extension boilerplate",
+  "description": "Overlay",
   "license": "MIT",
   "repository": {
     "type": "git",
