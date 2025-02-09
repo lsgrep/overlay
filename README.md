@@ -1,4 +1,6 @@
-# Overlay2
+# Overlay
+
+![Overlay](https://raw.githubusercontent.com/lsgrep/overlay/refs/heads/master/overlay.png)
 
 A Chrome extension that enhances your browsing experience with AI-powered assistance.
 
