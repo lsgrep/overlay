@@ -89,12 +89,12 @@ const SidePanel = () => {
               className={`flex items-center gap-2 p-1 rounded-lg border ${isLight ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'}`}>
               <button
                 onClick={() => setMode('conversational')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? (isLight ? 'bg-white shadow-sm' : 'bg-gray-700') : ''}`}>
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? (isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white') : ''}`}>
                 Conversational
               </button>
               <button
                 onClick={() => setMode('interactive')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? (isLight ? 'bg-white shadow-sm' : 'bg-gray-700') : ''}`}>
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? (isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white') : ''}`}>
                 Interactive
               </button>
             </div>
