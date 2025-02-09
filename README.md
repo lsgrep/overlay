@@ -18,12 +18,26 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 pnpm install
 ```
 
-2. Start development:
+2. Pull recommended models:
+```bash
+# Install Phi-4, a lightweight but powerful model
+ollama pull phi4
+
+# Install Mistral, great for general-purpose tasks
+ollama pull mistral
+```
+
+3. Start Ollama service with Chrome extension permissions:
+```bash
+OLLAMA_ORIGINS=chrome-extension://* ollama serve
+```
+
+4. Start development:
 ```bash
 pnpm dev
 ```
 
-3. Build for production:
+5. Build for production:
 ```bash
 pnpm build
 ```
