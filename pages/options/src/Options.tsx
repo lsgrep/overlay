@@ -16,6 +16,7 @@ const Options = () => {
   const [geminiKey, setGeminiKeyState] = useState('');
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [activeProviderTab, setActiveProviderTab] = useState('OpenAI');
 
   // New state variables for additional settings
   const [selectedModel, setSelectedModel] = useState('gpt-4');
@@ -100,7 +101,7 @@ const Options = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-2 sticky top-24">
-              {['General', 'API Keys', 'AI Models', 'Appearance', 'Language'].map(tab => (
+              {['General', 'OpenAI', 'Google', 'AI Models', 'Appearance', 'Language'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -129,10 +130,14 @@ const Options = () => {
                 </motion.div>
               )}
 
-              {activeTab === 'API Keys' && (
+              {activeTab === 'OpenAI' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">OpenAI API Key</label>
+                    <h3 className="text-lg font-semibold mb-1">OpenAI Settings</h3>
+                    <p className="text-sm opacity-60">Configure your OpenAI API key and model preferences</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">API Key</label>
                     <div className="relative">
                       <input
                         type={showOpenAIKey ? 'text' : 'password'}
@@ -151,8 +156,17 @@ const Options = () => {
                       </button>
                     </div>
                   </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'Google' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Gemini API Key</label>
+                    <h3 className="text-lg font-semibold mb-1">Google Settings</h3>
+                    <p className="text-sm opacity-60">Configure your Google API key and Gemini model preferences</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">API Key</label>
                     <div className="relative">
                       <input
                         type={showGeminiKey ? 'text' : 'password'}
