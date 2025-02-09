@@ -5,6 +5,7 @@ import { exampleThemeStorage, getOpenAIKey, getGeminiKey, setOpenAIKey, setGemin
 import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip } from 'react-tooltip';
 
 const Options = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -13,6 +14,8 @@ const Options = () => {
   const [geminiKey, setGeminiKeyState] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
+  const [showOpenAIKey, setShowOpenAIKey] = useState(false);
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
 
   useEffect(() => {
     // Load saved API keys
@@ -40,19 +43,35 @@ const Options = () => {
 
   return (
     <div
-      className={`min-h-screen ${isLight ? 'bg-gradient-to-br from-slate-50 to-slate-100 text-gray-900' : 'bg-gradient-to-br from-gray-800 to-gray-900 text-gray-100'}`}>
+      className={`min-h-screen transition-colors duration-300 ${isLight ? 'bg-gradient-to-br from-slate-50 to-slate-100 text-gray-900' : 'bg-gradient-to-br from-gray-800 to-gray-900 text-gray-100'}`}>
       {/* Header */}
-      <div className={`w-full py-6 px-8 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className={`w-full py-6 px-8 border-b backdrop-blur-md bg-opacity-50 sticky top-0 z-10 ${isLight ? 'border-gray-200 bg-white' : 'border-gray-700 bg-gray-900'}`}>
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <img src={icon} alt="Overlay" className="h-8 w-8" />
-            <h1 className="text-xl font-semibold">Overlay</h1>
+            <motion.img
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.5 }}
+              src={icon}
+              alt="Overlay"
+              className="h-8 w-8"
+            />
+            <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+              Overlay
+            </h1>
           </div>
-          <Button onClick={exampleThemeStorage.toggle} theme={theme} className="transition-transform hover:scale-105">
+          <Button
+            onClick={exampleThemeStorage.toggle}
+            theme={theme}
+            className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+            data-tooltip-id="theme-tooltip"
+            data-tooltip-content={`Switch to ${isLight ? 'Dark' : 'Light'} mode`}>
             {isLight ? '🌙' : '☀️'} {isLight ? 'Dark' : 'Light'} mode
           </Button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
       <motion.div
@@ -84,16 +103,30 @@ const Options = () => {
                 <label htmlFor="openai-key" className="block text-sm font-medium mb-2 flex items-center gap-2">
                   <img src="https://openai.com/favicon.ico" className="w-4 h-4" alt="OpenAI" />
                   OpenAI API Key
+                  <span
+                    className="ml-1 text-xs text-gray-500 dark:text-gray-400 cursor-help"
+                    data-tooltip-id="openai-tooltip"
+                    data-tooltip-content="Your OpenAI API key is required for AI-powered features. Get it from OpenAI's website.">
+                    ℹ️
+                  </span>
                 </label>
-                <input
-                  id="openai-key"
-                  type="password"
-                  value={openAIKey}
-                  onChange={e => setOpenAIKeyState(e.target.value)}
-                  className={`w-full p-3 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none
-                    ${isLight ? 'bg-white border-gray-300 focus:border-blue-500' : 'bg-gray-700 border-gray-600 focus:border-blue-400'}`}
-                  placeholder="sk-..."
-                />
+                <div className="relative">
+                  <input
+                    id="openai-key"
+                    type={showOpenAIKey ? 'text' : 'password'}
+                    value={openAIKey}
+                    onChange={e => setOpenAIKeyState(e.target.value)}
+                    className={`w-full p-3 pr-10 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none
+                      ${isLight ? 'bg-white border-gray-300 focus:border-blue-500' : 'bg-gray-700 border-gray-600 focus:border-blue-400'}`}
+                    placeholder="sk-..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowOpenAIKey(!showOpenAIKey)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    {showOpenAIKey ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
               </div>
               <div>
                 <label htmlFor="gemini-key" className="block text-sm font-medium mb-2 flex items-center gap-2">
@@ -103,16 +136,30 @@ const Options = () => {
                     alt="Gemini"
                   />
                   Gemini API Key
+                  <span
+                    className="ml-1 text-xs text-gray-500 dark:text-gray-400 cursor-help"
+                    data-tooltip-id="gemini-tooltip"
+                    data-tooltip-content="Your Gemini API key enables Google's AI features. Get it from Google AI Studio.">
+                    ℹ️
+                  </span>
                 </label>
-                <input
-                  id="gemini-key"
-                  type="password"
-                  value={geminiKey}
-                  onChange={e => setGeminiKeyState(e.target.value)}
-                  className={`w-full p-3 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none
-                    ${isLight ? 'bg-white border-gray-300 focus:border-blue-500' : 'bg-gray-700 border-gray-600 focus:border-blue-400'}`}
-                  placeholder="AI..."
-                />
+                <div className="relative">
+                  <input
+                    id="gemini-key"
+                    type={showGeminiKey ? 'text' : 'password'}
+                    value={geminiKey}
+                    onChange={e => setGeminiKeyState(e.target.value)}
+                    className={`w-full p-3 pr-10 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none
+                      ${isLight ? 'bg-white border-gray-300 focus:border-blue-500' : 'bg-gray-700 border-gray-600 focus:border-blue-400'}`}
+                    placeholder="AI..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowGeminiKey(!showGeminiKey)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    {showGeminiKey ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -179,4 +226,26 @@ const Options = () => {
   );
 };
 
-export default withErrorBoundary(withSuspense(Options, <div> Loading ... </div>), <div> Error Occur </div>);
+const OptionsWithTooltips = () => (
+  <>
+    <Options />
+    <Tooltip id="theme-tooltip" />
+    <Tooltip id="openai-tooltip" />
+    <Tooltip id="gemini-tooltip" />
+  </>
+);
+
+export default withErrorBoundary(
+  withSuspense(
+    OptionsWithTooltips,
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+    </div>,
+  ),
+  <div className="flex items-center justify-center min-h-screen text-red-500">
+    <div className="text-center">
+      <h2 className="text-xl font-bold mb-2">Oops! Something went wrong</h2>
+      <p>Please try refreshing the page</p>
+    </div>
+  </div>,
+);
