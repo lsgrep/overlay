@@ -59,17 +59,13 @@ const Options = () => {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${
-        isLight
-          ? 'bg-gradient-to-br from-slate-50 to-slate-100 text-gray-900'
-          : 'bg-gradient-to-br from-gray-800 to-gray-900 text-gray-100'
-      }`}>
+      className={`min-h-screen transition-colors duration-300 ${isLight ? 'bg-white text-black' : 'bg-black text-white'}`}>
       {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`w-full py-6 px-8 border-b backdrop-blur-md bg-opacity-50 sticky top-0 z-10 ${
-          isLight ? 'border-gray-200 bg-white' : 'border-gray-700 bg-gray-900'
+        className={`w-full py-6 px-8 border-b sticky top-0 z-10 ${
+          isLight ? 'border-black/10 bg-white' : 'border-white/10 bg-black'
         }`}>
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -96,10 +92,10 @@ const Options = () => {
       </motion.div>
 
       {/* Main Content with Tabs */}
-      <div className="max-w-6xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-8">
         <div className="flex gap-8">
           {/* Vertical Tab Navigation */}
-          <div className="w-48 shrink-0">
+          <div className="w-64 shrink-0">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -108,10 +104,10 @@ const Options = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                  className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
                     activeTab === tab
                       ? 'bg-blue-500 text-white'
-                      : `${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-800'} text-gray-500`
+                      : `${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-900'} text-gray-500`
                   }`}>
                   {tab}
                 </button>
@@ -120,27 +116,30 @@ const Options = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1">
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+          <div className="flex-1 max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
               {/* Tab Content */}
               {activeTab === 'General' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                  <h2 className="text-xl font-bold">Welcome to Settings</h2>
-                  <p className="text-sm text-gray-500">Configure your extension preferences using the tabs above.</p>
+                  <h2 className="text-2xl font-bold text-blue-500">Welcome to Settings</h2>
+                  <p className="text-sm opacity-60">Configure your extension preferences using the tabs above.</p>
                 </motion.div>
               )}
 
               {activeTab === 'API Keys' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">OpenAI API Key</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">OpenAI API Key</label>
                     <div className="relative">
                       <input
                         type={showOpenAIKey ? 'text' : 'password'}
                         value={openAIKey}
                         onChange={e => setOpenAIKeyState(e.target.value)}
-                        className={`w-full p-3 pr-10 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                          isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
+                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
+                          isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
                         }`}
                         placeholder="sk-..."
                       />
@@ -153,14 +152,14 @@ const Options = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Gemini API Key</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Gemini API Key</label>
                     <div className="relative">
                       <input
                         type={showGeminiKey ? 'text' : 'password'}
                         value={geminiKey}
                         onChange={e => setGeminiKeyState(e.target.value)}
-                        className={`w-full p-3 pr-10 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none ${
-                          isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
+                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
+                          isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
                         }`}
                         placeholder="AI..."
                       />
@@ -178,11 +177,11 @@ const Options = () => {
               {activeTab === 'AI Models' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Default Model</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Default Model</label>
                     <select
                       value={selectedModel}
                       onChange={e => setSelectedModel(e.target.value)}
-                      className={`w-full p-3 rounded-md border focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                         isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
                       }`}>
                       <option value="gpt-4">GPT-4</option>
@@ -191,7 +190,7 @@ const Options = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Max Tokens</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Max Tokens</label>
                     <input
                       type="range"
                       min="100"
@@ -201,10 +200,10 @@ const Options = () => {
                       onChange={e => setMaxTokens(Number(e.target.value))}
                       className="w-full"
                     />
-                    <div className="text-sm text-gray-500">{maxTokens} tokens</div>
+                    <div className="text-sm opacity-60">{maxTokens} tokens</div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Temperature</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Temperature</label>
                     <input
                       type="range"
                       min="0"
@@ -214,7 +213,7 @@ const Options = () => {
                       onChange={e => setTemperature(Number(e.target.value))}
                       className="w-full"
                     />
-                    <div className="text-sm text-gray-500">{temperature}</div>
+                    <div className="text-sm opacity-60">{temperature}</div>
                   </div>
                 </motion.div>
               )}
@@ -222,11 +221,11 @@ const Options = () => {
               {activeTab === 'Appearance' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Font Family</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Font Family</label>
                     <select
                       value={fontFamily}
                       onChange={e => setFontFamily(e.target.value)}
-                      className={`w-full p-3 rounded-md border focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                         isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
                       }`}>
                       <option value="Inter">Inter</option>
@@ -235,11 +234,11 @@ const Options = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Font Size</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Font Size</label>
                     <select
                       value={fontSize}
                       onChange={e => setFontSize(e.target.value)}
-                      className={`w-full p-3 rounded-md border focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                         isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
                       }`}>
                       <option value="14">Small</option>
@@ -253,11 +252,11 @@ const Options = () => {
               {activeTab === 'Language' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Preferred Language</label>
+                    <label className="block text-sm font-semibold mb-2 text-blue-500">Preferred Language</label>
                     <select
                       value={language}
                       onChange={e => setLanguage(e.target.value)}
-                      className={`w-full p-3 rounded-md border focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                         isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
                       }`}>
                       <option value="en">English</option>
@@ -271,7 +270,7 @@ const Options = () => {
               )}
 
               {/* Save Button */}
-              <div className="flex items-center justify-end mt-6">
+              <div className="flex items-center justify-end mt-8 pt-4 border-t dark:border-gray-700">
                 <Button
                   onClick={handleSave}
                   disabled={isSaving}
