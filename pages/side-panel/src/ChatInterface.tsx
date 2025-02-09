@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { TaskPlanView } from './components/TaskPlanView';
 
 interface Message {
   role: string;
@@ -134,7 +135,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
         if (done) break;
 
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\\n');
+        const lines = chunk.split('\n');
 
         for (const line of lines) {
           if (!line.trim()) continue;
@@ -186,39 +187,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
                 <div className="space-y-2">
                   {(() => {
                     try {
-                      // Try to parse as JSON first
                       const plan: TaskPlan = JSON.parse(message.content);
-                      return (
-                        <>
-                          <div className="font-medium">{plan.goal}</div>
-                          <div className="text-xs text-gray-500">Estimated time: {plan.estimated_time}</div>
-                          <div className="space-y-2">
-                            {plan.steps.map((step, i) => (
-                              <div
-                                key={i}
-                                className="flex items-start space-x-2 p-2 rounded bg-opacity-50 bg-gray-100 dark:bg-gray-800">
-                                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs">
-                                  {i + 1}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="text-sm">{step.description}</div>
-                                  <div className="text-xs text-gray-500 mt-1">
-                                    Action: {step.action}
-                                    {step.target && <span className="ml-2">Target: {step.target}</span>}
-                                    {step.value && <span className="ml-2">Value: {step.value}</span>}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </>
-                      );
+                      return <TaskPlanView plan={plan} isLight={isLight} />;
                     } catch (e) {
                       // If not a valid TaskPlan JSON, try to format as regular JSON
                       try {
                         const json = JSON.parse(message.content);
                         return (
-                          <pre className="whitespace-pre-wrap overflow-x-auto p-2 rounded bg-gray-100 dark:bg-gray-800 text-sm">
+                          <pre
+                            className={`whitespace-pre-wrap overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
                             {JSON.stringify(json, null, 2)}
                           </pre>
                         );
