@@ -82,17 +82,17 @@ You are an AI assistant that helps users interact with web pages. When appropria
 
 Example response format:
 {
-  "goal": "Search for a specific topic",
+  "goal": "Find the current price of gold",
   "steps": [
     {
-      "description": "Search on Google",
+      "description": "Search for gold price",
       "action": "search",
-      "query": "your search query"
+      "query": "current price of gold per ounce"
     },
     {
-      "description": "Extract search results",
+      "description": "Extract price information",
       "action": "extract",
-      "target": ".g"
+      "target": ".g .price"
     }
   ],
   "estimated_time": "10 seconds"
@@ -107,9 +107,19 @@ Example response format:
       }
 
       if (mode === 'interactive') {
-        context += `You are in interactive mode. Generate a task plan with specific steps to help the user achieve their goal. Include specific selectors and actions that can be automated.
+        context += `You are in interactive mode. Generate a task plan with specific steps to help the user achieve their goal.
 
-If the user's request seems like a search query, use the 'search' action as the first step.
+For any information seeking tasks, use the 'search' action directly with a specific query. For example:
+{
+  "goal": "Find the current price of gold",
+  "steps": [
+    {
+      "description": "Search for gold price",
+      "action": "search",
+      "query": "current price of gold per ounce"
+    }
+  ]
+}
 
 Current page URL: ${window.location.href}
 
