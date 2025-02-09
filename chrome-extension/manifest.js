@@ -39,7 +39,7 @@ const manifest = withSidePanel({
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  host_permissions: ['<all_urls>'],
+  host_permissions: ['<all_urls>', 'http://localhost:11434/*'],
   permissions: ['storage', 'scripting', 'tabs', 'notifications'],
   options_page: 'options/index.html',
   background: {

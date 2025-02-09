@@ -2,12 +2,29 @@ import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
 import { useEffect, useState } from 'react';
+import { ChatInterface } from './ChatInterface';
+
+interface OllamaModel {
+  id: string;
+  object: string;
+  created: number;
+  owned_by: string;
+}
+
+interface OllamaResponse {
+  object: string;
+  data: OllamaModel[];
+}
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
+  const [models, setModels] = useState<OllamaModel[]>([]);
+  const [selectedModel, setSelectedModel] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Get current tab info
@@ -17,37 +34,66 @@ const SidePanel = () => {
         setTitle(tabs[0].title || '');
       }
     });
+
+    // Fetch Ollama models
+    const fetchModels = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:11434/v1/models');
+        const data: OllamaResponse = await response.json();
+        setModels(data.data);
+        if (data.data.length > 0) {
+          setSelectedModel(data.data[0].id);
+        }
+      } catch (err) {
+        setError('Failed to fetch models. Make sure Ollama is running.');
+        console.error('Error fetching models:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchModels();
   }, []);
 
   return (
-    <div className={`min-h-screen ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
+    <div className={`flex flex-col h-screen ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
       <header className={`p-4 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
-        <div className="flex items-center justify-between">
-          <h1 className={`text-lg font-semibold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>Side Panel</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className={`text-lg font-semibold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>Ollama Chat</h1>
           <ThemeToggle />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <select
+            value={selectedModel}
+            onChange={e => setSelectedModel(e.target.value)}
+            disabled={loading}
+            className={`flex-1 p-2 rounded border ${isLight ? 'bg-white border-gray-200 text-gray-900' : 'bg-gray-700 border-gray-600 text-white'}`}>
+            {loading ? (
+              <option>Loading models...</option>
+            ) : error ? (
+              <option>Error loading models</option>
+            ) : (
+              models.map(model => (
+                <option key={model.id} value={model.id}>
+                  {model.id}
+                </option>
+              ))
+            )}
+          </select>
+          <button
+            onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
+            className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
+            title="Browse Ollama Models">
+            📚
+          </button>
         </div>
       </header>
 
-      <main className="p-4">
-        <section className={`mb-6 ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-          <h2 className="text-sm font-medium mb-2">Current Page</h2>
-          <div className="space-y-2">
-            <p className="text-sm truncate">{title}</p>
-            <p className="text-xs text-gray-500 truncate">{url}</p>
-          </div>
-        </section>
-
-        <section className={`${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-          <h2 className="text-sm font-medium mb-2">Actions</h2>
-          <div className="space-y-2">
-            <button
-              onClick={() => chrome.tabs.create({ url: 'https://www.google.com' })}
-              className={`w-full text-sm px-4 py-2 rounded ${isLight ? 'bg-white hover:bg-gray-50 text-gray-900' : 'bg-gray-700 hover:bg-gray-600 text-white'} border ${isLight ? 'border-gray-200' : 'border-gray-600'}`}>
-              Open New Tab
-            </button>
-          </div>
-        </section>
-      </main>
+      <div className="flex-1 overflow-hidden">
+        <ChatInterface selectedModel={selectedModel} isLight={isLight} />
+      </div>
     </div>
   );
 };
