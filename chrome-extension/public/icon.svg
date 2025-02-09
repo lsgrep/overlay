@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background square with rounded corners -->
+  <rect width="128" height="128" rx="24" fill="#2563EB" />
+  
+  <!-- Overlay layers -->
+  <g transform="translate(24, 24)">
+    <!-- Bottom layer -->
+    <rect
+      x="0"
+      y="16"
+      width="64"
+      height="64"
+      rx="8"
+      fill="white"
+      fill-opacity="0.3"
+    />
+    
+    <!-- Top layer -->
+    <rect
+      x="16"
+      y="0"
+      width="64"
+      height="64"
+      rx="8"
+      fill="white"
+    />
+  </g>
+</svg>
