@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, getOpenAIKey, getGeminiKey, setOpenAIKey, setGeminiKey } from '@extension/storage';
 import { Button } from '@extension/ui';
+import icon from '../../../chrome-extension/public/icon-128.png';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Options = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -37,21 +39,50 @@ const Options = () => {
   };
 
   return (
-    <div className={`min-h-screen p-8 ${isLight ? 'bg-slate-50 text-gray-900' : 'bg-gray-800 text-gray-100'}`}>
-      <div className="max-w-2xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Extension Settings</h1>
-          <Button onClick={exampleThemeStorage.toggle} theme={theme}>
-            {isLight ? '🌙' : '☀️'} Toggle theme
+    <div
+      className={`min-h-screen ${isLight ? 'bg-gradient-to-br from-slate-50 to-slate-100 text-gray-900' : 'bg-gradient-to-br from-gray-800 to-gray-900 text-gray-100'}`}>
+      {/* Header */}
+      <div className={`w-full py-6 px-8 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
+        <div className="max-w-2xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src={icon} alt="Overlay" className="h-8 w-8" />
+            <h1 className="text-xl font-semibold">Overlay</h1>
+          </div>
+          <Button onClick={exampleThemeStorage.toggle} theme={theme} className="transition-transform hover:scale-105">
+            {isLight ? '🌙' : '☀️'} {isLight ? 'Dark' : 'Light'} mode
           </Button>
         </div>
+      </div>
 
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">API Keys</h2>
-            <div className="space-y-4">
+      {/* Main Content */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-2xl mx-auto p-8 space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold">Settings</h1>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            Configure your extension preferences and API keys
+          </p>
+        </div>
+
+        <div className="space-y-8">
+          <motion.div
+            className={`p-6 rounded-lg shadow-lg ${isLight ? 'bg-white' : 'bg-gray-750'} border ${isLight ? 'border-gray-200' : 'border-gray-700'}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}>
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <span className="text-blue-500">🔑</span> API Keys
+            </h2>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
+              Configure your AI service API keys for enhanced functionality
+            </p>
+
+            <div className="space-y-6">
               <div>
-                <label htmlFor="openai-key" className="block text-sm font-medium mb-1">
+                <label htmlFor="openai-key" className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <img src="https://openai.com/favicon.ico" className="w-4 h-4" alt="OpenAI" />
                   OpenAI API Key
                 </label>
                 <input
@@ -59,12 +90,18 @@ const Options = () => {
                   type="password"
                   value={openAIKey}
                   onChange={e => setOpenAIKeyState(e.target.value)}
-                  className={`w-full p-2 rounded border ${isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'}`}
+                  className={`w-full p-3 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none
+                    ${isLight ? 'bg-white border-gray-300 focus:border-blue-500' : 'bg-gray-700 border-gray-600 focus:border-blue-400'}`}
                   placeholder="sk-..."
                 />
               </div>
               <div>
-                <label htmlFor="gemini-key" className="block text-sm font-medium mb-1">
+                <label htmlFor="gemini-key" className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <img
+                    src="https://ai.google.dev/static/site-assets/images/favicon.ico"
+                    className="w-4 h-4"
+                    alt="Gemini"
+                  />
                   Gemini API Key
                 </label>
                 <input
@@ -72,22 +109,72 @@ const Options = () => {
                   type="password"
                   value={geminiKey}
                   onChange={e => setGeminiKeyState(e.target.value)}
-                  className={`w-full p-2 rounded border ${isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'}`}
+                  className={`w-full p-3 rounded-md border transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none
+                    ${isLight ? 'bg-white border-gray-300 focus:border-blue-500' : 'bg-gray-700 border-gray-600 focus:border-blue-400'}`}
                   placeholder="AI..."
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="flex items-center space-x-4">
-            <Button onClick={handleSave} disabled={isSaving} theme={theme} className="px-4 py-2">
-              {isSaving ? 'Saving...' : 'Save Changes'}
+          <div className="flex items-center justify-between">
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              theme={theme}
+              className={`px-6 py-2.5 font-medium transition-all ${!isSaving && 'hover:scale-105'}`}>
+              {isSaving ? (
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Saving...
+                </span>
+              ) : (
+                'Save Changes'
+              )}
             </Button>
-            {saveStatus === 'success' && <span className="text-green-500">✓ Settings saved successfully</span>}
-            {saveStatus === 'error' && <span className="text-red-500">Failed to save settings</span>}
+            <AnimatePresence>
+              {saveStatus && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md ${saveStatus === 'success' ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                  {saveStatus === 'success' ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Settings saved successfully
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Failed to save settings
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
