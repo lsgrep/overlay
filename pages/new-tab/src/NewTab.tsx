@@ -5,22 +5,23 @@ import { exampleThemeStorage } from '@extension/storage';
 import { Button } from '@extension/ui';
 import { t } from '@extension/i18n';
 import { useState, useEffect } from 'react';
-import rumiData from './rumi.json';
+import quotesData from './quotes.json';
 
 const NewTab = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
-  const [randomQuote, setRandomQuote] = useState({ quote: '', category: '' });
+  const [randomQuote, setRandomQuote] = useState({ text: '', author: '', category: '' });
 
   useEffect(() => {
-    const categories = Object.keys(rumiData.categories);
+    const categories = Object.keys(quotesData.categories);
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const categoryQuotes = rumiData.categories[randomCategory].quotes;
-    const randomQuoteText = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
+    const categoryQuotes = quotesData.categories[randomCategory].quotes;
+    const randomQuoteData = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
 
     setRandomQuote({
-      quote: randomQuoteText,
-      category: rumiData.categories[randomCategory].name,
+      text: randomQuoteData.text,
+      author: randomQuoteData.author,
+      category: quotesData.categories[randomCategory].name,
     });
   }, []);
   return (
@@ -55,7 +56,7 @@ const NewTab = () => {
           <div className={`relative z-10 ${isLight ? 'text-gray-800' : 'text-gray-200'}`}>
             <blockquote className="text-3xl font-serif italic mb-8 leading-relaxed px-12">
               <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-                {randomQuote.quote}
+                {randomQuote.text}
               </span>
             </blockquote>
             <div className="flex flex-col items-center space-y-4">
@@ -64,10 +65,15 @@ const NewTab = () => {
                 <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-purple-300' : 'bg-purple-600'}`} />
                 <div className={`w-12 h-0.5 ${isLight ? 'bg-purple-200' : 'bg-purple-700'}`} />
               </div>
-              <p
-                className={`text-sm uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
-                {randomQuote.category}
-              </p>
+              <div className="flex flex-col space-y-2">
+                <p
+                  className={`text-sm uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+                  {randomQuote.category}
+                </p>
+                <p className={`text-sm italic ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
+                  — {randomQuote.author}
+                </p>
+              </div>
             </div>
           </div>
           <Button

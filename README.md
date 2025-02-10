@@ -6,10 +6,28 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 
 ## Features
 
-- Intelligent chat interface powered by Ollama
-- Dark/Light theme support
-- Sidepanel integration for easy access
-- Chrome Manifest V3 compatible
+### Core Features
+- ✅ Chrome Manifest V3 compatible
+- ✅ Dark/Light theme support
+- ✅ Sidepanel integration for easy access
+- ✅ Responsive and modern UI design
+
+### AI Integration
+- ✅ Intelligent chat interface powered by Ollama
+- ✅ Support for Ollama LLM models
+- 🚧 Context-aware browsing assistance
+- 📝 Custom model configuration
+- 📝 Chat history and conversation management
+
+### Content Features
+- ✅ Inspirational quotes on new tab
+- ✅ Quote categorization and attribution
+- 🚧 Customizable new tab layout
+- 📝 Task management
+
+### Privacy & Security
+- ✅ Local model execution via Ollama
+- ✅ No data collection or tracking
 
 ## Getting Started
 
