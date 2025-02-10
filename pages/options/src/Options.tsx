@@ -4,7 +4,7 @@ import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, getOpenAIKey, getGeminiKey, setOpenAIKey, setGeminiKey } from '@extension/storage';
 import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
 
 const Options = () => {
@@ -16,7 +16,7 @@ const Options = () => {
   const [geminiKey, setGeminiKeyState] = useState('');
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [activeProviderTab, setActiveProviderTab] = useState('OpenAI');
+
   const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string }>>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
@@ -34,7 +34,6 @@ const Options = () => {
 
   // Saving state
   const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
 
   const fetchGoogleModels = async (key: string) => {
     if (!key) return;
@@ -87,7 +86,6 @@ const Options = () => {
     try {
       // Save API keys (extend this logic if saving additional settings)
       await Promise.all([setOpenAIKey(openAIKey), setGeminiKey(geminiKey)]);
-      setSaveStatus('success');
     } catch (error) {
       console.error('Failed to save settings:', error);
       setSaveStatus('error');
@@ -175,9 +173,12 @@ const Options = () => {
                     <p className="text-sm opacity-60">Configure your OpenAI API key and model preferences</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">API Key</label>
+                    <label htmlFor="openai-key-2" className="block text-sm font-semibold mb-2 text-blue-500">
+                      API Key
+                    </label>
                     <div className="relative">
                       <input
+                        id="openai-key"
                         type={showOpenAIKey ? 'text' : 'password'}
                         value={openAIKey}
                         onChange={e => setOpenAIKeyState(e.target.value)}
@@ -205,9 +206,12 @@ const Options = () => {
                   </div>
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-blue-500">API Key</label>
+                      <label htmlFor="gemini-key" className="block text-sm font-semibold mb-2 text-blue-500">
+                        API Key
+                      </label>
                       <div className="relative">
                         <input
+                          id="gemini-key"
                           type={showGeminiKey ? 'text' : 'password'}
                           value={geminiKey}
                           onChange={e => setGeminiKeyState(e.target.value)}
@@ -226,8 +230,12 @@ const Options = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold mb-2 text-blue-500">Available Models</label>
-                      <div className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
+                      <label htmlFor="available-models" className="block text-sm font-semibold mb-2 text-blue-500">
+                        Available Models
+                      </label>
+                      <div
+                        id="available-models"
+                        className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
                         {isLoadingModels ? (
                           <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
                         ) : modelError ? (
@@ -255,8 +263,11 @@ const Options = () => {
               {activeTab === 'AI Models' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Default Model</label>
+                    <label htmlFor="default-model" className="block text-sm font-semibold mb-2 text-blue-500">
+                      Default Model
+                    </label>
                     <select
+                      id="default-model"
                       value={selectedModel}
                       onChange={e => setSelectedModel(e.target.value)}
                       className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
@@ -268,8 +279,11 @@ const Options = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Max Tokens</label>
+                    <label htmlFor="max-tokens" className="block text-sm font-semibold mb-2 text-blue-500">
+                      Max Tokens
+                    </label>
                     <input
+                      id="max-tokens"
                       type="range"
                       min="100"
                       max="4000"
@@ -281,8 +295,11 @@ const Options = () => {
                     <div className="text-sm opacity-60">{maxTokens} tokens</div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Temperature</label>
+                    <label htmlFor="temperature" className="block text-sm font-semibold mb-2 text-blue-500">
+                      Temperature
+                    </label>
                     <input
+                      id="temperature"
                       type="range"
                       min="0"
                       max="2"
@@ -299,8 +316,11 @@ const Options = () => {
               {activeTab === 'Appearance' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Font Family</label>
+                    <label htmlFor="font-family" className="block text-sm font-semibold mb-2 text-blue-500">
+                      Font Family
+                    </label>
                     <select
+                      id="font-family"
                       value={fontFamily}
                       onChange={e => setFontFamily(e.target.value)}
                       className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
@@ -312,8 +332,11 @@ const Options = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Font Size</label>
+                    <label htmlFor="font-size" className="block text-sm font-semibold mb-2 text-blue-500">
+                      Font Size
+                    </label>
                     <select
+                      id="font-size"
                       value={fontSize}
                       onChange={e => setFontSize(e.target.value)}
                       className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
@@ -330,8 +353,11 @@ const Options = () => {
               {activeTab === 'Language' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">Preferred Language</label>
+                    <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
+                      Preferred Language
+                    </label>
                     <select
+                      id="language"
                       value={language}
                       onChange={e => setLanguage(e.target.value)}
                       className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${

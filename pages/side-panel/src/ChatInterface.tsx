@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
-import { performSearch } from './utils/search';
 
 interface Message {
   role: string;
@@ -131,7 +130,33 @@ Current page URL: ${window.location.href}
       }
 
       // Add mode-specific context and format
-      let requestBody: any = {
+      const requestBody: {
+        model: string;
+        messages: Message[];
+        stream: boolean;
+        format?: {
+          type: string;
+          properties: {
+            goal: { type: string };
+            steps: {
+              type: string;
+              items: {
+                type: string;
+                properties: {
+                  description: { type: string };
+                  action: { type: string; enum: string[] };
+                  target: { type: string; optional: boolean };
+                  value: { type: string; optional: boolean };
+                  selector: { type: string; optional: boolean };
+                };
+                required: string[];
+              };
+            };
+            estimated_time: { type: string };
+          };
+          required: string[];
+        };
+      } = {
         model: selectedModel,
         messages: [...messages, { role: 'user', content: `${context}${input}` }],
         stream: true,
@@ -212,9 +237,9 @@ Current page URL: ${window.location.href}
           }
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error in chat:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -241,7 +266,7 @@ Current page URL: ${window.location.href}
                     try {
                       const plan: TaskPlan = JSON.parse(message.content);
                       return <TaskPlanView plan={plan} isLight={isLight} />;
-                    } catch (e) {
+                    } catch {
                       // If not a valid TaskPlan JSON, try to format as regular JSON
                       try {
                         const json = JSON.parse(message.content);
@@ -251,7 +276,7 @@ Current page URL: ${window.location.href}
                             {JSON.stringify(json, null, 2)}
                           </pre>
                         );
-                      } catch (e2) {
+                      } catch {
                         // If not JSON at all, render as markdown
                         return <ReactMarkdown>{message.content}</ReactMarkdown>;
                       }
