@@ -17,6 +17,9 @@ const Options = () => {
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [activeProviderTab, setActiveProviderTab] = useState('OpenAI');
+  const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string }>>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [modelError, setModelError] = useState<string | null>(null);
 
   // New state variables for additional settings
   const [selectedModel, setSelectedModel] = useState('gpt-4');
@@ -33,15 +36,50 @@ const Options = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
 
+  const fetchGoogleModels = async (key: string) => {
+    if (!key) return;
+
+    setIsLoadingModels(true);
+    setModelError(null);
+
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch models: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setGoogleModels(data.models || []);
+    } catch (error) {
+      console.error('Error fetching Google models:', error);
+      setModelError(error instanceof Error ? error.message : 'Failed to fetch models');
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
+
   useEffect(() => {
     // Load saved API keys
     const loadKeys = async () => {
       const [openai, gemini] = await Promise.all([getOpenAIKey(), getGeminiKey()]);
       if (openai) setOpenAIKeyState(openai);
-      if (gemini) setGeminiKeyState(gemini);
+      if (gemini) {
+        setGeminiKeyState(gemini);
+        fetchGoogleModels(gemini);
+      }
     };
     loadKeys();
   }, []);
+
+  // Fetch models when Gemini key changes
+  useEffect(() => {
+    if (geminiKey) {
+      fetchGoogleModels(geminiKey);
+    } else {
+      setGoogleModels([]);
+    }
+  }, [geminiKey]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -165,24 +203,50 @@ const Options = () => {
                     <h3 className="text-lg font-semibold mb-1">Google Settings</h3>
                     <p className="text-sm opacity-60">Configure your Google API key and Gemini model preferences</p>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2 text-blue-500">API Key</label>
-                    <div className="relative">
-                      <input
-                        type={showGeminiKey ? 'text' : 'password'}
-                        value={geminiKey}
-                        onChange={e => setGeminiKeyState(e.target.value)}
-                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                          isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-                        }`}
-                        placeholder="AI..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowGeminiKey(!showGeminiKey)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        {showGeminiKey ? '👁️' : '👁️‍🗨️'}
-                      </button>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-blue-500">API Key</label>
+                      <div className="relative">
+                        <input
+                          type={showGeminiKey ? 'text' : 'password'}
+                          value={geminiKey}
+                          onChange={e => setGeminiKeyState(e.target.value)}
+                          className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
+                            isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
+                          }`}
+                          placeholder="AI..."
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowGeminiKey(!showGeminiKey)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          {showGeminiKey ? '👁️' : '👁️‍🗨️'}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-blue-500">Available Models</label>
+                      <div className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
+                        {isLoadingModels ? (
+                          <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
+                        ) : modelError ? (
+                          <div className="p-4 text-center text-sm text-red-500">{modelError}</div>
+                        ) : googleModels.length === 0 ? (
+                          <div className="p-4 text-center text-sm opacity-60">
+                            {geminiKey ? 'No models found' : 'Enter API key to view available models'}
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-black/10 dark:divide-white/10">
+                            {googleModels.map(model => (
+                              <div key={model.name} className="p-3 text-sm">
+                                <div className="font-medium">{model.displayName || model.name.split('/').pop()}</div>
+                                <div className="text-xs opacity-60 mt-1">{model.name}</div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
