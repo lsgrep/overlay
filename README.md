@@ -14,7 +14,6 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 
 ### AI Integration
 - ✅ Intelligent chat interface powered by Ollama
-- ✅ Support for Ollama LLM models
 - 🚧 Context-aware browsing assistance
 - 📝 Custom model configuration
 - 📝 Chat history and conversation management
