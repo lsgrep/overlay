@@ -1,6 +1,6 @@
 import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
+import { exampleThemeStorage, getGeminiKey } from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { ChatInterface } from './ChatInterface';
 
@@ -16,30 +16,63 @@ interface OllamaResponse {
   data: OllamaModel[];
 }
 
+interface GeminiModel {
+  name: string;
+  displayName: string;
+}
+
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
-  const [models, setModels] = useState<OllamaModel[]>([]);
+  const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
+  const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
 
   useEffect(() => {
-    // Fetch Ollama models
     const fetchModels = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:11434/v1/models');
-        const data: OllamaResponse = await response.json();
-        setModels(data.data);
-        if (data.data.length > 0) {
-          setSelectedModel(data.data[0].id);
+
+        // Fetch Ollama models
+        try {
+          const ollamaResponse = await fetch('http://localhost:11434/v1/models');
+          const ollamaData: OllamaResponse = await ollamaResponse.json();
+          setOllamaModels(ollamaData.data);
+          if (ollamaData.data.length > 0 && !selectedModel) {
+            setSelectedModel(ollamaData.data[0].id);
+          }
+        } catch (err) {
+          console.error('Error fetching Ollama models:', err);
         }
-      } catch (err) {
-        setError('Failed to fetch models. Make sure Ollama is running.');
-        console.error('Error fetching models:', err);
+
+        // Fetch Gemini models
+        try {
+          const geminiKey = await getGeminiKey();
+          if (geminiKey) {
+            const geminiResponse = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
+            );
+            if (!geminiResponse.ok) {
+              throw new Error(`Failed to fetch Gemini models: ${geminiResponse.statusText}`);
+            }
+            const geminiData = await geminiResponse.json();
+            const formattedGeminiModels = (geminiData.models || [])
+              .filter(
+                (model: any) => model.name.includes('gemini') || model.displayName?.toLowerCase().includes('gemini'),
+              )
+              .map((model: any) => ({
+                name: model.name,
+                displayName: model.displayName || model.name.split('/').pop(),
+              }));
+            setGeminiModels(formattedGeminiModels);
+          }
+        } catch (err) {
+          console.error('Error fetching Gemini models:', err);
+        }
       } finally {
         setLoading(false);
       }
@@ -68,11 +101,26 @@ const SidePanel = () => {
               ) : error ? (
                 <option>Error loading models</option>
               ) : (
-                models.map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.id}
-                  </option>
-                ))
+                <>
+                  {geminiModels.length > 0 && (
+                    <optgroup label="Gemini Models">
+                      {geminiModels.map(model => (
+                        <option key={model.name} value={model.name}>
+                          {model.displayName}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {ollamaModels.length > 0 && (
+                    <optgroup label="Ollama Models">
+                      {ollamaModels.map(model => (
+                        <option key={model.id} value={model.id}>
+                          {model.id}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </>
               )}
             </select>
             <button
