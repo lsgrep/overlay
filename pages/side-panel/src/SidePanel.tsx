@@ -36,11 +36,13 @@ const SidePanel = () => {
     const fetchModels = async () => {
       try {
         setLoading(true);
+        setError('');
 
         // Fetch Ollama models
         try {
           const ollamaResponse = await fetch('http://localhost:11434/v1/models');
           const ollamaData: OllamaResponse = await ollamaResponse.json();
+          console.log('Ollama models:', ollamaData.data);
           setOllamaModels(ollamaData.data);
           if (ollamaData.data.length > 0 && !selectedModel) {
             setSelectedModel(ollamaData.data[0].id);
@@ -52,26 +54,44 @@ const SidePanel = () => {
         // Fetch Gemini models
         try {
           const geminiKey = await getGeminiKey();
+          console.log('Debug: Got Gemini key:', geminiKey ? 'yes' : 'no');
           if (geminiKey) {
             const geminiResponse = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
             );
             if (!geminiResponse.ok) {
+              const errorText = await geminiResponse.text();
+              console.error('Gemini API Error:', {
+                status: geminiResponse.status,
+                statusText: geminiResponse.statusText,
+                error: errorText,
+              });
               throw new Error(`Failed to fetch Gemini models: ${geminiResponse.statusText}`);
             }
             const geminiData = await geminiResponse.json();
+            console.log('Debug: Gemini API response:', geminiData);
+
             const formattedGeminiModels = (geminiData.models || [])
-              .filter(
-                (model: any) => model.name.includes('gemini') || model.displayName?.toLowerCase().includes('gemini'),
-              )
-              .map((model: any) => ({
-                name: model.name,
-                displayName: model.displayName || model.name.split('/').pop(),
-              }));
+              .filter((model: any) => {
+                const isGemini = model.name.includes('gemini') || model.displayName?.toLowerCase().includes('gemini');
+                console.log('Debug: Checking model:', model.name, isGemini);
+                return isGemini;
+              })
+              .map((model: any) => {
+                const formattedModel = {
+                  name: model.name,
+                  displayName: model.displayName || model.name.split('/').pop(),
+                };
+                console.log('Debug: Formatted model:', formattedModel);
+                return formattedModel;
+              });
+
+            console.log('Debug: Final Gemini models:', formattedGeminiModels);
             setGeminiModels(formattedGeminiModels);
           }
         } catch (err) {
           console.error('Error fetching Gemini models:', err);
+          setError('Failed to fetch Gemini models: ' + (err as Error).message);
         }
       } finally {
         setLoading(false);
@@ -99,20 +119,23 @@ const SidePanel = () => {
               {loading ? (
                 <option>Loading models...</option>
               ) : error ? (
-                <option>Error loading models</option>
+                <option>Error loading models: {error}</option>
               ) : (
                 <>
                   {geminiModels.length > 0 && (
-                    <optgroup label="Gemini Models">
-                      {geminiModels.map(model => (
-                        <option key={model.name} value={model.name}>
-                          {model.displayName}
-                        </option>
-                      ))}
+                    <optgroup label={`Gemini Models (${geminiModels.length})`}>
+                      {geminiModels.map(model => {
+                        console.log('Debug: Rendering Gemini model:', model);
+                        return (
+                          <option key={model.name} value={model.name}>
+                            {model.displayName}
+                          </option>
+                        );
+                      })}
                     </optgroup>
                   )}
                   {ollamaModels.length > 0 && (
-                    <optgroup label="Ollama Models">
+                    <optgroup label={`Ollama Models (${ollamaModels.length})`}>
                       {ollamaModels.map(model => (
                         <option key={model.id} value={model.id}>
                           {model.id}

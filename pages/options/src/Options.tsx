@@ -34,6 +34,7 @@ const Options = () => {
 
   // Saving state
   const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
 
   const fetchGoogleModels = async (key: string) => {
     if (!key) return;
@@ -86,6 +87,7 @@ const Options = () => {
     try {
       // Save API keys (extend this logic if saving additional settings)
       await Promise.all([setOpenAIKey(openAIKey), setGeminiKey(geminiKey)]);
+      setSaveStatus('success');
     } catch (error) {
       console.error('Failed to save settings:', error);
       setSaveStatus('error');
