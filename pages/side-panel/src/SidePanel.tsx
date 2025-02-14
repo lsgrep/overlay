@@ -32,11 +32,13 @@ const SidePanel = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
 
+  // Helper function to log both to console and UI
   useEffect(() => {
     const fetchModels = async () => {
       try {
         setLoading(true);
         setError('');
+        console.log('Debug: Fetching models...');
 
         // Fetch Ollama models
         try {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
+import { getGeminiKey } from '@extension/storage';
 
 interface Message {
   role: string;
@@ -54,7 +55,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
     setInput('');
     setIsLoading(true);
     setError(null);
-
+    console.log('Debug: Submitting chat:', { input, selectedModel, mode });
     try {
       // Get current tab and its content
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -130,110 +131,166 @@ Current page URL: ${window.location.href}
       }
 
       // Add mode-specific context and format
-      const requestBody: {
-        model: string;
-        messages: Message[];
-        stream: boolean;
-        format?: {
-          type: string;
-          properties: {
-            goal: { type: string };
-            steps: {
-              type: string;
-              items: {
-                type: string;
-                properties: {
-                  description: { type: string };
-                  action: { type: string; enum: string[] };
-                  target: { type: string; optional: boolean };
-                  value: { type: string; optional: boolean };
-                  selector: { type: string; optional: boolean };
-                };
-                required: string[];
-              };
-            };
-            estimated_time: { type: string };
-          };
-          required: string[];
-        };
-      } = {
-        model: selectedModel,
-        messages: [...messages, { role: 'user', content: `${context}${input}` }],
-        stream: true,
-      };
-
+      // Add mode-specific context
       if (mode === 'interactive') {
         context += `You are in interactive mode. You will help manipulate and interact with the page by providing a structured plan. Please analyze the task and break it down into clear steps.\n\n`;
-        requestBody.format = {
-          type: 'object',
-          properties: {
-            goal: { type: 'string' },
-            steps: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  description: { type: 'string' },
-                  action: { type: 'string', enum: ['click', 'type', 'navigate', 'wait', 'extract'] },
-                  target: { type: 'string', optional: true },
-                  value: { type: 'string', optional: true },
-                  selector: { type: 'string', optional: true },
-                },
-                required: ['description', 'action'],
-              },
-            },
-            estimated_time: { type: 'string' },
-          },
-          required: ['goal', 'steps', 'estimated_time'],
-        };
       } else {
         context += `You are in conversational mode. Please focus on answering questions about the page content without suggesting interactive actions.\n\n`;
       }
 
-      // Send the request to Ollama
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+      console.log('Debug: Chat context:', context);
+      console.log('current model:', selectedModel);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (selectedModel.includes('gemini')) {
+        // Get Gemini API key
+        const geminiKey = await getGeminiKey();
+        if (!geminiKey) {
+          throw new Error('Gemini API key not found');
+        }
 
-      let fullResponse = '';
-      const reader = response.body!.getReader();
-      const decoder = new TextDecoder();
+        console.log('Debug: Got Gemini key:', geminiKey);
 
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
+        // Ensure we have the full model path
+        const modelName = selectedModel.includes('/') ? selectedModel : `models/${selectedModel}`.replace('//', '/');
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${geminiKey}`;
 
-        for (const line of lines) {
-          if (!line.trim()) continue;
+        const requestBody = {
+          contents: messages.concat({ role: 'user', content: `${context}${input}` }).map(msg => ({
+            role: msg.role === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.content }],
+          })),
+          generationConfig: {
+            temperature: 0.7,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 2048,
+          },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            },
+          ],
+        };
 
-          try {
-            const data = JSON.parse(line);
-            if (data.message?.content) {
-              fullResponse += data.message.content;
-              setMessages(prev => {
-                const newMessages = [...prev];
-                const lastMessage = newMessages[newMessages.length - 1];
-                if (lastMessage && lastMessage.role === 'assistant') {
-                  lastMessage.content = fullResponse;
-                  return [...newMessages];
-                } else {
-                  return [...newMessages, { role: 'assistant', content: fullResponse }];
+        console.log('Debug: Sending request to Gemini:', {
+          url: apiUrl.replace(geminiKey, '[REDACTED]'),
+          body: requestBody,
+        });
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Gemini API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText,
+          });
+          throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log('Debug: Gemini response:', data);
+
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
+        setMessages(prev => [...prev, { role: 'assistant', content }]);
+      } else {
+        // Handle Ollama chat
+        const requestBody = {
+          model: selectedModel,
+          messages: [...messages, { role: 'user', content: `${context}${input}` }],
+          stream: true,
+          format:
+            mode === 'interactive'
+              ? {
+                  type: 'object',
+                  properties: {
+                    goal: { type: 'string' },
+                    steps: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          description: { type: 'string' },
+                          action: { type: 'string', enum: ['click', 'type', 'navigate', 'wait', 'extract'] },
+                          target: { type: 'string', optional: true },
+                          value: { type: 'string', optional: true },
+                          selector: { type: 'string', optional: true },
+                        },
+                        required: ['description', 'action'],
+                      },
+                    },
+                    estimated_time: { type: 'string' },
+                  },
+                  required: ['goal', 'steps', 'estimated_time'],
                 }
-              });
+              : undefined,
+        };
+
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        let fullResponse = '';
+        const reader = response.body!.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (!line.trim()) continue;
+
+            try {
+              const data = JSON.parse(line);
+              if (data.message?.content) {
+                fullResponse += data.message.content;
+                setMessages(prev => {
+                  const newMessages = [...prev];
+                  const lastMessage = newMessages[newMessages.length - 1];
+                  if (lastMessage && lastMessage.role === 'assistant') {
+                    lastMessage.content = fullResponse;
+                    return [...newMessages];
+                  } else {
+                    return [...newMessages, { role: 'assistant', content: fullResponse }];
+                  }
+                });
+              }
+            } catch (e) {
+              console.error('Error parsing JSON:', e, line);
             }
-          } catch (e) {
-            console.error('Error parsing JSON:', e, line);
           }
         }
       }
