@@ -1,7 +1,15 @@
 import '@src/Options.css';
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, getOpenAIKey, getGeminiKey, setOpenAIKey, setGeminiKey } from '@extension/storage';
+import {
+  exampleThemeStorage,
+  getOpenAIKey,
+  getGeminiKey,
+  setOpenAIKey,
+  setGeminiKey,
+  getDefaultLanguage,
+  setDefaultLanguage,
+} from '@extension/storage';
 import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion } from 'framer-motion';
@@ -26,6 +34,18 @@ const Options = () => {
   const [maxTokens, setMaxTokens] = useState(2000);
   const [temperature, setTemperature] = useState(0.7);
   const [language, setLanguage] = useState('en');
+  const [availableLanguages] = useState([
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'fr', name: 'Français' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'it', name: 'Italiano' },
+    { code: 'pt', name: 'Português' },
+    { code: 'ru', name: 'Русский' },
+    { code: 'zh', name: '中文' },
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' },
+  ]);
   const [fontFamily, setFontFamily] = useState('Inter');
   const [fontSize, setFontSize] = useState('16');
 
@@ -60,16 +80,17 @@ const Options = () => {
   };
 
   useEffect(() => {
-    // Load saved API keys
-    const loadKeys = async () => {
-      const [openai, gemini] = await Promise.all([getOpenAIKey(), getGeminiKey()]);
+    // Load saved settings
+    const loadSettings = async () => {
+      const [openai, gemini, defaultLang] = await Promise.all([getOpenAIKey(), getGeminiKey(), getDefaultLanguage()]);
       if (openai) setOpenAIKeyState(openai);
       if (gemini) {
         setGeminiKeyState(gemini);
         fetchGoogleModels(gemini);
       }
+      if (defaultLang) setLanguage(defaultLang);
     };
-    loadKeys();
+    loadSettings();
   }, []);
 
   // Fetch models when Gemini key changes
@@ -85,8 +106,8 @@ const Options = () => {
     setIsSaving(true);
     setSaveStatus(null);
     try {
-      // Save API keys (extend this logic if saving additional settings)
-      await Promise.all([setOpenAIKey(openAIKey), setGeminiKey(geminiKey)]);
+      // Save all settings
+      await Promise.all([setOpenAIKey(openAIKey), setGeminiKey(geminiKey), setDefaultLanguage(language)]);
       setSaveStatus('success');
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -162,9 +183,33 @@ const Options = () => {
               className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
               {/* Tab Content */}
               {activeTab === 'General' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-                  <h2 className="text-2xl font-bold text-blue-500">Welcome to Settings</h2>
-                  <p className="text-sm opacity-60">Configure your extension preferences using the tabs above.</p>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-blue-500">General Settings</h2>
+                    <p className="text-sm opacity-60">Configure your general extension preferences</p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
+                        Default Language
+                      </label>
+                      <select
+                        id="language"
+                        value={language}
+                        onChange={e => setLanguage(e.target.value)}
+                        className={`w-full p-2 rounded border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-800 text-white'}`}>
+                        {availableLanguages.map(lang => (
+                          <option key={lang.code} value={lang.code}>
+                            {lang.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-sm opacity-60">
+                        Select your preferred language for the extension interface
+                      </p>
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
