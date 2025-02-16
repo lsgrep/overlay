@@ -26,13 +26,14 @@ interface ChatInterfaceProps {
   selectedModel: string;
   isLight: boolean;
   mode: 'interactive' | 'conversational';
+  initialInput?: string;
 }
 
 const API_URL = 'http://localhost:11434/api/chat';
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, mode }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, mode, initialInput }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState(initialInput || '');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +45,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (initialInput) {
+      setInput(initialInput);
+    }
+  }, [initialInput]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

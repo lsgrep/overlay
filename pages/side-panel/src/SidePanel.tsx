@@ -31,8 +31,38 @@ const SidePanel = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
+  const [input, setInput] = useState('');
 
   // Helper function to log both to console and UI
+  // Listen for translation requests
+  useEffect(() => {
+    const handleMessage = (message: { type: string; text: string }) => {
+      console.log('Debug: Received message:', message);
+      if (!selectedModel) {
+        console.log('Debug: No model selected, ignoring message');
+        return;
+      }
+
+      if (message.type === 'TRANSLATE_TEXT') {
+        console.log('Debug: Processing translation request');
+        setInput(`Translate the following text to English: "${message.text}"`);
+      } else if (message.type === 'SELECTED_TEXT') {
+        console.log('Debug: Processing selected text');
+        setInput(message.text);
+      }
+    };
+
+    const listener = (message: any) => {
+      console.log('Debug: Message listener called with:', message);
+      handleMessage(message);
+      // Return true to indicate we want to keep the message channel open
+      return true;
+    };
+
+    chrome.runtime.onMessage.addListener(listener);
+    return () => chrome.runtime.onMessage.removeListener(listener);
+  }, [selectedModel]);
+
   useEffect(() => {
     const fetchModels = async () => {
       try {
@@ -176,7 +206,7 @@ const SidePanel = () => {
       </header>
 
       <div className="flex-1 overflow-hidden">
-        <ChatInterface selectedModel={selectedModel} isLight={isLight} mode={mode} />
+        <ChatInterface selectedModel={selectedModel} isLight={isLight} mode={mode} initialInput={input} />
       </div>
     </div>
   );
