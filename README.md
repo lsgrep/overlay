@@ -13,9 +13,17 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 - ✅ Responsive and modern UI design
 
 ### AI Integration
-- ✅ Intelligent chat interface powered by Ollama
-- 🚧 Context-aware browsing assistance
-- 📝 Custom model configuration
+- ✅ Intelligent chat interface with multiple model support
+  - Gemini Pro integration with API key
+  - Local model execution via Ollama
+  - Automatic model switching and persistence
+- ✅ Custom model configuration
+  - Default model selection in options
+  - Dynamic model discovery for both Gemini and Ollama
+  - Automatic retry mechanism for API rate limits
+- ✅ Context-aware browsing assistance
+  - Interactive and conversational modes
+  - Context menu integration for quick actions
 - 📝 Chat history and conversation management
 
 ### Content Features
@@ -35,19 +43,26 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 pnpm install
 ```
 
-2. Pull recommended models:
-```bash
-# Install Phi-4, a lightweight but powerful model
-ollama pull phi4
+2. Configure AI Models:
 
-# Install Mistral, great for general-purpose tasks
-ollama pull mistral
-```
+   a. For Ollama (Local Models):
+   ```bash
+   # Install recommended models
+   ollama pull mistral    # Great for general tasks
+   ollama pull codellama  # Specialized for code
+   ollama pull phi        # Fast and lightweight
+   ```
+
+   b. For Gemini (Cloud Models):
+   - Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Add the key in the extension options
 
 3. Start Ollama service with Chrome extension permissions:
 ```bash
 OLLAMA_ORIGINS=chrome-extension://* ollama serve
 ```
+
+Note: The extension will automatically discover available models from both Ollama and Gemini.
 
 4. Start development:
 ```bash
