@@ -33,22 +33,22 @@ const getLanguageName = async () => {
 const CONTEXT_MENU_ACTIONS = [
   {
     id: 'translate',
-    title: 'Translate',
+    title: '🌐 Translate',
     contexts: ['selection'],
   },
   {
     id: 'explain',
-    title: 'Explain This',
+    title: '💡 Explain This',
     contexts: ['selection'],
   },
   {
     id: 'improve',
-    title: 'Improve Writing',
+    title: '✨ Improve Writing',
     contexts: ['selection'],
   },
   {
     id: 'summarize',
-    title: 'Summarize',
+    title: '📝 Summarize',
     contexts: ['selection'],
   },
 ];
@@ -57,7 +57,7 @@ const CONTEXT_MENU_ACTIONS = [
 const updateTranslateTitle = async () => {
   const targetLang = await getLanguageName();
   chrome.contextMenus.update('translate', {
-    title: `Translate to ${targetLang}`,
+    title: `🌐 Translate to ${targetLang}`,
   });
 };
 
@@ -73,7 +73,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   // Create parent menu item
   chrome.contextMenus.create({
     id: 'overlay-actions',
-    title: 'Overlay Actions',
+    title: ' Overlay AI',
     contexts: ['selection'],
   });
 
