@@ -11,6 +11,8 @@ import {
   setDefaultLanguage,
   getDefaultModel,
   setDefaultModel,
+  fontFamilyStorage,
+  fontSizeStorage,
 } from '@extension/storage';
 import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
@@ -49,8 +51,8 @@ const Options = () => {
     { code: 'japanese', name: '日本語' },
     { code: 'korean', name: '한국어' },
   ]);
-  const [fontFamily, setFontFamily] = useState('Inter');
-  const [fontSize, setFontSize] = useState('16');
+  const fontFamily = useStorage(fontFamilyStorage);
+  const fontSize = useStorage(fontSizeStorage);
 
   // State for tab navigation
   const [activeTab, setActiveTab] = useState('General');
@@ -117,22 +119,27 @@ const Options = () => {
   useEffect(() => {
     // Load saved settings
     const loadSettings = async () => {
-      const [openai, gemini, defaultLang, defaultMod] = await Promise.all([
-        getOpenAIKey(),
-        getGeminiKey(),
-        getDefaultLanguage(),
-        getDefaultModel(),
-      ]);
-      if (openai) setOpenAIKeyState(openai);
-      if (gemini) {
-        setGeminiKeyState(gemini);
-        fetchGoogleModels(gemini);
-      }
-      if (defaultLang) setLanguage(defaultLang);
-      if (defaultMod) setSelectedModel(defaultMod);
+      try {
+        const [openai, gemini, defaultLang, defaultMod] = await Promise.all([
+          getOpenAIKey(),
+          getGeminiKey(),
+          getDefaultLanguage(),
+          getDefaultModel(),
+        ]);
 
-      // Fetch Ollama models on startup
-      fetchOllamaModels();
+        if (openai) setOpenAIKeyState(openai);
+        if (gemini) {
+          setGeminiKeyState(gemini);
+          fetchGoogleModels(gemini);
+        }
+        if (defaultLang) setLanguage(defaultLang);
+        if (defaultMod) setSelectedModel(defaultMod);
+
+        // Fetch Ollama models on startup
+        fetchOllamaModels();
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
     };
     loadSettings();
   }, []);
@@ -146,17 +153,32 @@ const Options = () => {
     }
   }, [geminiKey]);
 
+  // Apply font settings to the document
+  useEffect(() => {
+    if (fontFamily) {
+      document.documentElement.style.setProperty('--font-family', fontFamily);
+    }
+  }, [fontFamily]);
+
+  useEffect(() => {
+    if (fontSize) {
+      document.documentElement.style.setProperty('--font-size', `${fontSize}px`);
+    }
+  }, [fontSize]);
+
   const handleSave = async () => {
     setIsSaving(true);
     setSaveStatus(null);
     try {
       // Save all settings
-      await Promise.all([
-        setOpenAIKey(openAIKey),
-        setGeminiKey(geminiKey),
-        setDefaultLanguage(language),
-        setDefaultModel(selectedModel),
-      ]);
+      await Promise.all(
+        [
+          openAIKey && setOpenAIKey(openAIKey),
+          geminiKey && setGeminiKey(geminiKey),
+          language && setDefaultLanguage(language),
+          selectedModel && setDefaultModel(selectedModel),
+        ].filter(Boolean),
+      );
       setSaveStatus('success');
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -450,13 +472,17 @@ const Options = () => {
                     <select
                       id="font-family"
                       value={fontFamily}
-                      onChange={e => setFontFamily(e.target.value)}
+                      onChange={e => fontFamilyStorage.set(e.target.value)}
                       className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                         isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
                       }`}>
                       <option value="Inter">Inter</option>
-                      <option value="system-ui">System</option>
-                      <option value="monospace">Monospace</option>
+                      <option value="SF Pro Display">SF Pro Display</option>
+                      <option value="Roboto">Roboto</option>
+                      <option value="Open Sans">Open Sans</option>
+                      <option value="JetBrains Mono">JetBrains Mono</option>
+                      <option value="Fira Code">Fira Code</option>
+                      <option value="system-ui">System Default</option>
                     </select>
                   </div>
                   <div>
@@ -466,7 +492,7 @@ const Options = () => {
                     <select
                       id="font-size"
                       value={fontSize}
-                      onChange={e => setFontSize(e.target.value)}
+                      onChange={e => fontSizeStorage.set(e.target.value)}
                       className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                         isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
                       }`}>
