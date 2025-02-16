@@ -25,7 +25,7 @@ interface TaskPlan {
 interface ChatInterfaceProps {
   selectedModel: string;
   isLight: boolean;
-  mode: 'interactive' | 'conversational';
+  mode: 'interactive' | 'conversational' | 'context-menu';
   initialInput?: string;
 }
 
@@ -49,8 +49,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
   useEffect(() => {
     if (initialInput) {
       setInput(initialInput);
+      // Auto-submit for context-menu mode
+      if (mode === 'context-menu') {
+        const event = new Event('submit') as any;
+        handleSubmit(event);
+      }
     }
-  }, [initialInput]);
+  }, [initialInput, mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,9 +108,7 @@ Example response format:
     }
   ],
   "estimated_time": "10 seconds"
-}
-
-`;
+}`;
       if (tab?.title || tab?.url) {
         context += `Current page: ${tab.title || ''} ${tab.url ? `(${tab.url})` : ''}\n\n`;
       }

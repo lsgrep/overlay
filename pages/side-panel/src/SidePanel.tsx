@@ -2,6 +2,7 @@ import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, getGeminiKey } from '@extension/storage';
 import { useEffect, useState } from 'react';
+import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
 
 interface OllamaModel {
@@ -30,25 +31,34 @@ const SidePanel = () => {
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
+  const [mode, setMode] = useState<'interactive' | 'conversational' | 'context-menu'>('conversational');
   const [input, setInput] = useState('');
 
   // Helper function to log both to console and UI
-  // Listen for translation requests
+  // Listen for messages
   useEffect(() => {
-    const handleMessage = (message: { type: string; text: string }) => {
+    const handleMessage = (message: { type: string; text: string; actionId?: string }) => {
       console.log('Debug: Received message:', message);
       if (!selectedModel) {
         console.log('Debug: No model selected, ignoring message');
         return;
       }
 
-      if (message.type === 'TRANSLATE_TEXT') {
-        console.log('Debug: Processing translation request');
-        setInput(`Translate the following text to English: "${message.text}"`);
-      } else if (message.type === 'SELECTED_TEXT') {
-        console.log('Debug: Processing selected text');
-        setInput(message.text);
+      if (message.type === 'CONTEXT_MENU_ACTION' && message.actionId) {
+        console.log('Debug: Processing context menu action:', message.actionId);
+        const action = CONTEXT_MENU_ACTIONS.find(a => a.id === message.actionId);
+        console.log('Debug: Found action:', action);
+        if (action) {
+          setMode('context-menu');
+          setInput(action.prompt(message.text));
+          // Immediately submit the message
+          if (action.prompt(message.text)) {
+            // Pass the input to ChatInterface
+            const chatInput = action.prompt(message.text);
+            console.log('Debug: Setting chat input:', chatInput);
+            setInput(chatInput);
+          }
+        }
       }
     };
 
