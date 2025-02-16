@@ -120,6 +120,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
         undefined,
         mode,
       );
+      console.log('Debug: Completion:', completion);
       setMessages(prev => [...prev, { role: 'assistant', content: completion }]);
     } catch (err) {
       console.error('Error in chat:', err);
