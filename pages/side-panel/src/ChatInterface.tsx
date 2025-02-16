@@ -109,7 +109,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
       }
 
       // Get completion
-      const completion = await llmService.generateCompletion(messages.concat({ role: 'user', content: input }), prompt);
+      const completion = await llmService.generateCompletion(
+        messages.concat({ role: 'user', content: input }),
+        prompt,
+        undefined,
+        mode,
+      );
       setMessages(prev => [...prev, { role: 'assistant', content: completion }]);
     } catch (err) {
       console.error('Error in chat:', err);

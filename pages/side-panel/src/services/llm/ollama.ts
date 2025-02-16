@@ -9,12 +9,9 @@ export class OllamaService implements LLMService {
     this.apiUrl = apiUrl;
   }
 
-  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
-    const requestBody = {
-      model: this.modelName,
-      messages: [...messages, { role: 'user', content: context }],
-      stream: true,
-      format: {
+  private getRequestFormat(mode: 'interactive' | 'conversational' | 'context-menu') {
+    if (mode === 'interactive') {
+      return {
         type: 'object',
         properties: {
           goal: { type: 'string' },
@@ -35,7 +32,31 @@ export class OllamaService implements LLMService {
           estimated_time: { type: 'string' },
         },
         required: ['goal', 'steps', 'estimated_time'],
-      },
+      };
+    } else if (mode === 'conversational' || mode === 'context-menu') {
+      return {
+        type: 'object',
+        properties: {
+          response: { type: 'string' },
+          reasoning: { type: 'string', optional: true },
+        },
+        required: ['response'],
+      };
+    }
+    return undefined;
+  }
+
+  async generateCompletion(
+    messages: Message[],
+    context: string,
+    config?: LLMConfig,
+    mode: 'interactive' | 'conversational' | 'context-menu' = 'conversational',
+  ): Promise<string> {
+    const requestBody: any = {
+      model: this.modelName,
+      messages: [...messages, { role: 'user', content: context }],
+      stream: true,
+      format: this.getRequestFormat(mode),
     };
 
     const response = await fetch(this.apiUrl, {
@@ -51,6 +72,7 @@ export class OllamaService implements LLMService {
     }
 
     let fullResponse = '';
+    let accumulatedJson = '';
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
 
@@ -67,10 +89,41 @@ export class OllamaService implements LLMService {
         try {
           const data = JSON.parse(line);
           if (data.message?.content) {
-            fullResponse += data.message.content;
+            let content = data.message.content;
+            if (mode === 'interactive') {
+              // For interactive mode, accumulate JSON chunks
+              accumulatedJson += content;
+              try {
+                // Try to parse accumulated JSON
+                if (accumulatedJson.startsWith('{')) {
+                  const parsed = JSON.parse(accumulatedJson);
+                  if (parsed.goal && parsed.steps) {
+                    fullResponse = JSON.stringify(parsed, null, 2);
+                  }
+                }
+              } catch (e) {
+                // Ignore parse error as it might be incomplete JSON
+              }
+            } else {
+              // For conversational/context-menu modes
+              accumulatedJson += content;
+              if (accumulatedJson.startsWith('{')) {
+                try {
+                  const parsed = JSON.parse(accumulatedJson);
+                  if (parsed.response) {
+                    // Replace entire response with just the response field
+                    fullResponse = parsed.response;
+                  }
+                } catch (e) {
+                  // Ignore parse error as it might be incomplete JSON
+                }
+              } else {
+                fullResponse += content;
+              }
+            }
           }
         } catch (e) {
-          console.error('Error parsing JSON:', e, line);
+          console.error('Error parsing streaming JSON:', e);
         }
       }
     }
