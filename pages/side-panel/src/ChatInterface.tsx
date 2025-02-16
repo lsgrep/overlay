@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
+import { PaperAirplaneIcon, UserIcon, ChatBubbleLeftRightIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
 import { getGeminiKey } from '@extension/storage';
@@ -144,16 +145,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
               className={`text-xs font-semibold mb-1 flex items-center gap-1 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
               {message.role === 'user' ? (
                 <>
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                  </svg>
+                  <UserIcon className="w-3 h-3" />
                   <span>You</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                  </svg>
+                  <ChatBubbleLeftRightIcon className="w-3 h-3" />
                   <span>Assistant</span>
                 </>
               )}
@@ -197,14 +194,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
         {isLoading && (
           <div className={`flex justify-center py-2 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
             <div className="flex gap-1">
-              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path
-                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray="60 30"
-                />
-              </svg>
+              <ArrowPathIcon className="w-4 h-4 animate-spin" />
               <span className="text-sm">Thinking...</span>
             </div>
           </div>
@@ -240,14 +230,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             }`}>
             <span>Send</span>
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path
-                d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <PaperAirplaneIcon className="w-4 h-4" />
           </button>
         </div>
       </form>

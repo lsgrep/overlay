@@ -32,6 +32,7 @@
     "update-version": "bash update_version.sh"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "framer-motion": "^12.4.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",

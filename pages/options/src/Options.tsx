@@ -2,6 +2,16 @@ import '@src/Options.css';
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import {
+  SunIcon,
+  MoonIcon,
+  Cog6ToothIcon,
+  KeyIcon,
+  CloudIcon,
+  SparklesIcon,
+  PaintBrushIcon,
+  LanguageIcon,
+} from '@heroicons/react/24/solid';
+import {
   exampleThemeStorage,
   getOpenAIKey,
   getGeminiKey,
@@ -217,7 +227,10 @@ const Options = () => {
             className="transition-all duration-300 hover:scale-105"
             data-tooltip-id="theme-tooltip"
             data-tooltip-content={`Switch to ${isLight ? 'Dark' : 'Light'} mode`}>
-            {isLight ? '🌙' : '☀️'} {isLight ? 'Dark' : 'Light'} mode
+            <div className="flex items-center gap-2">
+              {isLight ? <MoonIcon className="w-4 h-4" /> : <SunIcon className="w-4 h-4" />}
+              <span>{isLight ? 'Dark' : 'Light'} mode</span>
+            </div>
           </Button>
         </div>
       </motion.div>
@@ -231,16 +244,24 @@ const Options = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-2 sticky top-24">
-              {['General', 'OpenAI', 'Google', 'AI Models', 'Appearance', 'Language'].map(tab => (
+              {[
+                { name: 'General', icon: <Cog6ToothIcon className="w-5 h-5" /> },
+                { name: 'OpenAI', icon: <KeyIcon className="w-5 h-5" /> },
+                { name: 'Google', icon: <CloudIcon className="w-5 h-5" /> },
+                { name: 'AI Models', icon: <SparklesIcon className="w-5 h-5" /> },
+                { name: 'Appearance', icon: <PaintBrushIcon className="w-5 h-5" /> },
+                { name: 'Language', icon: <LanguageIcon className="w-5 h-5" /> },
+              ].map(({ name: tab, icon }) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium ${
+                  className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium flex items-center gap-3 ${
                     activeTab === tab
                       ? 'bg-blue-500 text-white'
                       : `${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-900'} text-gray-500`
                   }`}>
-                  {tab}
+                  {icon}
+                  <span>{tab}</span>
                 </button>
               ))}
             </motion.div>
