@@ -1,6 +1,6 @@
 import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, getGeminiKey } from '@extension/storage';
+import { exampleThemeStorage, getGeminiKey, getDefaultModel, setDefaultModel } from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -33,6 +33,24 @@ const SidePanel = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational' | 'context-menu'>('conversational');
   const [input, setInput] = useState('');
+
+  // Load default model from storage
+  useEffect(() => {
+    const loadDefaultModel = async () => {
+      const defaultModel = await getDefaultModel();
+      if (defaultModel) {
+        setSelectedModel(defaultModel);
+      }
+    };
+    loadDefaultModel();
+  }, []);
+
+  // Save selected model to storage when it changes
+  useEffect(() => {
+    if (selectedModel) {
+      setDefaultModel(selectedModel);
+    }
+  }, [selectedModel]);
 
   // Helper function to log both to console and UI
   // Listen for messages
@@ -89,9 +107,6 @@ const SidePanel = () => {
           const ollamaData: OllamaResponse = await ollamaResponse.json();
           console.log('Ollama models:', ollamaData.data);
           setOllamaModels(ollamaData.data);
-          if (ollamaData.data.length > 0 && !selectedModel) {
-            setSelectedModel(ollamaData.data[0].id);
-          }
         } catch (err) {
           console.error('Error fetching Ollama models:', err);
         }
@@ -167,6 +182,7 @@ const SidePanel = () => {
                 <option>Error loading models: {error}</option>
               ) : (
                 <>
+                  <option value="">Select a model</option>
                   {geminiModels.length > 0 && (
                     <optgroup label={`Gemini Models (${geminiModels.length})`}>
                       {geminiModels.map(model => {

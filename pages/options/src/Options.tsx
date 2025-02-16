@@ -9,6 +9,8 @@ import {
   setGeminiKey,
   getDefaultLanguage,
   setDefaultLanguage,
+  getDefaultModel,
+  setDefaultModel,
 } from '@extension/storage';
 import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
@@ -25,12 +27,13 @@ const Options = () => {
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
 
-  const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string }>>([]);
+  const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
+  const [ollamaModels, setOllamaModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
 
   // New state variables for additional settings
-  const [selectedModel, setSelectedModel] = useState('gpt-4');
+  const [selectedModel, setSelectedModel] = useState('');
   const [maxTokens, setMaxTokens] = useState(2000);
   const [temperature, setTemperature] = useState(0.7);
   const [language, setLanguage] = useState('english');
@@ -66,14 +69,46 @@ const Options = () => {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch models: ${response.statusText}`);
+        throw new Error(`Failed to fetch Gemini models: ${response.statusText}`);
       }
 
       const data = await response.json();
-      setGoogleModels(data.models || []);
+      const models = (data.models || []).map((model: any) => ({
+        name: model.name,
+        displayName: model.displayName,
+        provider: 'gemini',
+      }));
+      setGoogleModels(models);
     } catch (error) {
-      console.error('Error fetching Google models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to fetch models');
+      console.error('Error fetching Gemini models:', error);
+      setModelError(error instanceof Error ? error.message : 'Failed to fetch Gemini models');
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
+
+  const fetchOllamaModels = async () => {
+    setIsLoadingModels(true);
+    setModelError(null);
+
+    try {
+      const response = await fetch('http://localhost:11434/api/tags');
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Ollama models: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const models =
+        data.models?.map((model: any) => ({
+          name: model.name,
+          displayName: model.name,
+          provider: 'ollama',
+        })) || [];
+      setOllamaModels(models);
+    } catch (error) {
+      console.error('Error fetching Ollama models:', error);
+      setModelError(error instanceof Error ? error.message : 'Failed to fetch Ollama models');
     } finally {
       setIsLoadingModels(false);
     }
@@ -82,13 +117,22 @@ const Options = () => {
   useEffect(() => {
     // Load saved settings
     const loadSettings = async () => {
-      const [openai, gemini, defaultLang] = await Promise.all([getOpenAIKey(), getGeminiKey(), getDefaultLanguage()]);
+      const [openai, gemini, defaultLang, defaultMod] = await Promise.all([
+        getOpenAIKey(),
+        getGeminiKey(),
+        getDefaultLanguage(),
+        getDefaultModel(),
+      ]);
       if (openai) setOpenAIKeyState(openai);
       if (gemini) {
         setGeminiKeyState(gemini);
         fetchGoogleModels(gemini);
       }
       if (defaultLang) setLanguage(defaultLang);
+      if (defaultMod) setSelectedModel(defaultMod);
+
+      // Fetch Ollama models on startup
+      fetchOllamaModels();
     };
     loadSettings();
   }, []);
@@ -107,7 +151,12 @@ const Options = () => {
     setSaveStatus(null);
     try {
       // Save all settings
-      await Promise.all([setOpenAIKey(openAIKey), setGeminiKey(geminiKey), setDefaultLanguage(language)]);
+      await Promise.all([
+        setOpenAIKey(openAIKey),
+        setGeminiKey(geminiKey),
+        setDefaultLanguage(language),
+        setDefaultModel(selectedModel),
+      ]);
       setSaveStatus('success');
     } catch (error) {
       console.error('Failed to save settings:', error);
@@ -208,6 +257,38 @@ const Options = () => {
                       <p className="mt-1 text-sm opacity-60">
                         Select your preferred language for the extension interface
                       </p>
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="model" className="block text-sm font-medium mb-1">
+                        Default Model
+                      </label>
+                      <select
+                        id="model"
+                        value={selectedModel}
+                        onChange={e => setSelectedModel(e.target.value)}
+                        className={`w-full p-2 rounded border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-800 text-white'}`}>
+                        <option value="">Select a model</option>
+                        {googleModels.length > 0 && (
+                          <optgroup label="Gemini Models">
+                            {googleModels.map(model => (
+                              <option key={model.name} value={model.name}>
+                                {model.displayName || model.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                        {ollamaModels.length > 0 && (
+                          <optgroup label="Ollama Models">
+                            {ollamaModels.map(model => (
+                              <option key={model.name} value={model.name}>
+                                {model.displayName}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
+                      </select>
+                      <p className="mt-1 text-sm opacity-60">Select your preferred AI model for chat interactions</p>
                     </div>
                   </div>
                 </motion.div>
