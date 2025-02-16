@@ -40,7 +40,13 @@ const manifest = withSidePanel({
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: ['<all_urls>', 'http://localhost:11434/*'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'contextMenus'],
+  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'contextMenus', 'clipboardWrite'],
+  web_accessible_resources: [
+    {
+      resources: ['new-tab/*'],
+      matches: ['<all_urls>'],
+    },
+  ],
   options_page: 'options/index.html',
   background: {
     service_worker: 'background.iife.js',

@@ -48,9 +48,9 @@ const NewTab = () => {
       </div>
 
       {/* Background pattern */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden z-0">
         <div
-          className={`absolute -inset-[10px] opacity-30 ${isLight ? 'bg-[radial-gradient(circle_at_center,_#4f46e520_1px,_transparent_1px)] [background-size:24px_24px]' : 'bg-[radial-gradient(circle_at_center,_#6366f120_1px,_transparent_1px)] [background-size:24px_24px]'}`}
+          className={`absolute -inset-[10px] opacity-30 z-0 ${isLight ? 'bg-[radial-gradient(circle_at_center,_#4f46e520_1px,_transparent_1px)] [background-size:24px_24px]' : 'bg-[radial-gradient(circle_at_center,_#6366f120_1px,_transparent_1px)] [background-size:24px_24px]'}`}
         />
       </div>
 

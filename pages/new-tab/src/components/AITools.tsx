@@ -75,10 +75,10 @@ export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
   const categories = Array.from(new Set(AI_TOOLS.map(tool => tool.category)));
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
+    <div className="w-full max-w-6xl mx-auto p-6 relative z-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {categories.map(category => (
-          <div key={category} className={`space-y-4 ${isLight ? 'text-gray-800' : 'text-white'}`}>
+          <div key={category} className={`space-y-4 relative ${isLight ? 'text-gray-800' : 'text-white'}`}>
             <h3 className="text-lg font-semibold capitalize mb-4">
               {category === 'general' ? 'Featured' : `${category} Tools`}
             </h3>
@@ -87,19 +87,19 @@ export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
                 <a
                   key={tool.name}
                   href={tool.url}
-                  // target="_blank"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className={`block p-4 rounded-lg transition-all duration-200 ${
+                  className={`block p-4 rounded-lg transition-all duration-200 cursor-pointer relative z-20 ${
                     isLight
                       ? 'bg-white/50 hover:bg-white/80 shadow-sm hover:shadow-md'
                       : 'bg-gray-800/50 hover:bg-gray-800/80 shadow-sm hover:shadow-md'
-                  }`}>
+                  } hover:scale-105`}>
                   <div className="flex items-center space-x-3">
-                    <span className="text-2xl" role="img" aria-label={tool.name}>
+                    <span className="text-2xl transition-transform duration-200" role="img" aria-label={tool.name}>
                       {tool.icon}
                     </span>
                     <div>
-                      <h4 className="font-medium">{tool.name}</h4>
+                      <h4 className="font-medium transition-colors duration-200 hover:text-indigo-500">{tool.name}</h4>
                       <p className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>{tool.description}</p>
                     </div>
                   </div>
