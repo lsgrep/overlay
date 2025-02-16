@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useStorage } from '@extension/shared';
+import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
 import { getGeminiKey } from '@extension/storage';
@@ -36,6 +38,8 @@ interface ChatInterfaceProps {
 const API_URL = 'http://localhost:11434/api/chat';
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, mode, initialInput }) => {
+  const fontFamily = useStorage(fontFamilyStorage);
+  const fontSize = useStorage(fontSizeStorage);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialInput || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -125,7 +129,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
         {messages.map((message, index) => (
           <div
@@ -136,6 +140,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
                 : `${isLight ? 'bg-gray-100' : 'bg-gray-700'} mr-4`
             }`}>
             <div
+              style={{ fontFamily, fontSize: `${fontSize}px` }}
               className={`text-xs font-semibold mb-1 flex items-center gap-1 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
               {message.role === 'user' ? (
                 <>
@@ -219,6 +224,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="Type your message..."
+            style={{ fontFamily, fontSize: `${fontSize}px` }}
             className={`flex-1 p-2 rounded-lg border ${
               isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-700 text-white'
             }`}
@@ -227,6 +233,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
+            style={{ fontFamily, fontSize: `${fontSize}px` }}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
               isLoading || !input.trim()
                 ? 'bg-blue-300 dark:bg-blue-600 cursor-not-allowed'
