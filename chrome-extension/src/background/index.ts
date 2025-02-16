@@ -1,5 +1,5 @@
 import 'webextension-polyfill';
-import { exampleThemeStorage } from '@extension/storage';
+import { exampleThemeStorage, getDefaultLanguage } from '@extension/storage';
 
 // Enable side panel opening on extension icon click
 chrome.sidePanel
@@ -13,10 +13,27 @@ exampleThemeStorage.get().then(theme => {
 
 console.log('Background service worker loaded');
 // Context menu actions
+const getLanguageName = async () => {
+  const targetLang = await getDefaultLanguage();
+  const languageNames: { [key: string]: string } = {
+    english: 'English',
+    spanish: 'Spanish',
+    french: 'French',
+    german: 'German',
+    italian: 'Italian',
+    portuguese: 'Portuguese',
+    russian: 'Russian',
+    chinese: 'Chinese',
+    japanese: 'Japanese',
+    korean: 'Korean',
+  };
+  return languageNames[targetLang] || 'English';
+};
+
 const CONTEXT_MENU_ACTIONS = [
   {
     id: 'translate',
-    title: 'Translate to English',
+    title: 'Translate',
     contexts: ['selection'],
   },
   {
@@ -36,8 +53,23 @@ const CONTEXT_MENU_ACTIONS = [
   },
 ];
 
+// Update translate menu title
+const updateTranslateTitle = async () => {
+  const targetLang = await getLanguageName();
+  chrome.contextMenus.update('translate', {
+    title: `Translate to ${targetLang}`,
+  });
+};
+
+// Listen for storage changes
+chrome.storage.onChanged.addListener(changes => {
+  if (changes['default-language']) {
+    updateTranslateTitle();
+  }
+});
+
 // Create context menu items
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(async () => {
   // Create parent menu item
   chrome.contextMenus.create({
     id: 'overlay-actions',

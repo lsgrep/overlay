@@ -23,14 +23,26 @@ export interface TaskPlan {
 export interface ContextMenuAction {
   id: string;
   title: string;
-  prompt: (text: string) => string;
+  prompt: (text: string) => Promise<string> | string;
 }
+
+import { getDefaultLanguage } from '@extension/storage';
+
+export const getTranslateTitle = async () => {
+  const targetLang = await getDefaultLanguage();
+  return `Translate to ${targetLang || 'English'}`;
+};
+
+export const getTranslatePrompt = async (text: string) => {
+  const targetLang = await getDefaultLanguage();
+  return `Translate the following text to ${targetLang || 'English'}: "${text}"`;
+};
 
 export const CONTEXT_MENU_ACTIONS: ContextMenuAction[] = [
   {
     id: 'translate',
-    title: 'Translate to English',
-    prompt: text => `Translate the following text to English: "${text}"`,
+    title: 'Translate',
+    prompt: async text => getTranslatePrompt(text),
   },
   {
     id: 'explain',

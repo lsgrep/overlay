@@ -37,7 +37,7 @@ const SidePanel = () => {
   // Helper function to log both to console and UI
   // Listen for messages
   useEffect(() => {
-    const handleMessage = (message: { type: string; text: string; actionId?: string }) => {
+    const handleMessage = async (message: { type: string; text: string; actionId?: string }) => {
       console.log('Debug: Received message:', message);
       if (!selectedModel) {
         console.log('Debug: No model selected, ignoring message');
@@ -49,23 +49,26 @@ const SidePanel = () => {
         const action = CONTEXT_MENU_ACTIONS.find(a => a.id === message.actionId);
         console.log('Debug: Found action:', action);
         if (action) {
-          setMode('context-menu');
-          setInput(action.prompt(message.text));
-          // Immediately submit the message
-          if (action.prompt(message.text)) {
-            // Pass the input to ChatInterface
-            const chatInput = action.prompt(message.text);
-            console.log('Debug: Setting chat input:', chatInput);
-            setInput(chatInput);
+          try {
+            const chatInput = await action.prompt(message.text);
+            if (chatInput) {
+              console.log('Debug: Setting chat input:', chatInput);
+              setMode('context-menu');
+              setInput(chatInput);
+            }
+          } catch (error) {
+            console.error('Error getting prompt:', error);
           }
         }
       }
     };
 
-    const listener = (message: any) => {
+    const listener = (message: any, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
       console.log('Debug: Message listener called with:', message);
-      handleMessage(message);
-      // Return true to indicate we want to keep the message channel open
+      handleMessage(message).catch(error => {
+        console.error('Error handling message:', error);
+      });
+      // Return true to indicate we want to keep the message channel open for async response
       return true;
     };
 

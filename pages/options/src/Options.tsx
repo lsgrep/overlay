@@ -33,18 +33,18 @@ const Options = () => {
   const [selectedModel, setSelectedModel] = useState('gpt-4');
   const [maxTokens, setMaxTokens] = useState(2000);
   const [temperature, setTemperature] = useState(0.7);
-  const [language, setLanguage] = useState('en');
+  const [language, setLanguage] = useState('english');
   const [availableLanguages] = useState([
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'fr', name: 'Français' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'it', name: 'Italiano' },
-    { code: 'pt', name: 'Português' },
-    { code: 'ru', name: 'Русский' },
-    { code: 'zh', name: '中文' },
-    { code: 'ja', name: '日本語' },
-    { code: 'ko', name: '한국어' },
+    { code: 'english', name: 'English' },
+    { code: 'spanish', name: 'Español' },
+    { code: 'french', name: 'Français' },
+    { code: 'german', name: 'Deutsch' },
+    { code: 'italian', name: 'Italiano' },
+    { code: 'portuguese', name: 'Português' },
+    { code: 'russian', name: 'Русский' },
+    { code: 'chinese', name: '中文' },
+    { code: 'japanese', name: '日本語' },
+    { code: 'korean', name: '한국어' },
   ]);
   const [fontFamily, setFontFamily] = useState('Inter');
   const [fontSize, setFontSize] = useState('16');
