@@ -1,6 +1,5 @@
 # Overlay
 
-
 [![Watch the video](https://cdn.loom.com/sessions/thumbnails/f7b5958bb7f14e4db3566eb4c23d6e70-bd26582bfc32b03b-full-play.gif)](https://www.loom.com/share/f7b5958bb7f14e4db3566eb4c23d6e70)
 
 A Chrome extension that enhances your browsing experience with AI-powered assistance.
