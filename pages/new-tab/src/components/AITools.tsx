@@ -1,11 +1,21 @@
 import React from 'react';
+import {
+  MagnifyingGlassIcon,
+  GlobeAltIcon,
+  ChatBubbleLeftRightIcon,
+  SparklesIcon,
+  CommandLineIcon,
+  PaintBrushIcon,
+} from '@heroicons/react/24/outline';
+import { IconBrandOpenai, IconBrandGoogle, IconRobot, IconBrandGithub } from '@tabler/icons-react';
 
 interface AITool {
   name: string;
   url: string;
   description: string;
-  icon: string;
-  category: 'chat' | 'code' | 'research' | 'general';
+  icon: React.ReactNode;
+  category: 'Chat' | 'Code' | 'Research' | 'General';
+  bgColor?: string;
 }
 
 const AI_TOOLS: AITool[] = [
@@ -13,57 +23,65 @@ const AI_TOOLS: AITool[] = [
     name: 'Phind',
     url: 'https://phind.com',
     description: 'AI-powered search engine for developers',
-    icon: '🔍',
-    category: 'code',
+    icon: <MagnifyingGlassIcon className="w-6 h-6" />,
+    category: 'Code',
+    bgColor: 'from-blue-500/20 to-indigo-500/20',
   },
   {
     name: 'Perplexity',
     url: 'https://perplexity.ai',
     description: 'AI research assistant with real-time web search',
-    icon: '🌐',
-    category: 'research',
+    icon: <GlobeAltIcon className="w-6 h-6" />,
+    category: 'Research',
+    bgColor: 'from-purple-500/20 to-pink-500/20',
   },
   {
     name: 'Claude',
     url: 'https://claude.ai',
     description: 'Advanced AI assistant by Anthropic',
-    icon: '🤖',
-    category: 'chat',
+    icon: <IconRobot size={24} />,
+    category: 'Chat',
+    bgColor: 'from-violet-500/20 to-purple-500/20',
   },
   {
     name: 'Gemini',
     url: 'https://gemini.google.com',
     description: "Google's advanced AI model",
-    icon: '🎯',
-    category: 'general',
+    icon: <IconBrandGoogle size={24} />,
+    category: 'General',
+    bgColor: 'from-blue-500/20 to-green-500/20',
   },
   {
     name: 'ChatGPT',
     url: 'https://chat.openai.com',
     description: "OpenAI's conversational AI",
-    icon: '💬',
-    category: 'chat',
+    icon: <IconBrandOpenai size={24} />,
+    category: 'Chat',
+    bgColor: 'from-emerald-500/20 to-teal-500/20',
   },
   {
     name: 'Hugging Face',
     url: 'https://huggingface.co',
     description: 'Hub for machine learning models and datasets',
-    icon: '🤗',
-    category: 'code',
+    icon: <SparklesIcon className="w-6 h-6" />,
+    category: 'Code',
+    bgColor: 'from-yellow-500/20 to-orange-500/20',
   },
   {
-    name: 'GitHub Copilot',
-    url: 'https://github.com/features/copilot',
-    description: 'AI pair programmer',
-    icon: '👨‍💻',
-    category: 'code',
+    name: 'GitHub',
+    url: 'https://github.com',
+    description: 'Github',
+    icon: <IconBrandGithub size={24} />,
+    category: 'Code',
+    bgColor: 'from-gray-500/20 to-slate-500/20',
   },
   {
     name: 'Midjourney',
     url: 'https://www.midjourney.com',
     description: 'AI image generation',
-    icon: '🎨',
-    category: 'general',
+    icon: <PaintBrushIcon className="w-6 h-6" />,
+    category: 'General',
+    bgColor: 'from-pink-500/20 to-rose-500/20',
   },
 ];
 
@@ -79,9 +97,7 @@ export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {categories.map(category => (
           <div key={category} className={`space-y-4 relative ${isLight ? 'text-gray-800' : 'text-white'}`}>
-            <h3 className="text-lg font-semibold capitalize mb-4">
-              {category === 'general' ? 'Featured' : `${category} Tools`}
-            </h3>
+            <h3 className="text-black font-medium mb-4">{category === 'General' ? 'Featured' : `${category} Tools`}</h3>
             <div className="space-y-3">
               {AI_TOOLS.filter(tool => tool.category === category).map(tool => (
                 <a
@@ -89,17 +105,15 @@ export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
                   href={tool.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`block p-4 rounded-lg transition-all duration-200 cursor-pointer relative z-20 ${
-                    isLight
-                      ? 'bg-white/50 hover:bg-white/80 shadow-sm hover:shadow-md'
-                      : 'bg-gray-800/50 hover:bg-gray-800/80 shadow-sm hover:shadow-md'
-                  } hover:scale-105`}>
+                  className={`block p-4 rounded-lg transition-all duration-300 cursor-pointer relative z-20 bg-gradient-to-br ${tool.bgColor} ${isLight ? 'bg-white/50 hover:bg-white/80 shadow-sm hover:shadow-md' : 'bg-gray-800/50 hover:bg-gray-800/80 shadow-sm hover:shadow-md'} hover:scale-105`}>
                   <div className="flex items-center space-x-3">
-                    <span className="text-2xl transition-transform duration-200" role="img" aria-label={tool.name}>
+                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm transition-transform duration-200 group-hover:scale-110">
                       {tool.icon}
-                    </span>
+                    </div>
                     <div>
-                      <h4 className="font-medium transition-colors duration-200 hover:text-indigo-500">{tool.name}</h4>
+                      <h4 className="text-black font-medium transition-colors duration-200 hover:text-indigo-500">
+                        {tool.name}
+                      </h4>
                       <p className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>{tool.description}</p>
                     </div>
                   </div>

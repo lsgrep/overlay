@@ -19,18 +19,20 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@extension/i18n": "workspace:*",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
     "@extension/ui": "workspace:*",
-    "@extension/i18n": "workspace:*"
+    "@heroicons/react": "^2.2.0",
+    "@tabler/icons-react": "^3.30.0"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",
     "@extension/tsconfig": "workspace:*",
     "@extension/vite-config": "workspace:*",
-    "sass": "1.79.4",
+    "cross-env": "^7.0.3",
     "postcss-load-config": "^6.0.1",
-    "cross-env": "^7.0.3"
+    "sass": "1.79.4"
   },
   "postcss": {
     "plugins": {
