@@ -126,21 +126,36 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`p-3 rounded-lg ${
+            className={`p-3 rounded-lg break-words max-w-full ${
               message.role === 'user'
                 ? `${isLight ? 'bg-blue-100' : 'bg-blue-900'} ml-4`
                 : `${isLight ? 'bg-gray-100' : 'bg-gray-700'} mr-4`
             }`}>
-            <div className={`text-xs font-semibold mb-1 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
-              {message.role === 'user' ? 'You' : 'Assistant'}
+            <div
+              className={`text-xs font-semibold mb-1 flex items-center gap-1 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+              {message.role === 'user' ? (
+                <>
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                  </svg>
+                  <span>You</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                  </svg>
+                  <span>Assistant</span>
+                </>
+              )}
             </div>
-            <div className={isLight ? 'text-gray-800' : 'text-gray-100'}>
+            <div className={`${isLight ? 'text-gray-800' : 'text-gray-100'} overflow-x-auto max-w-full`}>
               {mode === 'interactive' && message.role === 'assistant' ? (
-                <div className="space-y-2">
+                <div className="space-y-2 max-w-full">
                   {(() => {
                     try {
                       const plan: TaskPlan = JSON.parse(message.content);
@@ -151,28 +166,42 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
                         const json = JSON.parse(message.content);
                         return (
                           <pre
-                            className={`whitespace-pre-wrap overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
+                            className={`whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
                             {JSON.stringify(json, null, 2)}
                           </pre>
                         );
                       } catch {
                         // If not JSON at all, render as markdown
-                        return <ReactMarkdown>{message.content}</ReactMarkdown>;
+                        return (
+                          <div className="prose dark:prose-invert max-w-full break-words overflow-wrap-anywhere">
+                            <ReactMarkdown>{message.content}</ReactMarkdown>
+                          </div>
+                        );
                       }
                     }
                   })()}
                 </div>
               ) : (
-                <ReactMarkdown>{message.content}</ReactMarkdown>
+                <div className="prose dark:prose-invert max-w-full break-words overflow-wrap-anywhere">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
               )}
             </div>
           </div>
         ))}
         {isLoading && (
           <div className={`flex justify-center py-2 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
-            <div className="animate-bounce mx-1">●</div>
-            <div className="animate-bounce mx-1 delay-100">●</div>
-            <div className="animate-bounce mx-1 delay-200">●</div>
+            <div className="flex gap-1">
+              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path
+                  d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeDasharray="60 30"
+                />
+              </svg>
+              <span className="text-sm">Thinking...</span>
+            </div>
           </div>
         )}
         {error && (
@@ -198,12 +227,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
               isLoading || !input.trim()
                 ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             }`}>
-            Send
+            <span>Send</span>
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path
+                d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
         </div>
       </form>
