@@ -103,7 +103,7 @@ export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
                 <a
                   key={tool.name}
                   href={tool.url}
-                  target="_blank"
+                  // target="_blank"
                   rel="noopener noreferrer"
                   className={`block p-4 rounded-lg transition-all duration-300 cursor-pointer relative z-20 bg-gradient-to-br ${tool.bgColor} ${isLight ? 'bg-white/50 hover:bg-white/80 shadow-sm hover:shadow-md' : 'bg-gray-800/50 hover:bg-gray-800/80 shadow-sm hover:shadow-md'} hover:scale-105`}>
                   <div className="flex items-center space-x-3">
