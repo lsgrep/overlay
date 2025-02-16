@@ -229,7 +229,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
             disabled={isLoading || !input.trim()}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
               isLoading || !input.trim()
-                ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+                ? 'bg-blue-300 dark:bg-blue-600 cursor-not-allowed'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'
             }`}>
             <span>Send</span>
