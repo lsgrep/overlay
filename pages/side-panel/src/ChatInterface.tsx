@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
 import { getGeminiKey } from '@extension/storage';
+import { retry } from './utils/retry';
 
 interface Message {
   role: string;
@@ -201,23 +202,55 @@ Current page URL: ${window.location.href}
           body: requestBody,
         });
 
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
+        let response;
+        let retryCount = 0;
+        const maxRetries = 3;
+        const baseDelay = 1000;
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Gemini API Error:', {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorText,
-          });
-          throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+        while (retryCount < maxRetries) {
+          try {
+            response = await fetch(apiUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            if (response.ok) {
+              break;
+            }
+
+            const errorText = await response.text();
+            const error = new Error(`Gemini API error: ${response.status} - ${errorText}`);
+
+            // Only retry on rate limit errors
+            if (response.status !== 429 && !errorText.includes('RESOURCE_EXHAUSTED')) {
+              throw error;
+            }
+
+            retryCount++;
+            if (retryCount === maxRetries) {
+              throw error;
+            }
+
+            const delay = baseDelay * Math.pow(2, retryCount - 1);
+            console.log(`Attempt ${retryCount} failed, retrying in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } catch (error: any) {
+            if (
+              retryCount === maxRetries ||
+              (!error.message?.includes('429') && !error.message?.includes('RESOURCE_EXHAUSTED'))
+            ) {
+              console.error('Gemini API Error:', error);
+              setError(error.message || 'Failed to call Gemini API');
+              setIsLoading(false);
+              return;
+            }
+          }
         }
+
+        console.log('Debug: Gemini API call successful');
 
         const data = await response.json();
         console.log('Debug: Gemini response:', data);
