@@ -1,55 +1,42 @@
+import { Message } from './types';
 import { anthropicKeyStorage } from '@extension/storage';
 
-interface AnthropicMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-interface AnthropicResponse {
-  id: string;
-  type: string;
-  role: string;
-  content: Array<{
-    type: string;
-    text: string;
-  }>;
-}
-
 export class AnthropicService {
-  private static API_URL = 'https://api.anthropic.com/v1/messages';
-
-  static async chat(messages: AnthropicMessage[], model: string, systemPrompt?: string) {
-    const key = await anthropicKeyStorage.get();
-    if (!key) {
-      throw new Error('Anthropic API key not found');
+  static async chat(messages: Message[], model: string, context: string): Promise<string> {
+    const apiKey = anthropicKeyStorage.get();
+    if (!apiKey) {
+      throw new Error('Anthropic API key not found. Please set it in the options page.');
     }
 
     try {
-      const response = await fetch(this.API_URL, {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': key,
+          'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model,
-          messages,
-          max_tokens: 4096,
-          system: systemPrompt,
+          messages: [
+            {
+              role: 'user',
+              content: `Context: ${context}\n\n${messages[messages.length - 1].content}`,
+            },
+          ],
+          max_tokens: 1000,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(`Anthropic API error: ${error.error?.message || response.statusText}`);
+        throw new Error(`Anthropic API error: ${error.error?.message || 'Unknown error'}`);
       }
 
-      const data: AnthropicResponse = await response.json();
+      const data = await response.json();
       return data.content[0].text;
     } catch (error) {
-      console.error('Error in Anthropic chat:', error);
+      console.error('Anthropic API error:', error);
       throw error;
     }
   }

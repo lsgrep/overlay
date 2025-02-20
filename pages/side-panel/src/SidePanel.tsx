@@ -1,12 +1,6 @@
 import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import {
-  exampleThemeStorage,
-  geminiKeyStorage,
-  anthropicKeyStorage,
-  defaultLanguageStorage,
-  defaultModelStorage,
-} from '@extension/storage';
+import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -18,6 +12,7 @@ const SidePanel = () => {
   const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
   const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
   const [anthropicModels, setAnthropicModels] = useState<AnthropicModel[]>([]);
+  const [openaiModels, setOpenAIModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,10 +85,11 @@ const SidePanel = () => {
         setLoading(true);
         setError('');
 
-        const { anthropic, ollama, gemini } = await ModelService.fetchAllModels();
+        const { anthropic, ollama, gemini, openai } = await ModelService.fetchAllModels();
         setAnthropicModels(anthropic);
         setOllamaModels(ollama);
         setGeminiModels(gemini);
+        setOpenAIModels(openai);
       } catch (err) {
         console.error('Error fetching models:', err);
         setError('Failed to fetch models: ' + (err as Error).message);
@@ -127,6 +123,15 @@ const SidePanel = () => {
               ) : (
                 <>
                   <option value="">Select a model</option>
+                  {openaiModels.length > 0 && (
+                    <optgroup label={`OpenAI Models (${openaiModels.length})`}>
+                      {openaiModels.map(model => (
+                        <option key={model.name} value={model.name}>
+                          {model.displayName || model.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                   {anthropicModels.length > 0 && (
                     <optgroup label={`Anthropic Models (${anthropicModels.length})`}>
                       {anthropicModels.map(model => (

@@ -8,6 +8,7 @@ import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
 import { AnthropicService } from './services/llm/anthropic';
+import { OpenAIService } from './services/llm/openai';
 
 interface Message {
   role: string;
@@ -117,6 +118,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
       } else if (selectedModel.includes('gemini')) {
         const llmService = new GeminiService(selectedModel);
         response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
+      } else if (selectedModel.startsWith('gpt')) {
+        const llmService = new OpenAIService(selectedModel);
+        response = await llmService.generateCompletion(chatMessages, prompt);
       } else {
         const llmService = new OllamaService(selectedModel, API_URL);
         response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
