@@ -10,6 +10,11 @@ interface GeneralTabProps {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
   availableLanguages: Array<{ code: string; name: string }>;
+  googleModels: Array<{ name: string; displayName?: string; provider: string }>;
+  ollamaModels: Array<{ name: string; displayName?: string; provider: string }>;
+  anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
+  isLoadingModels: boolean;
+  modelError: string | null;
 }
 
 export const GeneralTab = ({
@@ -19,6 +24,11 @@ export const GeneralTab = ({
   selectedModel,
   setSelectedModel,
   availableLanguages,
+  googleModels = [],
+  ollamaModels = [],
+  anthropicModels = [],
+  isLoadingModels = false,
+  modelError = null,
 }: GeneralTabProps) => {
   useEffect(() => {
     const loadSettings = async () => {
@@ -78,7 +88,38 @@ export const GeneralTab = ({
               isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
             }`}>
             <option value="">Select a model</option>
-            {/* Models will be populated from parent component */}
+            {/* Google Models */}
+            {googleModels.length > 0 && (
+              <optgroup label="Google Models">
+                {googleModels.map(model => (
+                  <option key={model.name} value={model.name}>
+                    {model.displayName || model.name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {/* Anthropic Models */}
+            {anthropicModels.length > 0 && (
+              <optgroup label="Anthropic Models">
+                {anthropicModels.map(model => (
+                  <option key={model.name} value={model.name}>
+                    {model.displayName || model.name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {/* Ollama Models */}
+            {ollamaModels.length > 0 && (
+              <optgroup label="Ollama Models">
+                {ollamaModels.map(model => (
+                  <option key={model.name} value={model.name}>
+                    {model.displayName || model.name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+            {isLoadingModels && <option disabled>Loading models...</option>}
+            {modelError && <option disabled>Error loading models: {modelError}</option>}
           </select>
         </div>
       </div>
