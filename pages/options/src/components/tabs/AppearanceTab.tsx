@@ -29,11 +29,21 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
             className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
               isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
             }`}>
-            <option value="system-ui">System Default</option>
-            <option value="Arial">Arial</option>
-            <option value="Helvetica">Helvetica</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
+            <optgroup label="Programming Fonts">
+              <option value="JetBrains Mono">JetBrains Mono</option>
+              <option value="Fira Code">Fira Code</option>
+              <option value="Source Code Pro">Source Code Pro</option>
+              <option value="Cascadia Code">Cascadia Code</option>
+              <option value="Hack">Hack</option>
+              <option value="Monaco">Monaco</option>
+              <option value="Menlo">Menlo</option>
+              <option value="SF Mono">SF Mono</option>
+            </optgroup>
+            <optgroup label="System Fonts">
+              <option value="system-ui">System Default</option>
+              <option value="monospace">Monospace</option>
+              <option value="Courier New">Courier New</option>
+            </optgroup>
           </select>
         </div>
 
