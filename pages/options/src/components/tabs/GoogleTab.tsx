@@ -52,32 +52,35 @@ export const GoogleTab = ({
             </button>
           </div>
         </div>
+      </div>
 
-        <div>
-          <label htmlFor="available-models" className="block text-sm font-semibold mb-2 text-blue-500">
-            Available Models
-          </label>
-          <div id="available-models" className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
-            {isLoadingModels ? (
-              <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
-            ) : modelError ? (
-              <div className="p-4 text-center text-sm text-red-500">{modelError}</div>
-            ) : googleModels.length === 0 ? (
-              <div className="p-4 text-center text-sm opacity-60">
-                {geminiKey ? 'No models found' : 'Enter API key to view available models'}
-              </div>
-            ) : (
-              <div className="divide-y divide-black/10 dark:divide-white/10">
+      {/* API Key Status */}
+      <div className="mt-4">
+        {isLoadingModels ? (
+          <p className="text-sm text-blue-500">Validating API key...</p>
+        ) : modelError ? (
+          <p className="text-sm text-red-500">{modelError}</p>
+        ) : googleModels.length > 0 ? (
+          <div className="space-y-4">
+            <p className="text-sm text-green-500">✓ API key is valid ({googleModels.length} models available)</p>
+
+            {/* Models List */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2 text-blue-500">Available Models</h4>
+              <div
+                className={`rounded-md border ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
                 {googleModels.map(model => (
-                  <div key={model.name} className="p-3 text-sm">
-                    <div className="font-medium">{model.displayName || model.name.split('/').pop()}</div>
-                    <div className="text-xs opacity-60 mt-1">{model.name}</div>
+                  <div
+                    key={model.name}
+                    className={`p-3 border-b last:border-b-0 ${isLight ? 'border-black/5' : 'border-white/5'}`}>
+                    <div className="font-medium">{model.displayName || model.name}</div>
+                    <div className="text-sm opacity-60 mt-1">{model.name}</div>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </motion.div>
   );

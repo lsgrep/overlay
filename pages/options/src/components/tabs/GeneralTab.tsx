@@ -79,60 +79,62 @@ export const GeneralTab = ({
           <label htmlFor="default-model" className="block text-sm font-semibold mb-2 text-blue-500">
             Default Model
           </label>
-          <select
-            id="default-model"
-            value={selectedModel}
-            onChange={e => {
-              setSelectedModel(e.target.value);
-              defaultModelStorage.set(e.target.value);
-            }}
-            className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-              isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-            }`}>
-            <option value="">Select a model</option>
-            {/* OpenAI Models */}
-            {openaiModels.length > 0 && (
-              <optgroup label="OpenAI Models">
-                {openaiModels.map(model => (
-                  <option key={model.name} value={model.name}>
-                    {model.displayName || model.name}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-            {/* Google Models */}
-            {googleModels.length > 0 && (
-              <optgroup label="Google Models">
-                {googleModels.map(model => (
-                  <option key={model.name} value={model.name}>
-                    {model.displayName || model.name}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-            {/* Anthropic Models */}
-            {anthropicModels.length > 0 && (
-              <optgroup label="Anthropic Models">
-                {anthropicModels.map(model => (
-                  <option key={model.name} value={model.name}>
-                    {model.displayName || model.name}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-            {/* Ollama Models */}
-            {ollamaModels.length > 0 && (
-              <optgroup label="Ollama Models">
-                {ollamaModels.map(model => (
-                  <option key={model.name} value={model.name}>
-                    {model.displayName || model.name}
-                  </option>
-                ))}
-              </optgroup>
-            )}
-            {isLoadingModels && <option disabled>Loading models...</option>}
-            {modelError && <option disabled>Error loading models: {modelError}</option>}
-          </select>
+          <div className={`rounded-md border ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
+            <select
+              id="default-model"
+              value={selectedModel}
+              onChange={e => {
+                setSelectedModel(e.target.value);
+                defaultModelStorage.set(e.target.value);
+              }}
+              className={`w-full p-3 bg-transparent focus:outline-none ${isLight ? 'text-black' : 'text-white'}`}>
+              <option value="" className={isLight ? 'bg-black/5' : 'bg-white/5'}>
+                Select a model
+              </option>
+              {/* OpenAI Models */}
+              {openaiModels.length > 0 && (
+                <optgroup label="OpenAI Models">
+                  {openaiModels.map(model => (
+                    <option key={model.name} value={model.name}>
+                      {model.displayName || model.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {/* Google Models */}
+              {googleModels.length > 0 && (
+                <optgroup label="Google Models">
+                  {googleModels.map(model => (
+                    <option key={model.name} value={model.name}>
+                      {model.displayName || model.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {/* Anthropic Models */}
+              {anthropicModels.length > 0 && (
+                <optgroup label="Anthropic Models">
+                  {anthropicModels.map(model => (
+                    <option key={model.name} value={model.name}>
+                      {model.displayName || model.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {/* Ollama Models */}
+              {ollamaModels.length > 0 && (
+                <optgroup label="Ollama Models">
+                  {ollamaModels.map(model => (
+                    <option key={model.name} value={model.name}>
+                      {model.displayName || model.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {isLoadingModels && <option disabled>Loading models...</option>}
+              {modelError && <option disabled>Error loading models: {modelError}</option>}
+            </select>
+          </div>
         </div>
       </div>
     </motion.div>

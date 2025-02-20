@@ -58,7 +58,25 @@ export const OpenAITab = ({
         ) : modelError ? (
           <p className="text-sm text-red-500">{modelError}</p>
         ) : openaiModels.length > 0 ? (
-          <p className="text-sm text-green-500">✓ API key is valid ({openaiModels.length} models available)</p>
+          <div className="space-y-4">
+            <p className="text-sm text-green-500">✓ API key is valid ({openaiModels.length} models available)</p>
+
+            {/* Models List */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2 text-blue-500">Available Models</h4>
+              <div
+                className={`bg-opacity-5 rounded-md border ${isLight ? 'bg-black border-black/10' : 'bg-white border-white/10'}`}>
+                {openaiModels.map(model => (
+                  <div
+                    key={model.name}
+                    className={`p-3 border-b last:border-b-0 ${isLight ? 'border-black/5' : 'border-white/5'}`}>
+                    <div className="font-medium">{model.displayName || model.name}</div>
+                    <div className="text-sm opacity-60 mt-1">{model.name}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
     </motion.div>
