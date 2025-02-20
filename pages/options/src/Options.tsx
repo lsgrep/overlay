@@ -16,10 +16,6 @@ import {
   openAIKeyStorage,
   geminiKeyStorage,
   anthropicKeyStorage,
-  getDefaultLanguage,
-  setDefaultLanguage,
-  getDefaultModel,
-  setDefaultModel,
   fontFamilyStorage,
   fontSizeStorage,
 } from '@extension/storage';
@@ -27,6 +23,8 @@ import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
+import { GeneralTab, OpenAITab, GoogleTab, AnthropicTab, AppearanceTab } from './components/tabs';
+import { CheckIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 const Options = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -192,7 +190,6 @@ const Options = () => {
                 { name: 'OpenAI', icon: <KeyIcon className="w-5 h-5" /> },
                 { name: 'Google', icon: <CloudIcon className="w-5 h-5" /> },
                 { name: 'Anthropic', icon: <KeyIcon className="w-5 h-5" /> },
-                { name: 'AI Models', icon: <SparklesIcon className="w-5 h-5" /> },
                 { name: 'Appearance', icon: <PaintBrushIcon className="w-5 h-5" /> },
                 { name: 'Language', icon: <LanguageIcon className="w-5 h-5" /> },
               ].map(({ name: tab, icon }) => (
@@ -219,334 +216,43 @@ const Options = () => {
               className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
               {/* Tab Content */}
               {activeTab === 'General' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-blue-500">General Settings</h2>
-                    <p className="text-sm opacity-60">Configure your general extension preferences</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
-                        Default Language
-                      </label>
-                      <select
-                        id="language"
-                        value={language}
-                        onChange={e => setLanguage(e.target.value)}
-                        className={`w-full p-2 rounded border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-800 text-white'}`}>
-                        {availableLanguages.map(lang => (
-                          <option key={lang.code} value={lang.code}>
-                            {lang.name}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="mt-1 text-sm opacity-60">
-                        Select your preferred language for the extension interface
-                      </p>
-                    </div>
-
-                    <div className="mb-4">
-                      <label htmlFor="model" className="block text-sm font-medium mb-1">
-                        Default Model
-                      </label>
-                      <select
-                        id="model"
-                        value={selectedModel}
-                        onChange={e => setSelectedModel(e.target.value)}
-                        className={`w-full p-2 rounded border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-800 text-white'}`}>
-                        <option value="">Select a model</option>
-                        {googleModels.length > 0 && (
-                          <optgroup label="Gemini Models">
-                            {googleModels.map(model => (
-                              <option key={model.name} value={model.name}>
-                                {model.displayName || model.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                        {ollamaModels.length > 0 && (
-                          <optgroup label="Ollama Models">
-                            {ollamaModels.map(model => (
-                              <option key={model.name} value={model.name}>
-                                {model.displayName}
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                        {anthropicModels.length > 0 && (
-                          <optgroup label="Anthropic Models">
-                            {anthropicModels.map(model => (
-                              <option key={model.name} value={model.name}>
-                                {model.displayName}
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                      </select>
-                      <p className="mt-1 text-sm opacity-60">Select your preferred AI model for chat interactions</p>
-                    </div>
-                  </div>
-                </motion.div>
+                <GeneralTab
+                  isLight={isLight}
+                  language={language}
+                  setLanguage={setLanguage}
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
+                  availableLanguages={availableLanguages}
+                />
               )}
 
               {activeTab === 'OpenAI' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">OpenAI Settings</h3>
-                    <p className="text-sm opacity-60">Configure your OpenAI API key and model preferences</p>
-                  </div>
-                  <div>
-                    <label htmlFor="openai-key-2" className="block text-sm font-semibold mb-2 text-blue-500">
-                      API Key
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="openai-key"
-                        type={showOpenAIKey ? 'text' : 'password'}
-                        value={openAIKey}
-                        onChange={e => openAIKeyStorage.set(e.target.value)}
-                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                          isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-                        }`}
-                        placeholder="sk-..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowOpenAIKey(!showOpenAIKey)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        {showOpenAIKey ? '👁️' : '👁️‍🗨️'}
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                <OpenAITab isLight={isLight} showOpenAIKey={showOpenAIKey} setShowOpenAIKey={setShowOpenAIKey} />
               )}
 
               {activeTab === 'Google' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">Google Settings</h3>
-                    <p className="text-sm opacity-60">Configure your Google API key and Gemini model preferences</p>
-                  </div>
-                  <div className="space-y-6">
-                    <div>
-                      <label htmlFor="gemini-key" className="block text-sm font-semibold mb-2 text-blue-500">
-                        API Key
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="gemini-key"
-                          type={showGeminiKey ? 'text' : 'password'}
-                          value={geminiKey}
-                          onChange={e => geminiKeyStorage.set(e.target.value)}
-                          className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                            isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-                          }`}
-                          placeholder="AI..."
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowGeminiKey(!showGeminiKey)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          {showGeminiKey ? '👁️' : '👁️‍🗨️'}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="available-models" className="block text-sm font-semibold mb-2 text-blue-500">
-                        Available Models
-                      </label>
-                      <div
-                        id="available-models"
-                        className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
-                        {isLoadingModels ? (
-                          <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
-                        ) : modelError ? (
-                          <div className="p-4 text-center text-sm text-red-500">{modelError}</div>
-                        ) : googleModels.length === 0 ? (
-                          <div className="p-4 text-center text-sm opacity-60">
-                            {geminiKey ? 'No models found' : 'Enter API key to view available models'}
-                          </div>
-                        ) : (
-                          <div className="divide-y divide-black/10 dark:divide-white/10">
-                            {googleModels.map(model => (
-                              <div key={model.name} className="p-3 text-sm">
-                                <div className="font-medium">{model.displayName || model.name.split('/').pop()}</div>
-                                <div className="text-xs opacity-60 mt-1">{model.name}</div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                <GoogleTab
+                  isLight={isLight}
+                  showGeminiKey={showGeminiKey}
+                  setShowGeminiKey={setShowGeminiKey}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                  googleModels={googleModels}
+                />
               )}
 
               {activeTab === 'Anthropic' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">Anthropic Settings</h3>
-                    <p className="text-sm opacity-60">Configure your Anthropic API key for Claude access</p>
-                  </div>
-                  <div>
-                    <label htmlFor="anthropic-key" className="block text-sm font-semibold mb-2 text-blue-500">
-                      API Key
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="anthropic-key"
-                        type={showAnthropicKey ? 'text' : 'password'}
-                        value={anthropicKey}
-                        onChange={e => anthropicKeyStorage.set(e.target.value)}
-                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}
-                        placeholder="sk-ant-..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowAnthropicKey(!showAnthropicKey)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        {showAnthropicKey ? '👁️' : '👁️‍🗨️'}
-                      </button>
-                    </div>
-                    <p className="mt-2 text-sm opacity-60">
-                      Get your API key from the{' '}
-                      <a
-                        href="https://console.anthropic.com/account/keys"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-600">
-                        Anthropic Console
-                      </a>
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="available-anthropic-models"
-                      className="block text-sm font-semibold mb-2 text-blue-500">
-                      Available Models
-                    </label>
-                    <div
-                      id="available-anthropic-models"
-                      className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
-                      {isLoadingModels ? (
-                        <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
-                      ) : modelError ? (
-                        <div className="p-4 text-center text-sm text-red-500">{modelError}</div>
-                      ) : anthropicModels.length === 0 ? (
-                        <div className="p-4 text-center text-sm opacity-60">
-                          {anthropicKey ? 'No models found' : 'Enter API key to view available models'}
-                        </div>
-                      ) : (
-                        <div className="divide-y divide-black/10 dark:divide-white/10">
-                          {anthropicModels.map(model => (
-                            <div key={model.name} className="p-3 text-sm">
-                              <div className="font-medium">{model.displayName || model.name.split('/').pop()}</div>
-                              <div className="text-xs opacity-60 mt-1">{model.name}</div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
+                <AnthropicTab
+                  isLight={isLight}
+                  showAnthropicKey={showAnthropicKey}
+                  setShowAnthropicKey={setShowAnthropicKey}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                  anthropicModels={anthropicModels}
+                />
               )}
 
-              {activeTab === 'AI Models' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <label htmlFor="default-model" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Default Model
-                    </label>
-                    <select
-                      id="default-model"
-                      value={selectedModel}
-                      onChange={e => setSelectedModel(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="gpt-4">GPT-4</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                      <option value="gemini-pro">Gemini Pro</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="max-tokens" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Max Tokens
-                    </label>
-                    <input
-                      id="max-tokens"
-                      type="range"
-                      min="100"
-                      max="4000"
-                      step="100"
-                      value={maxTokens}
-                      onChange={e => setMaxTokens(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="text-sm opacity-60">{maxTokens} tokens</div>
-                  </div>
-                  <div>
-                    <label htmlFor="temperature" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Temperature
-                    </label>
-                    <input
-                      id="temperature"
-                      type="range"
-                      min="0"
-                      max="2"
-                      step="0.1"
-                      value={temperature}
-                      onChange={e => setTemperature(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="text-sm opacity-60">{temperature}</div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'Appearance' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <label htmlFor="font-family" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Font Family
-                    </label>
-                    <select
-                      id="font-family"
-                      value={fontFamily}
-                      onChange={e => fontFamilyStorage.set(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="Inter">Inter</option>
-                      <option value="SF Pro Display">SF Pro Display</option>
-                      <option value="Roboto">Roboto</option>
-                      <option value="Open Sans">Open Sans</option>
-                      <option value="JetBrains Mono">JetBrains Mono</option>
-                      <option value="Fira Code">Fira Code</option>
-                      <option value="system-ui">System Default</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="font-size" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Font Size
-                    </label>
-                    <select
-                      id="font-size"
-                      value={fontSize}
-                      onChange={e => fontSizeStorage.set(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="14">Small</option>
-                      <option value="16">Medium</option>
-                      <option value="18">Large</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
+              {activeTab === 'Appearance' && <AppearanceTab isLight={isLight} />}
 
               {activeTab === 'Language' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
