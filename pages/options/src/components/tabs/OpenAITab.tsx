@@ -6,9 +6,19 @@ interface OpenAITabProps {
   isLight: boolean;
   showOpenAIKey: boolean;
   setShowOpenAIKey: (show: boolean) => void;
+  isLoadingModels?: boolean;
+  modelError?: string | null;
+  openaiModels?: Array<{ name: string; displayName?: string; provider: string }>;
 }
 
-export const OpenAITab = ({ isLight, showOpenAIKey, setShowOpenAIKey }: OpenAITabProps) => {
+export const OpenAITab = ({
+  isLight,
+  showOpenAIKey,
+  setShowOpenAIKey,
+  isLoadingModels = false,
+  modelError = null,
+  openaiModels = [],
+}: OpenAITabProps) => {
   const openAIKey = useStorage(openAIKeyStorage);
 
   return (
@@ -39,6 +49,17 @@ export const OpenAITab = ({ isLight, showOpenAIKey, setShowOpenAIKey }: OpenAITa
             {showOpenAIKey ? '👁️' : '👁️‍🗨️'}
           </button>
         </div>
+      </div>
+
+      {/* API Key Status */}
+      <div className="mt-4">
+        {isLoadingModels ? (
+          <p className="text-sm text-blue-500">Validating API key...</p>
+        ) : modelError ? (
+          <p className="text-sm text-red-500">{modelError}</p>
+        ) : openaiModels.length > 0 ? (
+          <p className="text-sm text-green-500">✓ API key is valid ({openaiModels.length} models available)</p>
+        ) : null}
       </div>
     </motion.div>
   );

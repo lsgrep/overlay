@@ -1,4 +1,4 @@
-import { anthropicKeyStorage, geminiKeyStorage } from '@extension/storage';
+import { anthropicKeyStorage, geminiKeyStorage, openAIKeyStorage } from '@extension/storage';
 
 export interface Model {
   name: string;
@@ -19,6 +19,7 @@ interface OllamaResponse {
 }
 
 export class ModelService {
+  private static OPENAI_API_URL = 'https://api.openai.com/v1/models';
   private static ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/models';
   private static OLLAMA_API_URL = 'http://localhost:11434';
   private static GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -90,12 +91,47 @@ export class ModelService {
       }));
   }
 
-  static async fetchAllModels(): Promise<{ anthropic: Model[]; ollama: Model[]; gemini: Model[] }> {
+  static async fetchOpenAIModels(key: string): Promise<Model[]> {
+    if (!key) {
+      throw new Error('No API key found');
+    }
+
+    const response = await fetch(this.OPENAI_API_URL, {
+      headers: {
+        Authorization: `Bearer ${key}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch OpenAI models: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.data
+      .filter((model: any) => model.id.startsWith('gpt-'))
+      .map((model: any) => ({
+        name: model.id,
+        displayName: model.id,
+        provider: 'openai',
+      }));
+  }
+
+  static async fetchAllModels(): Promise<{ openai: Model[]; anthropic: Model[]; ollama: Model[]; gemini: Model[] }> {
+    let openaiModels: Model[] = [];
     let anthropicModels: Model[] = [];
     let ollamaModels: Model[] = [];
     let geminiModels: Model[] = [];
 
     try {
+      const openaiKey = await openAIKeyStorage.get();
+      if (openaiKey) {
+        try {
+          openaiModels = await this.fetchOpenAIModels(openaiKey);
+        } catch (error) {
+          console.error('Error fetching OpenAI models:', error);
+        }
+      }
+
       const anthropicKey = await anthropicKeyStorage.get();
       if (anthropicKey) {
         try {
@@ -124,6 +160,7 @@ export class ModelService {
     }
 
     return {
+      openai: openaiModels,
       anthropic: anthropicModels,
       ollama: ollamaModels,
       gemini: geminiModels,

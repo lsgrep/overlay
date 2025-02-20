@@ -36,6 +36,7 @@ const Options = () => {
   const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
 
+  const [openaiModels, setOpenAIModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [ollamaModels, setOllamaModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [anthropicModels, setAnthropicModels] = useState<
@@ -88,7 +89,8 @@ const Options = () => {
         setIsLoadingModels(true);
         setModelError(null);
 
-        const { anthropic, ollama, gemini } = await ModelService.fetchAllModels();
+        const { openai, anthropic, ollama, gemini } = await ModelService.fetchAllModels();
+        setOpenAIModels(openai);
         setAnthropicModels(anthropic);
         setOllamaModels(ollama);
         setGoogleModels(gemini);
@@ -226,7 +228,14 @@ const Options = () => {
               )}
 
               {activeTab === 'OpenAI' && (
-                <OpenAITab isLight={isLight} showOpenAIKey={showOpenAIKey} setShowOpenAIKey={setShowOpenAIKey} />
+                <OpenAITab
+                  isLight={isLight}
+                  showOpenAIKey={showOpenAIKey}
+                  setShowOpenAIKey={setShowOpenAIKey}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                  openaiModels={openaiModels}
+                />
               )}
 
               {activeTab === 'Google' && (

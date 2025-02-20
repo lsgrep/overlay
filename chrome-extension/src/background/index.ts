@@ -1,5 +1,5 @@
 import 'webextension-polyfill';
-import { exampleThemeStorage, getDefaultLanguage } from '@extension/storage';
+import { exampleThemeStorage, defaultLanguageStorage } from '@extension/storage';
 
 // Enable side panel opening on extension icon click
 chrome.sidePanel
@@ -14,7 +14,7 @@ exampleThemeStorage.get().then(theme => {
 console.log('Background service worker loaded');
 // Context menu actions
 const getLanguageName = async () => {
-  const targetLang = await getDefaultLanguage();
+  const targetLang = await defaultLanguageStorage.get();
   const languageNames: { [key: string]: string } = {
     english: 'English',
     spanish: 'Spanish',

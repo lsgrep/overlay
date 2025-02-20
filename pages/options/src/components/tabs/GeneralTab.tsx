@@ -1,5 +1,5 @@
 import { useStorage } from '@extension/shared';
-import { getDefaultLanguage, setDefaultLanguage, getDefaultModel, setDefaultModel } from '@extension/storage';
+import { defaultLanguageStorage, defaultModelStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
@@ -10,6 +10,7 @@ interface GeneralTabProps {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
   availableLanguages: Array<{ code: string; name: string }>;
+  openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
   googleModels: Array<{ name: string; displayName?: string; provider: string }>;
   ollamaModels: Array<{ name: string; displayName?: string; provider: string }>;
   anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
@@ -24,24 +25,25 @@ export const GeneralTab = ({
   selectedModel,
   setSelectedModel,
   availableLanguages,
+  openaiModels = [],
   googleModels = [],
   ollamaModels = [],
   anthropicModels = [],
   isLoadingModels = false,
   modelError = null,
 }: GeneralTabProps) => {
+  // Use storage hooks for language and model
+  const defaultLanguage = useStorage(defaultLanguageStorage);
+  const defaultModel = useStorage(defaultModelStorage);
+
+  // Update language and model when storage changes
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const [defaultLang, defaultMod] = await Promise.all([getDefaultLanguage(), getDefaultModel()]);
-        if (defaultLang) setLanguage(defaultLang);
-        if (defaultMod) setSelectedModel(defaultMod);
-      } catch (error) {
-        console.error('Error loading settings:', error);
-      }
-    };
-    loadSettings();
-  }, []);
+    if (defaultLanguage) setLanguage(defaultLanguage);
+  }, [defaultLanguage, setLanguage]);
+
+  useEffect(() => {
+    if (defaultModel) setSelectedModel(defaultModel);
+  }, [defaultModel, setSelectedModel]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -60,7 +62,7 @@ export const GeneralTab = ({
             value={language}
             onChange={e => {
               setLanguage(e.target.value);
-              setDefaultLanguage(e.target.value);
+              defaultLanguageStorage.set(e.target.value);
             }}
             className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
               isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
@@ -82,12 +84,22 @@ export const GeneralTab = ({
             value={selectedModel}
             onChange={e => {
               setSelectedModel(e.target.value);
-              setDefaultModel(e.target.value);
+              defaultModelStorage.set(e.target.value);
             }}
             className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
               isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
             }`}>
             <option value="">Select a model</option>
+            {/* OpenAI Models */}
+            {openaiModels.length > 0 && (
+              <optgroup label="OpenAI Models">
+                {openaiModels.map(model => (
+                  <option key={model.name} value={model.name}>
+                    {model.displayName || model.name}
+                  </option>
+                ))}
+              </optgroup>
+            )}
             {/* Google Models */}
             {googleModels.length > 0 && (
               <optgroup label="Google Models">

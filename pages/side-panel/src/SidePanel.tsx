@@ -4,8 +4,8 @@ import {
   exampleThemeStorage,
   geminiKeyStorage,
   anthropicKeyStorage,
-  getDefaultModel,
-  setDefaultModel,
+  defaultLanguageStorage,
+  defaultModelStorage,
 } from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
@@ -27,7 +27,7 @@ const SidePanel = () => {
   // Load default model from storage
   useEffect(() => {
     const loadDefaultModel = async () => {
-      const defaultModel = await getDefaultModel();
+      const defaultModel = await defaultModelStorage.get();
       if (defaultModel) {
         setSelectedModel(defaultModel);
       }
@@ -38,7 +38,7 @@ const SidePanel = () => {
   // Save selected model to storage when it changes
   useEffect(() => {
     if (selectedModel) {
-      setDefaultModel(selectedModel);
+      defaultModelStorage.set(selectedModel);
     }
   }, [selectedModel]);
 

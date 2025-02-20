@@ -26,15 +26,15 @@ export interface ContextMenuAction {
   prompt: (text: string) => Promise<string> | string;
 }
 
-import { getDefaultLanguage } from '@extension/storage';
+import { defaultLanguageStorage } from '@extension/storage';
 
 export const getTranslateTitle = async () => {
-  const targetLang = await getDefaultLanguage();
+  const targetLang = await defaultLanguageStorage.get();
   return `Translate to ${targetLang || 'English'}`;
 };
 
 export const getTranslatePrompt = async (text: string) => {
-  const targetLang = await getDefaultLanguage();
+  const targetLang = await defaultLanguageStorage.get();
   return `Translate the following text to ${targetLang || 'English'}: "${text}"`;
 };
 
