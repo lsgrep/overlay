@@ -1,5 +1,5 @@
 import '@src/SidePanel.css';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
+import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import {
   exampleThemeStorage,
   geminiKeyStorage,
@@ -10,28 +10,6 @@ import {
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
-
-interface OllamaModel {
-  id: string;
-  object: string;
-  created: number;
-  owned_by: string;
-}
-
-interface OllamaResponse {
-  object: string;
-  data: OllamaModel[];
-}
-
-interface GeminiModel {
-  name: string;
-  displayName: string;
-}
-
-interface AnthropicModel {
-  name: string;
-  displayName: string;
-}
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -112,88 +90,13 @@ const SidePanel = () => {
         setLoading(true);
         setError('');
 
-        // Fetch Anthropic models
-        const anthropicKey = await anthropicKeyStorage.get();
-        if (anthropicKey) {
-          try {
-            const response = await fetch('https://api.anthropic.com/v1/models', {
-              headers: {
-                'x-api-key': anthropicKey,
-                'anthropic-version': '2023-06-01',
-                'anthropic-dangerous-direct-browser-access': 'true',
-              },
-            });
-
-            if (!response.ok) {
-              throw new Error(`Failed to fetch Anthropic models: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            const models = data.data.map((model: any) => ({
-              name: model.id,
-              displayName: model.display_name,
-            }));
-
-            setAnthropicModels(models);
-          } catch (err) {
-            console.error('Error fetching Anthropic models:', err);
-            setError('Failed to fetch Anthropic models: ' + (err as Error).message);
-          }
-        }
-        console.log('Debug: Fetching models...');
-
-        // Fetch Ollama models
-        try {
-          const ollamaResponse = await fetch('http://localhost:11434/v1/models');
-          const ollamaData: OllamaResponse = await ollamaResponse.json();
-          console.log('Ollama models:', ollamaData.data);
-          setOllamaModels(ollamaData.data);
-        } catch (err) {
-          console.error('Error fetching Ollama models:', err);
-        }
-
-        // Fetch Gemini models
-        try {
-          const geminiKey = await geminiKeyStorage.get();
-          console.log('Debug: Got Gemini key:', geminiKey ? 'yes' : 'no');
-          if (geminiKey) {
-            const geminiResponse = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
-            );
-            if (!geminiResponse.ok) {
-              const errorText = await geminiResponse.text();
-              console.error('Gemini API Error:', {
-                status: geminiResponse.status,
-                statusText: geminiResponse.statusText,
-                error: errorText,
-              });
-              throw new Error(`Failed to fetch Gemini models: ${geminiResponse.statusText}`);
-            }
-            const geminiData = await geminiResponse.json();
-            console.log('Debug: Gemini API response:', geminiData);
-
-            const formattedGeminiModels = (geminiData.models || [])
-              .filter((model: any) => {
-                const isGemini = model.name.includes('gemini') || model.displayName?.toLowerCase().includes('gemini');
-                console.log('Debug: Checking model:', model.name, isGemini);
-                return isGemini;
-              })
-              .map((model: any) => {
-                const formattedModel = {
-                  name: model.name,
-                  displayName: model.displayName || model.name.split('/').pop(),
-                };
-                console.log('Debug: Formatted model:', formattedModel);
-                return formattedModel;
-              });
-
-            console.log('Debug: Final Gemini models:', formattedGeminiModels);
-            setGeminiModels(formattedGeminiModels);
-          }
-        } catch (err) {
-          console.error('Error fetching Gemini models:', err);
-          setError('Failed to fetch Gemini models: ' + (err as Error).message);
-        }
+        const { anthropic, ollama, gemini } = await ModelService.fetchAllModels();
+        setAnthropicModels(anthropic);
+        setOllamaModels(ollama);
+        setGeminiModels(gemini);
+      } catch (err) {
+        console.error('Error fetching models:', err);
+        setError('Failed to fetch models: ' + (err as Error).message);
       } finally {
         setLoading(false);
       }
@@ -248,8 +151,8 @@ const SidePanel = () => {
                   {ollamaModels.length > 0 && (
                     <optgroup label={`Ollama Models (${ollamaModels.length})`}>
                       {ollamaModels.map(model => (
-                        <option key={model.id} value={model.id}>
-                          {model.id}
+                        <option key={model.name} value={model.name}>
+                          {model.displayName}
                         </option>
                       ))}
                     </optgroup>

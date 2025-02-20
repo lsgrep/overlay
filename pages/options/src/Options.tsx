@@ -1,6 +1,6 @@
 import '@src/Options.css';
 import { useEffect, useState } from 'react';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
+import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import {
   SunIcon,
   MoonIcon,
@@ -75,137 +75,41 @@ const Options = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
 
-  const fetchGoogleModels = async (key: string) => {
-    if (!key) return;
-
-    setIsLoadingModels(true);
-    setModelError(null);
-
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Gemini models: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const models = (data.models || []).map((model: any) => ({
-        name: model.name,
-        displayName: model.displayName,
-        provider: 'gemini',
-      }));
-      setGoogleModels(models);
-    } catch (error) {
-      console.error('Error fetching Gemini models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to fetch Gemini models');
-    } finally {
-      setIsLoadingModels(false);
-    }
-  };
-
-  const fetchOllamaModels = async () => {
-    setIsLoadingModels(true);
-    setModelError(null);
-
-    try {
-      const response = await fetch('http://localhost:11434/api/tags');
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Ollama models: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const models =
-        data.models?.map((model: any) => ({
-          name: model.name,
-          displayName: model.name,
-          provider: 'ollama',
-        })) || [];
-      setOllamaModels(models);
-    } catch (error) {
-      console.error('Error fetching Ollama models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to fetch Ollama models');
-    } finally {
-      setIsLoadingModels(false);
-    }
-  };
-
-  const fetchAnthropicModels = async (key: string) => {
-    if (!key) return;
-
-    setIsLoadingModels(true);
-    setModelError(null);
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/models', {
-        headers: {
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Anthropic models: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const models = data.data.map((model: any) => ({
-        name: model.id,
-        displayName: model.display_name,
-        provider: 'anthropic',
-      }));
-
-      setAnthropicModels(models);
-    } catch (error) {
-      console.error('Error fetching Anthropic models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to fetch Anthropic models');
-    } finally {
-      setIsLoadingModels(false);
-    }
-  };
-
   useEffect(() => {
     // Load saved settings
     const loadSettings = async () => {
       try {
         const [defaultLang, defaultMod] = await Promise.all([getDefaultLanguage(), getDefaultModel()]);
-
-        if (geminiKey) {
-          fetchGoogleModels(geminiKey);
-        }
-        if (anthropicKey) {
-          fetchAnthropicModels(anthropicKey);
-        }
         if (defaultLang) setLanguage(defaultLang);
         if (defaultMod) setSelectedModel(defaultMod);
-
-        // Fetch Ollama models on startup
-        fetchOllamaModels();
       } catch (error) {
         console.error('Error loading settings:', error);
       }
     };
     loadSettings();
-  }, [geminiKey]);
+  }, []);
 
-  // Fetch models when Gemini key changes
+  // Fetch models when API keys change
   useEffect(() => {
-    if (geminiKey) {
-      fetchGoogleModels(geminiKey);
-    } else {
-      setGoogleModels([]);
-    }
-  }, [geminiKey]);
+    const fetchModels = async () => {
+      try {
+        setIsLoadingModels(true);
+        setModelError(null);
 
-  // Fetch models when Anthropic key changes
-  useEffect(() => {
-    if (anthropicKey) {
-      fetchAnthropicModels(anthropicKey);
-    } else {
-      setAnthropicModels([]);
-    }
-  }, [anthropicKey]);
+        const { anthropic, ollama, gemini } = await ModelService.fetchAllModels();
+        setAnthropicModels(anthropic);
+        setOllamaModels(ollama);
+        setGoogleModels(gemini);
+      } catch (error) {
+        console.error('Error fetching models:', error);
+        setModelError(error instanceof Error ? error.message : 'Failed to fetch models');
+      } finally {
+        setIsLoadingModels(false);
+      }
+    };
+
+    fetchModels();
+  }, [geminiKey, anthropicKey]);
 
   // Apply font settings to the document
   useEffect(() => {
