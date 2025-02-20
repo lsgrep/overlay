@@ -1,98 +1,133 @@
-import { Message, LLMService, LLMConfig } from './types';
-
-interface OllamaMessage {
-  role: string;
-  content: string;
-}
-
-interface OllamaResponse {
-  model: string;
-  message: {
-    role: string;
-    content: string;
-  };
-  done: boolean;
-  total_duration: number;
-  load_duration: number;
-  prompt_eval_duration: number;
-  eval_duration: number;
-}
+import { LLMConfig, LLMService, Message } from './types';
 
 export class OllamaService implements LLMService {
-  private readonly model: string;
-  private readonly apiUrl: string;
-  private readonly maxRetries = 3;
-  private readonly baseDelay = 1000;
+  private modelName: string;
+  private apiUrl: string;
 
-  constructor(model: string, apiUrl: string) {
-    this.model = model;
+  constructor(modelName: string, apiUrl = 'http://localhost:11434/api/chat') {
+    this.modelName = modelName;
     this.apiUrl = apiUrl;
   }
 
-  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
-    const ollamaMessages: OllamaMessage[] = [
-      {
-        role: 'system',
-        content: `You are a helpful AI assistant. Context: ${context}`,
-      },
-      ...messages.map(msg => ({
-        role: msg.role.toLowerCase(),
-        content: msg.content,
-      })),
-    ];
+  private getRequestFormat(mode: 'interactive' | 'conversational' | 'context-menu') {
+    if (mode === 'interactive') {
+      return {
+        type: 'object',
+        properties: {
+          goal: { type: 'string' },
+          steps: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                description: { type: 'string' },
+                action: { type: 'string', enum: ['click', 'type', 'navigate', 'wait', 'extract'] },
+                target: { type: 'string', optional: true },
+                value: { type: 'string', optional: true },
+                selector: { type: 'string', optional: true },
+              },
+              required: ['description', 'action'],
+            },
+          },
+          estimated_time: { type: 'string' },
+        },
+        required: ['goal', 'steps', 'estimated_time'],
+      };
+    } else if (mode === 'conversational' || mode === 'context-menu') {
+      return {
+        type: 'object',
+        properties: {
+          response: { type: 'string' },
+          reasoning: { type: 'string', optional: true },
+        },
+        required: ['response'],
+      };
+    }
+    return undefined;
+  }
 
-    const requestBody = {
-      model: this.model,
-      messages: ollamaMessages,
-      options: {
-        temperature: config?.temperature ?? 0.7,
-        top_k: config?.topK ?? 40,
-        top_p: config?.topP ?? 0.95,
-        num_predict: config?.maxOutputTokens ?? 1000,
-      },
+  async generateCompletion(
+    messages: Message[],
+    context: string,
+    config?: LLMConfig,
+    mode: 'interactive' | 'conversational' | 'context-menu' = 'conversational',
+  ): Promise<string> {
+    const requestBody: any = {
+      model: this.modelName,
+      messages: [...messages, { role: 'user', content: context }],
+      stream: true,
+      format: this.getRequestFormat(mode),
     };
 
-    let response;
-    let retryCount = 0;
+    const response = await fetch(this.apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
 
-    while (retryCount < this.maxRetries) {
-      try {
-        response = await fetch(this.apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-        if (response.ok) {
-          break;
-        }
+    let fullResponse = '';
+    let accumulatedJson = '';
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
 
-        const errorText = await response.text();
-        const error = new Error(`Ollama API error: ${response.status} - ${errorText}`);
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
 
-        retryCount++;
-        if (retryCount === this.maxRetries) {
-          throw error;
-        }
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
 
-        const delay = this.baseDelay * Math.pow(2, retryCount - 1);
-        console.log(`Attempt ${retryCount} failed, retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } catch (error: any) {
-        if (retryCount === this.maxRetries) {
-          console.error('Error in Ollama chat:', error);
-          throw error;
+      for (const line of lines) {
+        if (!line.trim()) continue;
+
+        try {
+          const data = JSON.parse(line);
+          if (data.message?.content) {
+            let content = data.message.content;
+            if (mode === 'interactive') {
+              // For interactive mode, accumulate JSON chunks
+              accumulatedJson += content;
+              try {
+                // Try to parse accumulated JSON
+                if (accumulatedJson.startsWith('{')) {
+                  const parsed = JSON.parse(accumulatedJson);
+                  if (parsed.goal && parsed.steps) {
+                    fullResponse = JSON.stringify(parsed, null, 2);
+                  }
+                }
+              } catch (e) {
+                // Ignore parse error as it might be incomplete JSON
+              }
+            } else {
+              // For conversational/context-menu modes
+              accumulatedJson += content;
+              if (accumulatedJson.startsWith('{')) {
+                try {
+                  const parsed = JSON.parse(accumulatedJson);
+                  if (parsed.response) {
+                    // Replace entire response with just the response field
+                    fullResponse = parsed.response;
+                  }
+                } catch (e) {
+                  // Ignore parse error as it might be incomplete JSON
+                }
+              } else {
+                fullResponse += content;
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing streaming JSON:', e);
         }
       }
     }
 
-    if (!response) {
-      throw new Error('Failed to get response from Ollama API');
-    }
-
-    const data: OllamaResponse = await response.json();
-    return data.message?.content || 'No response generated';
+    return fullResponse;
   }
 }
