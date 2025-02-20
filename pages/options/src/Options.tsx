@@ -219,6 +219,7 @@ const Options = () => {
                   selectedModel={selectedModel}
                   setSelectedModel={setSelectedModel}
                   availableLanguages={availableLanguages}
+                  openaiModels={openaiModels}
                   googleModels={googleModels}
                   ollamaModels={ollamaModels}
                   anthropicModels={anthropicModels}
