@@ -137,17 +137,29 @@ const Options = () => {
     setModelError(null);
 
     try {
-      // Add Claude 3 family models
-      const models = [
-        { name: 'claude-3-opus-20240229', displayName: 'Claude 3 Opus', provider: 'anthropic' },
-        { name: 'claude-3-sonnet-20240229', displayName: 'Claude 3 Sonnet', provider: 'anthropic' },
-        { name: 'claude-3-haiku-20240307', displayName: 'Claude 3 Haiku', provider: 'anthropic' },
-        { name: 'claude-3.5-sonnet-20240320', displayName: 'Claude 3.5 Sonnet', provider: 'anthropic' },
-      ];
+      const response = await fetch('https://api.anthropic.com/v1/models', {
+        headers: {
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Anthropic models: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const models = data.data.map((model: any) => ({
+        name: model.id,
+        displayName: model.display_name,
+        provider: 'anthropic',
+      }));
+
       setAnthropicModels(models);
     } catch (error) {
-      console.error('Error setting Anthropic models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to set Anthropic models');
+      console.error('Error fetching Anthropic models:', error);
+      setModelError(error instanceof Error ? error.message : 'Failed to fetch Anthropic models');
     } finally {
       setIsLoadingModels(false);
     }

@@ -1,6 +1,12 @@
 import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, geminiKeyStorage, getDefaultModel, setDefaultModel } from '@extension/storage';
+import {
+  exampleThemeStorage,
+  geminiKeyStorage,
+  anthropicKeyStorage,
+  getDefaultModel,
+  setDefaultModel,
+} from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -22,12 +28,18 @@ interface GeminiModel {
   displayName: string;
 }
 
+interface AnthropicModel {
+  name: string;
+  displayName: string;
+}
+
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
   const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
   const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
+  const [anthropicModels, setAnthropicModels] = useState<AnthropicModel[]>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -99,6 +111,35 @@ const SidePanel = () => {
       try {
         setLoading(true);
         setError('');
+
+        // Fetch Anthropic models
+        const anthropicKey = await anthropicKeyStorage.get();
+        if (anthropicKey) {
+          try {
+            const response = await fetch('https://api.anthropic.com/v1/models', {
+              headers: {
+                'x-api-key': anthropicKey,
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`Failed to fetch Anthropic models: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            const models = data.data.map((model: any) => ({
+              name: model.id,
+              displayName: model.display_name,
+            }));
+
+            setAnthropicModels(models);
+          } catch (err) {
+            console.error('Error fetching Anthropic models:', err);
+            setError('Failed to fetch Anthropic models: ' + (err as Error).message);
+          }
+        }
         console.log('Debug: Fetching models...');
 
         // Fetch Ollama models
@@ -183,6 +224,15 @@ const SidePanel = () => {
               ) : (
                 <>
                   <option value="">Select a model</option>
+                  {anthropicModels.length > 0 && (
+                    <optgroup label={`Anthropic Models (${anthropicModels.length})`}>
+                      {anthropicModels.map(model => (
+                        <option key={model.name} value={model.name}>
+                          {model.displayName}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                   {geminiModels.length > 0 && (
                     <optgroup label={`Gemini Models (${geminiModels.length})`}>
                       {geminiModels.map(model => {

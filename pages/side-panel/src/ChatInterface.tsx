@@ -4,11 +4,10 @@ import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
 import { PaperAirplaneIcon, UserIcon, ChatBubbleLeftRightIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
-import { getGeminiKey } from '@extension/storage';
-import { retry } from './utils/retry';
 import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
+import { AnthropicService } from './services/llm/anthropic';
 
 interface Message {
   role: string;
@@ -105,23 +104,26 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
 
       console.log('Debug: Generated prompt:', prompt);
 
-      // Instantiate required LLM service
-      let llmService;
-      if (selectedModel.includes('gemini')) {
-        llmService = new GeminiService(selectedModel);
+      // Prepare messages for the selected model
+      const chatMessages = messages.concat({ role: 'user', content: input });
+
+      let response;
+      if (selectedModel.startsWith('claude')) {
+        const anthropicMessages = chatMessages.map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.content,
+        }));
+        response = await AnthropicService.chat(anthropicMessages, selectedModel);
+      } else if (selectedModel.includes('gemini')) {
+        const llmService = new GeminiService(selectedModel);
+        response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
       } else {
-        llmService = new OllamaService(selectedModel, API_URL);
+        const llmService = new OllamaService(selectedModel, API_URL);
+        response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
       }
 
-      // Get completion
-      const completion = await llmService.generateCompletion(
-        messages.concat({ role: 'user', content: input }),
-        prompt,
-        undefined,
-        mode,
-      );
-      console.log('Debug: Completion:', completion);
-      setMessages(prev => [...prev, { role: 'assistant', content: completion }]);
+      console.log('Debug: Response:', response);
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (err) {
       console.error('Error in chat:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
