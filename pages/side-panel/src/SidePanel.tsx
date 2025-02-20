@@ -1,6 +1,6 @@
 import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, getGeminiKey, getDefaultModel, setDefaultModel } from '@extension/storage';
+import { exampleThemeStorage, geminiKeyStorage, getDefaultModel, setDefaultModel } from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -113,7 +113,7 @@ const SidePanel = () => {
 
         // Fetch Gemini models
         try {
-          const geminiKey = await getGeminiKey();
+          const geminiKey = await geminiKeyStorage.get();
           console.log('Debug: Got Gemini key:', geminiKey ? 'yes' : 'no');
           if (geminiKey) {
             const geminiResponse = await fetch(

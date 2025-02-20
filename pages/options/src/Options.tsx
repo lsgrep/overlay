@@ -13,10 +13,9 @@ import {
 } from '@heroicons/react/24/solid';
 import {
   exampleThemeStorage,
-  getOpenAIKey,
-  getGeminiKey,
-  setOpenAIKey,
-  setGeminiKey,
+  openAIKeyStorage,
+  geminiKeyStorage,
+  anthropicKeyStorage,
   getDefaultLanguage,
   setDefaultLanguage,
   getDefaultModel,
@@ -33,14 +32,19 @@ const Options = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
-  // Existing API key states
-  const [openAIKey, setOpenAIKeyState] = useState('');
-  const [geminiKey, setGeminiKeyState] = useState('');
+  // API key states
+  const openAIKey = useStorage(openAIKeyStorage);
+  const geminiKey = useStorage(geminiKeyStorage);
+  const anthropicKey = useStorage(anthropicKeyStorage);
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [showAnthropicKey, setShowAnthropicKey] = useState(false);
 
   const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [ollamaModels, setOllamaModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
+  const [anthropicModels, setAnthropicModels] = useState<
+    Array<{ name: string; displayName?: string; provider: string }>
+  >([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
 
@@ -126,21 +130,40 @@ const Options = () => {
     }
   };
 
+  const fetchAnthropicModels = async (key: string) => {
+    if (!key) return;
+
+    setIsLoadingModels(true);
+    setModelError(null);
+
+    try {
+      // Add Claude 3 family models
+      const models = [
+        { name: 'claude-3-opus-20240229', displayName: 'Claude 3 Opus', provider: 'anthropic' },
+        { name: 'claude-3-sonnet-20240229', displayName: 'Claude 3 Sonnet', provider: 'anthropic' },
+        { name: 'claude-3-haiku-20240307', displayName: 'Claude 3 Haiku', provider: 'anthropic' },
+        { name: 'claude-3.5-sonnet-20240320', displayName: 'Claude 3.5 Sonnet', provider: 'anthropic' },
+      ];
+      setAnthropicModels(models);
+    } catch (error) {
+      console.error('Error setting Anthropic models:', error);
+      setModelError(error instanceof Error ? error.message : 'Failed to set Anthropic models');
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
+
   useEffect(() => {
     // Load saved settings
     const loadSettings = async () => {
       try {
-        const [openai, gemini, defaultLang, defaultMod] = await Promise.all([
-          getOpenAIKey(),
-          getGeminiKey(),
-          getDefaultLanguage(),
-          getDefaultModel(),
-        ]);
+        const [defaultLang, defaultMod] = await Promise.all([getDefaultLanguage(), getDefaultModel()]);
 
-        if (openai) setOpenAIKeyState(openai);
-        if (gemini) {
-          setGeminiKeyState(gemini);
-          fetchGoogleModels(gemini);
+        if (geminiKey) {
+          fetchGoogleModels(geminiKey);
+        }
+        if (anthropicKey) {
+          fetchAnthropicModels(anthropicKey);
         }
         if (defaultLang) setLanguage(defaultLang);
         if (defaultMod) setSelectedModel(defaultMod);
@@ -152,7 +175,7 @@ const Options = () => {
       }
     };
     loadSettings();
-  }, []);
+  }, [geminiKey]);
 
   // Fetch models when Gemini key changes
   useEffect(() => {
@@ -162,6 +185,15 @@ const Options = () => {
       setGoogleModels([]);
     }
   }, [geminiKey]);
+
+  // Fetch models when Anthropic key changes
+  useEffect(() => {
+    if (anthropicKey) {
+      fetchAnthropicModels(anthropicKey);
+    } else {
+      setAnthropicModels([]);
+    }
+  }, [anthropicKey]);
 
   // Apply font settings to the document
   useEffect(() => {
@@ -182,12 +214,7 @@ const Options = () => {
     try {
       // Save all settings
       await Promise.all(
-        [
-          openAIKey && setOpenAIKey(openAIKey),
-          geminiKey && setGeminiKey(geminiKey),
-          language && setDefaultLanguage(language),
-          selectedModel && setDefaultModel(selectedModel),
-        ].filter(Boolean),
+        [language && setDefaultLanguage(language), selectedModel && setDefaultModel(selectedModel)].filter(Boolean),
       );
       setSaveStatus('success');
     } catch (error) {
@@ -248,6 +275,7 @@ const Options = () => {
                 { name: 'General', icon: <Cog6ToothIcon className="w-5 h-5" /> },
                 { name: 'OpenAI', icon: <KeyIcon className="w-5 h-5" /> },
                 { name: 'Google', icon: <CloudIcon className="w-5 h-5" /> },
+                { name: 'Anthropic', icon: <KeyIcon className="w-5 h-5" /> },
                 { name: 'AI Models', icon: <SparklesIcon className="w-5 h-5" /> },
                 { name: 'Appearance', icon: <PaintBrushIcon className="w-5 h-5" /> },
                 { name: 'Language', icon: <LanguageIcon className="w-5 h-5" /> },
@@ -330,6 +358,15 @@ const Options = () => {
                             ))}
                           </optgroup>
                         )}
+                        {anthropicModels.length > 0 && (
+                          <optgroup label="Anthropic Models">
+                            {anthropicModels.map(model => (
+                              <option key={model.name} value={model.name}>
+                                {model.displayName}
+                              </option>
+                            ))}
+                          </optgroup>
+                        )}
                       </select>
                       <p className="mt-1 text-sm opacity-60">Select your preferred AI model for chat interactions</p>
                     </div>
@@ -352,7 +389,7 @@ const Options = () => {
                         id="openai-key"
                         type={showOpenAIKey ? 'text' : 'password'}
                         value={openAIKey}
-                        onChange={e => setOpenAIKeyState(e.target.value)}
+                        onChange={e => openAIKeyStorage.set(e.target.value)}
                         className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                           isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
                         }`}
@@ -385,7 +422,7 @@ const Options = () => {
                           id="gemini-key"
                           type={showGeminiKey ? 'text' : 'password'}
                           value={geminiKey}
-                          onChange={e => setGeminiKeyState(e.target.value)}
+                          onChange={e => geminiKeyStorage.set(e.target.value)}
                           className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
                             isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
                           }`}
@@ -426,6 +463,76 @@ const Options = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === 'Anthropic' && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-1">Anthropic Settings</h3>
+                    <p className="text-sm opacity-60">Configure your Anthropic API key for Claude access</p>
+                  </div>
+                  <div>
+                    <label htmlFor="anthropic-key" className="block text-sm font-semibold mb-2 text-blue-500">
+                      API Key
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="anthropic-key"
+                        type={showAnthropicKey ? 'text' : 'password'}
+                        value={anthropicKey}
+                        onChange={e => anthropicKeyStorage.set(e.target.value)}
+                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}
+                        placeholder="sk-ant-..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAnthropicKey(!showAnthropicKey)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        {showAnthropicKey ? '👁️' : '👁️‍🗨️'}
+                      </button>
+                    </div>
+                    <p className="mt-2 text-sm opacity-60">
+                      Get your API key from the{' '}
+                      <a
+                        href="https://console.anthropic.com/account/keys"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-600">
+                        Anthropic Console
+                      </a>
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="available-anthropic-models"
+                      className="block text-sm font-semibold mb-2 text-blue-500">
+                      Available Models
+                    </label>
+                    <div
+                      id="available-anthropic-models"
+                      className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
+                      {isLoadingModels ? (
+                        <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
+                      ) : modelError ? (
+                        <div className="p-4 text-center text-sm text-red-500">{modelError}</div>
+                      ) : anthropicModels.length === 0 ? (
+                        <div className="p-4 text-center text-sm opacity-60">
+                          {anthropicKey ? 'No models found' : 'Enter API key to view available models'}
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-black/10 dark:divide-white/10">
+                          {anthropicModels.map(model => (
+                            <div key={model.name} className="p-3 text-sm">
+                              <div className="font-medium">{model.displayName || model.name.split('/').pop()}</div>
+                              <div className="text-xs opacity-60 mt-1">{model.name}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -597,6 +704,7 @@ const OptionsWithTooltips = () => (
     <Tooltip id="theme-tooltip" />
     <Tooltip id="openai-tooltip" />
     <Tooltip id="gemini-tooltip" />
+    <Tooltip id="anthropic-tooltip" />
   </>
 );
 

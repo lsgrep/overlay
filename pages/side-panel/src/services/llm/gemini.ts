@@ -1,4 +1,4 @@
-import { getGeminiKey } from '@extension/storage';
+import { geminiKeyStorage } from '@extension/storage';
 import { LLMConfig, LLMService, Message } from './types';
 
 export class GeminiService implements LLMService {
@@ -10,7 +10,7 @@ export class GeminiService implements LLMService {
   }
 
   async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
-    const geminiKey = await getGeminiKey();
+    const geminiKey = await geminiKeyStorage.get();
     if (!geminiKey) {
       throw new Error('Gemini API key not found');
     }
