@@ -113,7 +113,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
           role: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.content,
         }));
-        response = await AnthropicService.chat(anthropicMessages, selectedModel);
+        response = await AnthropicService.chat(anthropicMessages, selectedModel, prompt);
       } else if (selectedModel.includes('gemini')) {
         const llmService = new GeminiService(selectedModel);
         response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);

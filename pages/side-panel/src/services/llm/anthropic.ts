@@ -18,7 +18,7 @@ interface AnthropicResponse {
 export class AnthropicService {
   private static API_URL = 'https://api.anthropic.com/v1/messages';
 
-  static async chat(messages: AnthropicMessage[], model: string) {
+  static async chat(messages: AnthropicMessage[], model: string, systemPrompt?: string) {
     const key = await anthropicKeyStorage.get();
     if (!key) {
       throw new Error('Anthropic API key not found');
@@ -37,6 +37,7 @@ export class AnthropicService {
           model,
           messages,
           max_tokens: 4096,
+          system: systemPrompt,
         }),
       });
 
