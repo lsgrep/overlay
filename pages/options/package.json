@@ -21,7 +21,11 @@
   "dependencies": {
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
-    "@extension/ui": "workspace:*"
+    "@extension/ui": "workspace:*",
+    "@hookform/resolvers": "^4.1.0",
+    "lucide-react": "^0.475.0",
+    "react-hook-form": "^7.54.2",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",

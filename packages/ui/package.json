@@ -24,17 +24,24 @@
   },
   "devDependencies": {
     "@extension/tsconfig": "workspace:*",
+    "@hookform/resolvers": "^4.1.0",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@shadcn/ui": "^0.0.4",
     "class-variance-authority": "^0.7.1",
     "deepmerge": "^4.3.1",
+    "lucide-react": "^0.475.0",
+    "react-hook-form": "^7.54.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "tsc-alias": "^1.8.10"
+    "tsc-alias": "^1.8.10",
+    "zod": "^3.24.2"
   },
   "dependencies": {
-    "clsx": "^2.1.1"
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-popover": "^1.1.6",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0"
   }
 }

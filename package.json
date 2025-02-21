@@ -33,10 +33,15 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.4.1",
+    "lucide-react": "^0.475.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-tooltip": "^5.28.0"
+    "react-tooltip": "^5.28.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",

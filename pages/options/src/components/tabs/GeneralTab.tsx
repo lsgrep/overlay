@@ -2,6 +2,11 @@ import { useStorage } from '@extension/shared';
 import { defaultLanguageStorage, defaultModelStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@extension/ui/lib/utils';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Select,
   SelectContent,
@@ -11,6 +16,24 @@ import {
   SelectTrigger,
   SelectValue,
   Label,
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from '@extension/ui';
 
 interface GeneralTabProps {
@@ -45,6 +68,7 @@ export const GeneralTab = ({
   // Use storage hooks for language and model
   const defaultLanguage = useStorage(defaultLanguageStorage);
   const defaultModel = useStorage(defaultModelStorage);
+  const [open, setOpen] = useState(false);
 
   // Update language and model when storage changes
   useEffect(() => {
@@ -88,72 +112,126 @@ export const GeneralTab = ({
 
         <div className="grid w-full max-w-sm items-center gap-1.5">
           <Label htmlFor="default-model">Default Model</Label>
-          <Select
-            value={selectedModel}
-            onValueChange={value => {
-              setSelectedModel(value);
-              defaultModelStorage.set(value);
-            }}>
-            <SelectTrigger id="default-model">
-              <SelectValue placeholder="Select a model" />
-            </SelectTrigger>
-            <SelectContent>
-              {/* OpenAI Models */}
-              {openaiModels.length > 0 && (
-                <SelectGroup>
-                  <SelectLabel>OpenAI Models</SelectLabel>
-                  {openaiModels.map(model => (
-                    <SelectItem key={model.name} value={model.name}>
-                      {model.displayName || model.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              )}
-              {/* Google Models */}
-              {googleModels.length > 0 && (
-                <SelectGroup>
-                  <SelectLabel>Google Models</SelectLabel>
-                  {googleModels.map(model => (
-                    <SelectItem key={model.name} value={model.name}>
-                      {model.displayName || model.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              )}
-              {/* Anthropic Models */}
-              {anthropicModels.length > 0 && (
-                <SelectGroup>
-                  <SelectLabel>Anthropic Models</SelectLabel>
-                  {anthropicModels.map(model => (
-                    <SelectItem key={model.name} value={model.name}>
-                      {model.displayName || model.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              )}
-              {/* Ollama Models */}
-              {ollamaModels.length > 0 && (
-                <SelectGroup>
-                  <SelectLabel>Ollama Models</SelectLabel>
-                  {ollamaModels.map(model => (
-                    <SelectItem key={model.name} value={model.name}>
-                      {model.displayName || model.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              )}
-              {isLoadingModels && (
-                <SelectItem value="loading" disabled>
-                  Loading models...
-                </SelectItem>
-              )}
-              {modelError && (
-                <SelectItem value="error" disabled>
-                  Error loading models: {modelError}
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" role="combobox" className="w-full justify-between">
+                {selectedModel
+                  ? [...openaiModels, ...googleModels, ...anthropicModels, ...ollamaModels].find(
+                      model => model.name === selectedModel,
+                    )?.displayName || selectedModel
+                  : 'Select a model...'}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[400px] p-0">
+              <Command>
+                <CommandInput placeholder="Search models..." />
+                <CommandEmpty>No model found.</CommandEmpty>
+                <CommandList>
+                  {isLoadingModels ? (
+                    <div className="py-6 text-center text-sm">Loading models...</div>
+                  ) : modelError ? (
+                    <div className="py-6 text-center text-sm text-red-500">{modelError}</div>
+                  ) : (
+                    <>
+                      {/* OpenAI Models */}
+                      {openaiModels.length > 0 && (
+                        <CommandGroup heading="OpenAI Models">
+                          {openaiModels.map(model => (
+                            <CommandItem
+                              key={model.name}
+                              value={model.name}
+                              onSelect={() => {
+                                setSelectedModel(model.name);
+                                defaultModelStorage.set(model.name);
+                                setOpen(false);
+                              }}>
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                )}
+                              />
+                              {model.displayName || model.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                      {/* Google Models */}
+                      {googleModels.length > 0 && (
+                        <CommandGroup heading="Google Models">
+                          {googleModels.map(model => (
+                            <CommandItem
+                              key={model.name}
+                              value={model.name}
+                              onSelect={() => {
+                                setSelectedModel(model.name);
+                                defaultModelStorage.set(model.name);
+                                setOpen(false);
+                              }}>
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                )}
+                              />
+                              {model.displayName || model.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                      {/* Anthropic Models */}
+                      {anthropicModels.length > 0 && (
+                        <CommandGroup heading="Anthropic Models">
+                          {anthropicModels.map(model => (
+                            <CommandItem
+                              key={model.name}
+                              value={model.name}
+                              onSelect={() => {
+                                setSelectedModel(model.name);
+                                defaultModelStorage.set(model.name);
+                                setOpen(false);
+                              }}>
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                )}
+                              />
+                              {model.displayName || model.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                      {/* Ollama Models */}
+                      {ollamaModels.length > 0 && (
+                        <CommandGroup heading="Ollama Models">
+                          {ollamaModels.map(model => (
+                            <CommandItem
+                              key={model.name}
+                              value={model.name}
+                              onSelect={() => {
+                                setSelectedModel(model.name);
+                                defaultModelStorage.set(model.name);
+                                setOpen(false);
+                              }}>
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                )}
+                              />
+                              {model.displayName || model.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                    </>
+                  )}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </motion.div>
