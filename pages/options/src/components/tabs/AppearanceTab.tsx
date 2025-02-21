@@ -1,6 +1,16 @@
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+  Label,
+} from '@extension/ui';
 
 interface AppearanceTabProps {
   isLight: boolean;
@@ -18,51 +28,59 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
       </div>
 
       <div className="space-y-6">
-        <div>
-          <label htmlFor="font-family" className="block text-sm font-semibold mb-2 text-blue-500">
+        <div className="space-y-2">
+          <Label htmlFor="font-family" className="text-blue-500">
             Font Family
-          </label>
-          <select
-            id="font-family"
-            value={fontFamily}
-            onChange={e => fontFamilyStorage.set(e.target.value)}
-            className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-              isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-            }`}>
-            <optgroup label="Programming Fonts">
-              <option value="JetBrains Mono">JetBrains Mono</option>
-              <option value="Fira Code">Fira Code</option>
-              <option value="Source Code Pro">Source Code Pro</option>
-              <option value="Cascadia Code">Cascadia Code</option>
-              <option value="Hack">Hack</option>
-              <option value="Monaco">Monaco</option>
-              <option value="Menlo">Menlo</option>
-              <option value="SF Mono">SF Mono</option>
-            </optgroup>
-            <optgroup label="System Fonts">
-              <option value="system-ui">System Default</option>
-              <option value="monospace">Monospace</option>
-              <option value="Courier New">Courier New</option>
-            </optgroup>
-          </select>
+          </Label>
+          <Select value={fontFamily} onValueChange={value => fontFamilyStorage.set(value)}>
+            <SelectTrigger
+              id="font-family"
+              className={`w-full ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+              <SelectValue placeholder="Select a font family" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Programming Fonts</SelectLabel>
+                <SelectItem value="JetBrains Mono">JetBrains Mono</SelectItem>
+                <SelectItem value="Fira Code">Fira Code</SelectItem>
+                <SelectItem value="Source Code Pro">Source Code Pro</SelectItem>
+                <SelectItem value="Cascadia Code">Cascadia Code</SelectItem>
+                <SelectItem value="Hack">Hack</SelectItem>
+                <SelectItem value="Monaco">Monaco</SelectItem>
+                <SelectItem value="Menlo">Menlo</SelectItem>
+                <SelectItem value="SF Mono">SF Mono</SelectItem>
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>System Fonts</SelectLabel>
+                <SelectItem value="system-ui">System Default</SelectItem>
+                <SelectItem value="monospace">Monospace</SelectItem>
+                <SelectItem value="Courier New">Courier New</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div>
-          <label htmlFor="font-size" className="block text-sm font-semibold mb-2 text-blue-500">
+        <div className="space-y-2">
+          <Label htmlFor="font-size" className="text-blue-500">
             Font Size
-          </label>
-          <div className="flex items-center gap-4">
-            <input
+          </Label>
+          <Select value={`${fontSize}`} onValueChange={value => fontSizeStorage.set(parseInt(value, 10))}>
+            <SelectTrigger
               id="font-size"
-              type="range"
-              min="12"
-              max="24"
-              value={fontSize}
-              onChange={e => fontSizeStorage.set(parseInt(e.target.value, 10))}
-              className="flex-1"
-            />
-            <span className="text-sm">{fontSize}px</span>
-          </div>
+              className={`w-full ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+              <SelectValue placeholder="Select a font size" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="12">12px</SelectItem>
+              <SelectItem value="13">13px</SelectItem>
+              <SelectItem value="14">14px</SelectItem>
+              <SelectItem value="15">15px</SelectItem>
+              <SelectItem value="16">16px</SelectItem>
+              <SelectItem value="18">18px</SelectItem>
+              <SelectItem value="20">20px</SelectItem>
+              <SelectItem value="24">24px</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div>

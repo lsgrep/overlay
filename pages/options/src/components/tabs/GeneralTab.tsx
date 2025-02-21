@@ -2,6 +2,16 @@ import { useStorage } from '@extension/shared';
 import { defaultLanguageStorage, defaultModelStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+  Label,
+} from '@extension/ui';
 
 interface GeneralTabProps {
   isLight: boolean;
@@ -53,88 +63,97 @@ export const GeneralTab = ({
       </div>
 
       <div className="space-y-6">
-        <div>
-          <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
-            Default Language
-          </label>
-          <select
-            id="language"
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="language">Default Language</Label>
+          <Select
             value={language}
-            onChange={e => {
-              setLanguage(e.target.value);
-              defaultLanguageStorage.set(e.target.value);
-            }}
-            className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-              isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-            }`}>
-            {availableLanguages.map(lang => (
-              <option key={lang.code} value={lang.code}>
-                {lang.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={value => {
+              setLanguage(value);
+              defaultLanguageStorage.set(value);
+            }}>
+            <SelectTrigger id="language">
+              <SelectValue placeholder="Select a language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {availableLanguages.map(lang => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div>
-          <label htmlFor="default-model" className="block text-sm font-semibold mb-2 text-blue-500">
-            Default Model
-          </label>
-          <div className={`rounded-md border ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
-            <select
-              id="default-model"
-              value={selectedModel}
-              onChange={e => {
-                setSelectedModel(e.target.value);
-                defaultModelStorage.set(e.target.value);
-              }}
-              className={`w-full p-3 bg-transparent focus:outline-none ${isLight ? 'text-black' : 'text-white'}`}>
-              <option value="" className={isLight ? 'bg-black/5' : 'bg-white/5'}>
-                Select a model
-              </option>
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="default-model">Default Model</Label>
+          <Select
+            value={selectedModel}
+            onValueChange={value => {
+              setSelectedModel(value);
+              defaultModelStorage.set(value);
+            }}>
+            <SelectTrigger id="default-model">
+              <SelectValue placeholder="Select a model" />
+            </SelectTrigger>
+            <SelectContent>
               {/* OpenAI Models */}
               {openaiModels.length > 0 && (
-                <optgroup label="OpenAI Models">
+                <SelectGroup>
+                  <SelectLabel>OpenAI Models</SelectLabel>
                   {openaiModels.map(model => (
-                    <option key={model.name} value={model.name}>
+                    <SelectItem key={model.name} value={model.name}>
                       {model.displayName || model.name}
-                    </option>
+                    </SelectItem>
                   ))}
-                </optgroup>
+                </SelectGroup>
               )}
               {/* Google Models */}
               {googleModels.length > 0 && (
-                <optgroup label="Google Models">
+                <SelectGroup>
+                  <SelectLabel>Google Models</SelectLabel>
                   {googleModels.map(model => (
-                    <option key={model.name} value={model.name}>
+                    <SelectItem key={model.name} value={model.name}>
                       {model.displayName || model.name}
-                    </option>
+                    </SelectItem>
                   ))}
-                </optgroup>
+                </SelectGroup>
               )}
               {/* Anthropic Models */}
               {anthropicModels.length > 0 && (
-                <optgroup label="Anthropic Models">
+                <SelectGroup>
+                  <SelectLabel>Anthropic Models</SelectLabel>
                   {anthropicModels.map(model => (
-                    <option key={model.name} value={model.name}>
+                    <SelectItem key={model.name} value={model.name}>
                       {model.displayName || model.name}
-                    </option>
+                    </SelectItem>
                   ))}
-                </optgroup>
+                </SelectGroup>
               )}
               {/* Ollama Models */}
               {ollamaModels.length > 0 && (
-                <optgroup label="Ollama Models">
+                <SelectGroup>
+                  <SelectLabel>Ollama Models</SelectLabel>
                   {ollamaModels.map(model => (
-                    <option key={model.name} value={model.name}>
+                    <SelectItem key={model.name} value={model.name}>
                       {model.displayName || model.name}
-                    </option>
+                    </SelectItem>
                   ))}
-                </optgroup>
+                </SelectGroup>
               )}
-              {isLoadingModels && <option disabled>Loading models...</option>}
-              {modelError && <option disabled>Error loading models: {modelError}</option>}
-            </select>
-          </div>
+              {isLoadingModels && (
+                <SelectItem value="loading" disabled>
+                  Loading models...
+                </SelectItem>
+              )}
+              {modelError && (
+                <SelectItem value="error" disabled>
+                  Error loading models: {modelError}
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </motion.div>
