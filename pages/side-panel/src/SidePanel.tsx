@@ -1,4 +1,4 @@
-import '@src/SidePanel.css';
+// import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
 import { useEffect, useState } from 'react';
