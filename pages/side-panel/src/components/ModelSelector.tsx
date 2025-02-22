@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@extension/ui/lib/utils';
+import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import {
   Button,
   Popover,
@@ -77,10 +78,13 @@ export const ModelSelector = ({
                             setSelectedModel(model.name);
                             setOpen(false);
                           }}>
-                          <Check
-                            className={cn('mr-2 h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
-                          />
-                          {model.displayName || model.name}
+                          <div className="flex items-center gap-2">
+                            <Check
+                              className={cn('h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
+                            />
+                            <OpenAIIcon className="h-4 w-4" />
+                            {model.displayName || model.name}
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -97,10 +101,13 @@ export const ModelSelector = ({
                             setSelectedModel(model.name);
                             setOpen(false);
                           }}>
-                          <Check
-                            className={cn('mr-2 h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
-                          />
-                          {model.displayName || model.name}
+                          <div className="flex items-center gap-2">
+                            <Check
+                              className={cn('h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
+                            />
+                            <GeminiIcon className="h-4 w-4" />
+                            {model.displayName || model.name}
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -117,10 +124,13 @@ export const ModelSelector = ({
                             setSelectedModel(model.name);
                             setOpen(false);
                           }}>
-                          <Check
-                            className={cn('mr-2 h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
-                          />
-                          {model.displayName || model.name}
+                          <div className="flex items-center gap-2">
+                            <Check
+                              className={cn('h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
+                            />
+                            <AnthropicIcon className="h-4 w-4" />
+                            {model.displayName || model.name}
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -137,10 +147,13 @@ export const ModelSelector = ({
                             setSelectedModel(model.name);
                             setOpen(false);
                           }}>
-                          <Check
-                            className={cn('mr-2 h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
-                          />
-                          {model.displayName || model.name}
+                          <div className="flex items-center gap-2">
+                            <Check
+                              className={cn('h-4 w-4', selectedModel === model.name ? 'opacity-100' : 'opacity-0')}
+                            />
+                            <OllamaIcon className="h-4 w-4" />
+                            {model.displayName || model.name}
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
