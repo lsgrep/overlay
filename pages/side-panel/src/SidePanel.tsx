@@ -2,8 +2,9 @@
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
+import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
 import { ModelSelector } from './components/ModelSelector';
@@ -127,17 +128,13 @@ const SidePanel = () => {
               value={mode}
               onValueChange={value => value && setMode(value as 'conversational' | 'interactive')}
               className="flex-1">
-              <ToggleGroupItem value="conversational" className="relative flex-1 justify-center">
+              <ToggleGroupItem value="conversational" className="flex-1">
+                <MessageCircle className="mr-2" />
                 Conversational
-                <Check
-                  className={`w-4 h-4 text-primary-foreground absolute right-2 ${mode === 'conversational' ? 'block' : 'hidden'}`}
-                />
               </ToggleGroupItem>
-              <ToggleGroupItem value="interactive" className="relative flex-1 justify-center">
+              <ToggleGroupItem value="interactive" className="flex-1">
+                <Blocks className="mr-2" />
                 Interactive
-                <Check
-                  className={`w-4 h-4 text-primary-foreground absolute right-2 ${mode === 'interactive' ? 'block' : 'hidden'}`}
-                />
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
