@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
-import { PaperAirplaneIcon, UserIcon, ChatBubbleLeftRightIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { Terminal } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
 import { PromptManager } from './services/llm/prompt';
@@ -10,10 +11,16 @@ import { OllamaService } from './services/llm/ollama';
 import { AnthropicService } from './services/llm/anthropic';
 import { OpenAIService } from './services/llm/openai';
 import { Button, Textarea } from '@extension/ui';
+import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 
 interface Message {
   role: string;
   content: string;
+  model?: {
+    name: string;
+    displayName?: string;
+    provider: string;
+  };
 }
 
 interface TaskStep {
@@ -138,6 +145,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       } else if (selectedModel.includes('gemini')) {
         const llmService = new GeminiService(selectedModel);
         response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
+        const modelName = selectedModel.replace('models/', '');
+        const model = {
+          name: selectedModel,
+          provider: 'gemini',
+          displayName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
+        };
+        setMessages(prev => [...prev, { role: 'assistant', content: response, model }]);
+        return;
       } else if (selectedModel.startsWith('gpt')) {
         const llmService = new OpenAIService(selectedModel);
         response = await llmService.generateCompletion(chatMessages, prompt);
@@ -147,7 +162,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
 
       console.log('Debug: Response:', response);
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      const model = [...(openaiModels || []), ...(anthropicModels || []), ...(ollamaModels || [])].find(
+        model => model.name === selectedModel,
+      ) || {
+        name: selectedModel,
+        provider: selectedModel.startsWith('gpt') ? 'openai' : 'ollama',
+        displayName: selectedModel,
+      };
+      setMessages(prev => [...prev, { role: 'assistant', content: response, model }]);
     } catch (err) {
       console.error('Error in chat:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -168,13 +190,31 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               className="text-xs font-semibold mb-1 flex items-center gap-1 text-muted-foreground">
               {message.role === 'user' ? (
                 <>
-                  <UserIcon className="w-3 h-3" />
+                  <Terminal className="w-3 h-3" />
                   <span>You</span>
                 </>
               ) : (
                 <>
-                  <ChatBubbleLeftRightIcon className="w-3 h-3" />
-                  <span>Assistant</span>
+                  {(() => {
+                    const provider = message.model?.provider;
+                    const Icon =
+                      provider === 'openai'
+                        ? OpenAIIcon
+                        : provider === 'gemini'
+                          ? GeminiIcon
+                          : provider === 'anthropic'
+                            ? AnthropicIcon
+                            : provider === 'ollama'
+                              ? OllamaIcon
+                              : null;
+
+                    return (
+                      <>
+                        {Icon && <Icon className="w-3 h-3" />}
+                        <span>{message.model?.displayName || message.model?.name || 'Assistant'}</span>
+                      </>
+                    );
+                  })()}
                 </>
               )}
             </div>
