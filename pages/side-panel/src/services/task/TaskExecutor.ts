@@ -1,5 +1,6 @@
 import { navigateTo } from '../../utils/navigation';
 import { performSearch } from '../../utils/search';
+import { AnthropicPromptGenerator } from '../llm/prompts';
 import type { PageContext } from '../llm/prompts/types';
 import type { LLMService } from '../llm/types';
 
@@ -232,17 +233,29 @@ export class TaskExecutor {
               console.log('Updating page context...');
               console.log('Tab details:', tab);
               if (tab.id) {
-                // Get the original HTML of the page
-                const [htmlResult] = await chrome.scripting.executeScript({
-                  target: { tabId: tab.id },
-                  func: () => document.documentElement.outerHTML,
+                // Get both the HTML and text content of the page
+                console.log('Fetching page content for tab:', tab.id);
+                const [htmlResult, textResult] = await Promise.all([
+                  chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    func: () => document.documentElement.outerHTML,
+                  }),
+                  chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    func: () => document.body.innerText,
+                  }),
+                ]);
+
+                console.log('Content fetched:', {
+                  textLength: textResult?.[0]?.result?.length,
+                  htmlLength: htmlResult?.[0]?.result?.length,
                 });
 
                 this.pageContext = {
                   url: tab.url,
                   title: tab.title,
-                  content: ctx?.content, // Preserve existing content until we can fetch new content
-                  originalHtml: htmlResult?.result,
+                  content: textResult?.[0]?.result || '', // Get actual text content of the current page
+                  originalHtml: htmlResult?.[0]?.result,
                 };
                 // Mark navigation as complete
                 this.setState({
@@ -280,25 +293,53 @@ export class TaskExecutor {
             console.log('Debug: No extraction result found, attempting LLM extraction');
             console.log('Debug: LLM service:', this.llmService);
             console.log('Debug: Goal:', this.goal);
-            // if (!this.llmService || !this.goal) {
-            //   throw new Error('LLM service or goal not available for extraction');
-            // }
-            // TODO: Use LLM service with goal for extraction
-            // const llmResult = await this.llmService.chat([{
-            //   role: 'user',
-            //   content: `Extract data from the page with goal: ${this.goal}`
-            // }], 'claude-3', ctx?.content || '');
+            if (!this.llmService || !this.goal) {
+              throw new Error('LLM service or goal not available for extraction');
+            }
+            const promptManager = new AnthropicPromptGenerator();
+            const prompt = promptManager.generateExtractionPrompt(this.pageContext?.content || '', this.goal);
+            try {
+              console.log('Attempting LLM extraction with prompt:', prompt);
+              const llmResult = await this.llmService.generateCompletion(
+                [{ role: 'user', content: prompt }],
+                '', // No additional context needed since it's in the prompt
+              );
+              console.log('LLM extraction result:', llmResult);
+              let extractedData;
+              try {
+                const parsedResult = JSON.parse(llmResult);
+                if (parsedResult.error) {
+                  console.warn('LLM extraction failed:', parsedResult.error);
+                  throw new Error(parsedResult.error);
+                }
+                extractedData = [
+                  {
+                    text: parsedResult.answer,
+                    html: parsedResult.answer, // Since this is LLM-extracted, we use the same text
+                    attributes: { confidence: parsedResult.confidence.toString() },
+                  },
+                ];
+              } catch (parseError) {
+                console.error('Failed to parse LLM result:', parseError);
+                throw new Error('Failed to parse LLM extraction result');
+              }
+              return { result: extractedData };
+            } catch (llmError) {
+              console.error('LLM extraction failed:', llmError);
+              throw llmError;
+            }
+          } else {
+            console.log('Debug: Extraction result:', extractionResult);
+            // if this is null let's use LLM
+            this.setState({
+              actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
+              extractedData: {
+                ...this.state.extractedData,
+                [action.id]: extractionResult.result,
+              },
+            });
+            break;
           }
-          console.log('Debug: Extraction result:', extractionResult);
-          // if this is null let's use LLM
-          this.setState({
-            actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
-            extractedData: {
-              ...this.state.extractedData,
-              [action.id]: extractionResult.result,
-            },
-          });
-          break;
         }
 
         default:
