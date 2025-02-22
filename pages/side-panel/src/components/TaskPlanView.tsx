@@ -24,6 +24,7 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
     console.log('Setting initial state:', initialState);
     return initialState;
   });
+  const [hasExecuted, setHasExecuted] = useState(false);
 
   useEffect(() => {
     // Subscribe to state changes
@@ -31,8 +32,21 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
       console.log('TaskPlanView received new state:', newState);
       setState(newState);
     });
-    return () => unsubscribe();
-  }, [executor]);
+
+    // Auto-execute after 3 seconds if not already executed
+    const timer = setTimeout(() => {
+      if (!hasExecuted) {
+        console.log('Auto-executing task plan');
+        executor.executeTask(plan, pageContext);
+        setHasExecuted(true);
+      }
+    }, 3000);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
+    };
+  }, [executor, plan, pageContext, hasExecuted]);
 
   // Update page context when it changes
   useEffect(() => {
