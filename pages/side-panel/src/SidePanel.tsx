@@ -9,7 +9,6 @@ import { ModelSelector } from './components/ModelSelector';
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
-
   const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
   const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
   const [anthropicModels, setAnthropicModels] = useState<AnthropicModel[]>([]);
@@ -105,11 +104,6 @@ const SidePanel = () => {
   return (
     <div className={`flex flex-col h-screen ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
       <header className={`p-4 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h1 className={`text-lg font-semibold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>Overlay</h1>
-          <ThemeToggle />
-        </div>
-
         <div className="flex flex-col gap-4">
           <ModelSelector
             selectedModel={selectedModel}
@@ -121,13 +115,6 @@ const SidePanel = () => {
             isLoading={loading}
             error={error}
           />
-          <button
-            onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
-            className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
-            title="Browse Ollama Models">
-            📚
-          </button>
-
           <div className="flex items-center justify-between gap-2">
             <span className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>Mode:</span>
             <div
@@ -163,19 +150,6 @@ const SidePanel = () => {
         />
       </div>
     </div>
-  );
-};
-
-const ThemeToggle = () => {
-  const theme = useStorage(exampleThemeStorage);
-  const isLight = theme === 'light';
-
-  return (
-    <button
-      onClick={exampleThemeStorage.toggle}
-      className={`p-2 rounded-full ${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-700'}`}>
-      {isLight ? '🌙' : '☀️'}
-    </button>
   );
 };
 

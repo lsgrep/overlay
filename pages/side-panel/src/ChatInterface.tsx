@@ -4,12 +4,12 @@ import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
 import { PaperAirplaneIcon, UserIcon, ChatBubbleLeftRightIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
-import { ModelSelector } from './components/ModelSelector';
 import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
 import { AnthropicService } from './services/llm/anthropic';
 import { OpenAIService } from './services/llm/openai';
+import { Button } from '@extension/ui';
 
 interface Message {
   role: string;
@@ -158,18 +158,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   return (
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
-      <div className="p-4">
-        <ModelSelector
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          openaiModels={openaiModels}
-          googleModels={googleModels}
-          ollamaModels={ollamaModels}
-          anthropicModels={anthropicModels}
-          isLoadingModels={isLoadingModels}
-          modelError={modelError}
-        />
-      </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
         {messages.map((message, index) => (
           <div
@@ -259,18 +247,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             }`}
             disabled={isLoading}
           />
-          <button
+          <Button
             type="submit"
             disabled={isLoading || !input.trim()}
             style={{ fontFamily, fontSize: `${fontSize}px` }}
-            className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              isLoading || !input.trim()
-                ? 'bg-blue-300 dark:bg-blue-600 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}>
+            // className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
+            //   isLoading || !input.trim()
+            //     ? 'bg-blue-300 dark:bg-blue-600 cursor-not-allowed'
+            //     : 'bg-blue-500 hover:bg-blue-600 text-white'
+            // }`}
+          >
             <span>Send</span>
             <PaperAirplaneIcon className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </form>
     </div>
