@@ -1,5 +1,6 @@
 import { navigateTo } from '../../utils/navigation';
 import { performSearch } from '../../utils/search';
+import type { PageContext } from '../llm/prompts/types';
 
 export interface ActionParameters {
   url?: string;
@@ -47,6 +48,14 @@ export interface ExecutionState {
   error: string | null;
   actionStatuses: Record<string, ActionStatus>;
   retryCount: Record<string, number>;
+  extractedData: Record<
+    string,
+    Array<{
+      text: string;
+      html: string;
+      attributes: Record<string, string>;
+    }>
+  >;
 }
 
 export class TaskExecutor {
@@ -56,32 +65,53 @@ export class TaskExecutor {
     error: null,
     actionStatuses: {},
     retryCount: {},
+    extractedData: {},
   };
 
-  private listeners: ((state: ExecutionState) => void)[] = [];
-
-  constructor() {
-    this.resetState();
-  }
-
-  private resetState() {
+  private initializeState() {
+    console.log('Initializing TaskExecutor state');
     this.state = {
       currentStep: null,
       executing: false,
       error: null,
       actionStatuses: {},
       retryCount: {},
+      extractedData: {},
     };
+    console.log('Initial state:', this.state);
+  }
+
+  private listeners: ((state: ExecutionState) => void)[] = [];
+
+  private pageContext: PageContext | null = null;
+
+  constructor(pageContext?: PageContext) {
+    this.initializeState();
+    if (pageContext) {
+      this.pageContext = pageContext;
+      console.log('TaskExecutor initialized with page context:', pageContext);
+    }
+  }
+
+  private resetState() {
+    this.initializeState();
     this.notifyListeners();
   }
 
   private setState(updates: Partial<ExecutionState>) {
-    this.state = { ...this.state, ...updates };
+    const newState = { ...this.state, ...updates };
+    console.log('TaskExecutor setState:', {
+      current: this.state,
+      updates,
+      newState,
+    });
+    this.state = newState;
     this.notifyListeners();
   }
 
   private notifyListeners() {
-    this.listeners.forEach(listener => listener(this.state));
+    console.log('TaskExecutor notifying listeners with state:', this.state);
+    this.listeners.forEach(listener => listener({ ...this.state }));
   }
 
   public subscribe(listener: (state: ExecutionState) => void) {
@@ -117,7 +147,7 @@ export class TaskExecutor {
     }
   }
 
-  private async handleStepAction(action: Action): Promise<boolean> {
+  private async handleStepAction(action: Action, pageContext?: PageContext): Promise<boolean> {
     try {
       if (!this.validateAction(action)) {
         return false;
@@ -126,6 +156,9 @@ export class TaskExecutor {
       this.setState({
         actionStatuses: { ...this.state.actionStatuses, [action.id]: 'loading' },
       });
+
+      // Get the current page context
+      const ctx = pageContext || this.pageContext;
 
       switch (action.type) {
         case 'search':
@@ -137,7 +170,15 @@ export class TaskExecutor {
         case 'navigate_to':
           if (action.parameters.url) {
             try {
-              await navigateTo(action.parameters.url);
+              const tab = await navigateTo(action.parameters.url);
+              // Update page context after navigation
+              if (tab.url && tab.title) {
+                this.pageContext = {
+                  url: tab.url,
+                  title: tab.title,
+                  content: ctx?.content, // Preserve existing content until we can fetch new content
+                };
+              }
               // Add a small delay after navigation to ensure page is interactive
               await new Promise(resolve => setTimeout(resolve, 1000));
             } catch (error) {
@@ -156,16 +197,68 @@ export class TaskExecutor {
           break;
 
         case 'click_element':
-          if (action.parameters.selector) {
+          if (action.parameters.selector && ctx) {
             // TODO: Implement click action using content script
             throw new Error('Click action not implemented yet');
           }
           break;
 
         case 'extract_data':
-          if (action.parameters.selector) {
-            // TODO: Implement data extraction using content script
-            throw new Error('Data extraction not implemented yet');
+          if (action.parameters.selector && ctx) {
+            // Get the current active tab
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (!tab?.id) {
+              throw new Error('No active tab found');
+            }
+
+            // Execute the extraction script
+            const [result] = await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: selector => {
+                const elements = document.querySelectorAll(selector);
+                if (elements.length === 0) {
+                  return { error: `No elements found matching selector: ${selector}` };
+                }
+
+                // Extract text content from all matching elements
+                const results = Array.from(elements).map(el => ({
+                  text: el.textContent?.trim() || '',
+                  html: el.innerHTML,
+                  attributes: Object.fromEntries(Array.from(el.attributes).map(attr => [attr.name, attr.value])),
+                }));
+
+                return { results };
+              },
+              args: [action.parameters.selector],
+            });
+
+            if (!result?.result) {
+              throw new Error('Failed to execute extraction script');
+            }
+
+            const extractionResult = result.result as {
+              error?: string;
+              results?: Array<{ text: string; html: string; attributes: Record<string, string> }>;
+            };
+
+            if (extractionResult.error) {
+              throw new Error(extractionResult.error);
+            }
+
+            // Store the extracted data in the state
+            console.log('Extraction successful:', {
+              actionId: action.id,
+              results: extractionResult.results,
+            });
+
+            this.setState({
+              extractedData: {
+                ...this.state.extractedData,
+                [action.id]: extractionResult.results,
+              },
+            });
+
+            console.log('Updated state:', this.state);
           }
           break;
 
@@ -213,7 +306,18 @@ export class TaskExecutor {
     return this.handleStepAction(action);
   }
 
-  public async executeTask(plan: TaskPlan) {
+  public setPageContext(pageContext: PageContext) {
+    this.pageContext = pageContext;
+  }
+
+  public getPageContext(): PageContext | null {
+    return this.pageContext;
+  }
+
+  public async executeTask(plan: TaskPlan, pageContext?: PageContext) {
+    if (pageContext) {
+      this.pageContext = pageContext;
+    }
     this.resetState();
     this.setState({ executing: true });
 

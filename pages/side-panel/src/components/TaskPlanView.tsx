@@ -1,25 +1,45 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { TaskExecutor, type TaskPlan, type ExecutionState } from '../services/task/TaskExecutor';
+import type { PageContext } from '../services/llm/prompts/types';
 
 interface TaskPlanViewProps {
   plan: TaskPlan;
   isLight: boolean;
+  pageContext?: PageContext;
 }
 
-export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight }) => {
+export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageContext }) => {
   // Create a TaskExecutor instance
-  const [executor] = useState(() => new TaskExecutor());
-  const [state, setState] = useState<ExecutionState>(executor.getState());
+  const [executor] = useState(() => {
+    const exec = new TaskExecutor(pageContext);
+    console.log('Initial executor state:', exec.getState());
+    return exec;
+  });
+  const [state, setState] = useState<ExecutionState>(() => {
+    const initialState = executor.getState();
+    console.log('Setting initial state:', initialState);
+    return initialState;
+  });
 
   useEffect(() => {
     // Subscribe to state changes
-    const unsubscribe = executor.subscribe(setState);
+    const unsubscribe = executor.subscribe(newState => {
+      console.log('TaskPlanView received new state:', newState);
+      setState(newState);
+    });
     return () => unsubscribe();
   }, [executor]);
 
+  // Update page context when it changes
+  useEffect(() => {
+    if (pageContext) {
+      executor.setPageContext(pageContext);
+    }
+  }, [executor, pageContext]);
+
   const executeAllSteps = () => {
-    executor.executeTask(plan);
+    executor.executeTask(plan, pageContext);
   };
 
   return (
@@ -93,6 +113,51 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight }) => 
                   )}
                 </span>
               </div>
+
+              {/* Show extracted data if available */}
+              {action.type === 'extract_data' &&
+                (() => {
+                  console.log('Checking extracted data for action:', {
+                    actionId: action.id,
+                    hasExtractedData: !!state.extractedData,
+                    extractedData: state.extractedData?.[action.id],
+                    status: state.actionStatuses[action.id],
+                  });
+
+                  if (
+                    state.extractedData &&
+                    state.extractedData[action.id] &&
+                    state.actionStatuses[action.id] === 'complete'
+                  ) {
+                    return (
+                      <div className={`mt-3 p-3 rounded-lg ${isLight ? 'bg-gray-100' : 'bg-gray-700'}`}>
+                        <h4 className={`text-sm font-medium mb-2 ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+                          Extracted Data ({state.extractedData[action.id].length} items)
+                        </h4>
+                        <div className="space-y-2">
+                          {state.extractedData[action.id].map((item, i) => (
+                            <div key={i} className={`p-2 rounded ${isLight ? 'bg-white' : 'bg-gray-800'} text-sm`}>
+                              <div className={isLight ? 'text-gray-800' : 'text-gray-200'}>{item.text}</div>
+                              {Object.entries(item.attributes).length > 0 && (
+                                <div className="mt-1 flex flex-wrap gap-1">
+                                  {Object.entries(item.attributes).map(([key, value]) => (
+                                    <span
+                                      key={key}
+                                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs
+                                  ${isLight ? 'bg-gray-100 text-gray-600' : 'bg-gray-600 text-gray-300'}`}>
+                                      {key}="{value}"
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
             </div>
           </div>
         ))}
