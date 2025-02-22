@@ -2,6 +2,7 @@ export interface PageContext {
   title?: string;
   url?: string;
   content?: string;
+  originalHtml?: string;
 }
 
 export interface ModelInfo {
