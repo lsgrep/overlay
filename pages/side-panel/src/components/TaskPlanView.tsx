@@ -78,11 +78,15 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight }) => 
     }
   };
 
+  const [actionStatus, setActionStatus] = useState<Record<string, 'pending' | 'loading' | 'complete' | 'error'>>({});
+
   const handleStepAction = async (action: Action): Promise<boolean> => {
     try {
       if (!validateAction(action)) {
         return false;
       }
+
+      setActionStatus(prev => ({ ...prev, [action.id]: 'loading' }));
 
       switch (action.type) {
         case 'search':
@@ -90,21 +94,51 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight }) => 
             await performSearch(action.parameters.query);
           }
           break;
+
         case 'navigate_to':
           if (action.parameters.url) {
-            await navigateTo(action.parameters.url);
+            try {
+              await navigateTo(action.parameters.url);
+              // Add a small delay after navigation to ensure page is interactive
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            } catch (error) {
+              if (error.message === 'Navigation timeout') {
+                throw new Error(`Navigation to ${action.parameters.url} timed out`);
+              }
+              throw error;
+            }
           }
           break;
+
         case 'wait':
           if (action.parameters.duration) {
             await new Promise(resolve => setTimeout(resolve, action.parameters.duration! * 1000));
           }
           break;
-        // Add other action handlers here
+
+        case 'click_element':
+          if (action.parameters.selector) {
+            // TODO: Implement click action using content script
+            throw new Error('Click action not implemented yet');
+          }
+          break;
+
+        case 'extract_data':
+          if (action.parameters.selector) {
+            // TODO: Implement data extraction using content script
+            throw new Error('Data extraction not implemented yet');
+          }
+          break;
+
+        default:
+          throw new Error(`Unknown action type: ${action.type}`);
       }
+
+      setActionStatus(prev => ({ ...prev, [action.id]: 'complete' }));
       return true;
     } catch (error) {
       setError(error.message);
+      setActionStatus(prev => ({ ...prev, [action.id]: 'error' }));
       return false;
     }
   };
@@ -193,7 +227,10 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight }) => 
             key={action.id}
             className={`flex items-start space-x-3 p-3 rounded-lg ${isLight ? 'bg-gray-50' : 'bg-gray-800'}
               ${currentStep === i ? 'ring-2 ring-blue-500' : ''}
-              ${retryCount[action.id] ? 'border-l-4 border-yellow-500' : ''}`}>
+              ${retryCount[action.id] ? 'border-l-4 border-yellow-500' : ''}
+              ${actionStatus[action.id] === 'loading' ? 'bg-blue-50' : ''}
+              ${actionStatus[action.id] === 'complete' ? 'bg-green-50' : ''}
+              ${actionStatus[action.id] === 'error' ? 'bg-red-50' : ''}`}>
             <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm">
               {i + 1}
             </div>
@@ -206,6 +243,26 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight }) => 
                   {action.parameters.url && <span className="ml-2">URL: {action.parameters.url}</span>}
                   {action.parameters.selector && <span className="ml-2">Selector: {action.parameters.selector}</span>}
                   {action.parameters.value && <span className="ml-2">Value: {action.parameters.value}</span>}
+                  {actionStatus[action.id] && (
+                    <span
+                      className={`ml-2 ${
+                        {
+                          loading: 'text-blue-500',
+                          complete: 'text-green-500',
+                          error: 'text-red-500',
+                          pending: 'text-gray-500',
+                        }[actionStatus[action.id]]
+                      }`}>
+                      {
+                        {
+                          loading: '⏳ Running...',
+                          complete: '✓ Complete',
+                          error: '✗ Failed',
+                          pending: 'Pending',
+                        }[actionStatus[action.id]]
+                      }
+                    </span>
+                  )}
                   {retryCount[action.id] > 0 && (
                     <span className="ml-2 text-yellow-500">
                       Retries: {retryCount[action.id]}/{plan.error_handling.max_retries}
