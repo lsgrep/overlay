@@ -24,12 +24,14 @@ export const AnthropicTab = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-1">Anthropic Settings</h3>
-        <p className="text-sm opacity-60">Configure your Anthropic API key for Claude access</p>
+      <div className="space-y-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight">Anthropic Settings</h2>
+        <p className="text-sm text-muted-foreground">Configure your Anthropic API key for Claude access</p>
       </div>
       <div>
-        <label htmlFor="anthropic-key" className="block text-sm font-semibold mb-2 text-blue-500">
+        <label
+          htmlFor="anthropic-key"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           API Key
         </label>
         <div className="relative">

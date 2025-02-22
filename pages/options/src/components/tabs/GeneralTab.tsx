@@ -81,14 +81,18 @@ export const GeneralTab = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-1">General Settings</h3>
-        <p className="text-sm opacity-60">Configure your default preferences for the AI assistant</p>
+      <div className="space-y-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight">General Settings</h2>
+        <p className="text-sm text-muted-foreground">Configure your default preferences for the AI assistant</p>
       </div>
 
       <div className="space-y-6">
         <div className="grid w-full max-w-sm items-center gap-1.5">
-          <Label htmlFor="language">Default Language</Label>
+          <Label
+            htmlFor="language"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            Default Language
+          </Label>
           <Select
             value={language}
             onValueChange={value => {

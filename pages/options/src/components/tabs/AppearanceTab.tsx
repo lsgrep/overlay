@@ -22,14 +22,16 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-1">Appearance Settings</h3>
-        <p className="text-sm opacity-60">Customize the visual appearance of the application</p>
+      <div className="space-y-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight">Appearance Settings</h2>
+        <p className="text-sm text-muted-foreground">Customize the visual appearance of the application</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="font-family" className="text-blue-500">
+          <Label
+            htmlFor="font-family"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Font Family
           </Label>
           <Select value={fontFamily} onValueChange={value => fontFamilyStorage.set(value)}>

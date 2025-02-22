@@ -23,12 +23,14 @@ export const OpenAITab = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-1">OpenAI Settings</h3>
-        <p className="text-sm opacity-60">Configure your OpenAI API key and model preferences</p>
+      <div className="space-y-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight">OpenAI Settings</h2>
+        <p className="text-sm text-muted-foreground">Configure your OpenAI API key and model preferences</p>
       </div>
       <div>
-        <label htmlFor="openai-key" className="block text-sm font-semibold mb-2 text-blue-500">
+        <label
+          htmlFor="openai-key"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           API Key
         </label>
         <div className="relative">

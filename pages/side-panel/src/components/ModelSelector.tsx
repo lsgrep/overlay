@@ -48,11 +48,37 @@ export const ModelSelector = ({
       <Popover open={open} onOpenChange={setOpen} className="flex-1">
         <PopoverTrigger asChild>
           <Button id="model-selector" variant="outline" role="combobox" className="w-full justify-between">
-            {selectedModel
-              ? [...openaiModels, ...geminiModels, ...anthropicModels, ...ollamaModels].find(
-                  model => model.name === selectedModel,
-                )?.displayName || selectedModel
-              : 'Select a model...'}
+            <div className="flex items-center gap-2">
+              {selectedModel ? (
+                <>
+                  {(() => {
+                    const model = [...openaiModels, ...geminiModels, ...anthropicModels, ...ollamaModels].find(
+                      model => model.name === selectedModel,
+                    );
+                    const provider = model?.provider;
+                    const Icon =
+                      provider === 'openai'
+                        ? OpenAIIcon
+                        : provider === 'gemini'
+                          ? GeminiIcon
+                          : provider === 'anthropic'
+                            ? AnthropicIcon
+                            : provider === 'ollama'
+                              ? OllamaIcon
+                              : null;
+
+                    return Icon && <Icon className="h-4 w-4" />;
+                  })()}
+                  <span>
+                    {[...openaiModels, ...geminiModels, ...anthropicModels, ...ollamaModels].find(
+                      model => model.name === selectedModel,
+                    )?.displayName || selectedModel}
+                  </span>
+                </>
+              ) : (
+                'Select a model...'
+              )}
+            </div>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

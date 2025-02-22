@@ -157,7 +157,7 @@ const Options = () => {
                   className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium flex items-center gap-3 ${
                     activeTab === tab
                       ? 'bg-blue-500 text-white'
-                      : `${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-900'} text-gray-500`
+                      : `${isLight ? 'hover:bg-gray-100 text-gray-900' : 'hover:bg-gray-900 text-gray-100'}`
                   }`}>
                   {icon}
                   <span>{tab}</span>

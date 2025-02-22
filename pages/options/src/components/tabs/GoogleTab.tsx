@@ -24,13 +24,15 @@ export const GoogleTab = ({
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold mb-1">Google Settings</h3>
-        <p className="text-sm opacity-60">Configure your Google API key and Gemini model preferences</p>
+      <div className="space-y-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight">Google Settings</h2>
+        <p className="text-sm text-muted-foreground">Configure your Google API key and Gemini model preferences</p>
       </div>
       <div className="space-y-6">
         <div>
-          <label htmlFor="gemini-key" className="block text-sm font-semibold mb-2 text-blue-500">
+          <label
+            htmlFor="gemini-key"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             API Key
           </label>
           <div className="relative">
