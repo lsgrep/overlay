@@ -323,14 +323,27 @@ export class TaskExecutor {
                 console.error('Failed to parse LLM result:', parseError);
                 throw new Error('Failed to parse LLM extraction result');
               }
+              // Update state with LLM extraction result
+              this.setState({
+                actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
+                extractedData: {
+                  ...this.state.extractedData,
+                  [action.id]: extractedData,
+                },
+              });
               return { result: extractedData };
             } catch (llmError) {
               console.error('LLM extraction failed:', llmError);
+              // Update state to reflect error
+              this.setState({
+                actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
+                error: llmError.message,
+              });
               throw llmError;
             }
           } else {
             console.log('Debug: Extraction result:', extractionResult);
-            // if this is null let's use LLM
+            // Update state with selector-based extraction result
             this.setState({
               actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
               extractedData: {

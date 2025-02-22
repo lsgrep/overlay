@@ -2,26 +2,31 @@ import { PromptGenerator } from './types';
 
 export class AnthropicPromptGenerator implements PromptGenerator {
   generateExtractionPrompt(pageContent: string, question: string): string {
-    return `Human: I need your help extracting a specific piece of information from a webpage. The selector-based extraction failed, so I need you to find the answer in the page content.
+    return `Human: You are a data extraction assistant. Your task is to extract specific information from webpage content. You must ONLY respond with a valid JSON object, nothing else. No explanations, no additional text.
 
-Question: ${question}
+Extract the answer to this question: ${question}
 
-Page Content:
+From this content:
 ${pageContent}
 
-Please find the specific answer to the question in the content. Return ONLY a JSON response in this format:
+Respond with ONLY one of these JSON formats:
 
+For successful extraction:
 {
-  "answer": string,      // The extracted answer to the question
-  "confidence": number  // Your confidence in the answer (0-1)
+  "answer": "<the extracted answer>",
+  "confidence": <number between 0 and 1>
 }
 
-If you cannot find the answer, return:
+For failed extraction:
 {
-  "error": "Brief explanation of why the answer could not be found"
+  "error": "<brief error message>"
 }
 
-A: I will find the specific answer to your question.`;
+Assistant: {"answer": "example", "confidence": 0.9}
+
+Human: Remember to ONLY return valid JSON. No other text. Extract the answer now:
+
+Assistant:`;
   }
   generateSystemPrompt(goal: string): string {
     return `Human: You are Claude, an AI assistant that helps users interact with web pages. Your responses must follow this structured JSON format. You can also assist with extracting data when selector-based extraction fails.
