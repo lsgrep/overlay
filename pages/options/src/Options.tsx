@@ -1,16 +1,8 @@
 // import '@src/Options.css';
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import {
-  SunIcon,
-  MoonIcon,
-  Cog6ToothIcon,
-  KeyIcon,
-  CloudIcon,
-  SparklesIcon,
-  PaintBrushIcon,
-  LanguageIcon,
-} from '@heroicons/react/24/solid';
+import { Cog6ToothIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
+import { OpenAIIcon, GeminiIcon, AnthropicIcon } from '@extension/ui';
 import {
   exampleThemeStorage,
   openAIKeyStorage,
@@ -19,7 +11,6 @@ import {
   fontFamilyStorage,
   fontSizeStorage,
 } from '@extension/storage';
-import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
@@ -118,23 +109,6 @@ const Options = () => {
     }
   }, [fontSize]);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    setSaveStatus(null);
-    try {
-      // Save all settings
-      await Promise.all(
-        [language && setDefaultLanguage(language), selectedModel && setDefaultModel(selectedModel)].filter(Boolean),
-      );
-      setSaveStatus('success');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      setSaveStatus('error');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${isLight ? 'bg-white text-black' : 'bg-black text-white'}`}>
@@ -158,17 +132,6 @@ const Options = () => {
               Overlay
             </h1>
           </div>
-          <Button
-            onClick={exampleThemeStorage.toggle}
-            theme={theme}
-            className="transition-all duration-300 hover:scale-105"
-            data-tooltip-id="theme-tooltip"
-            data-tooltip-content={`Switch to ${isLight ? 'Dark' : 'Light'} mode`}>
-            <div className="flex items-center gap-2">
-              {isLight ? <MoonIcon className="w-4 h-4" /> : <SunIcon className="w-4 h-4" />}
-              <span>{isLight ? 'Dark' : 'Light'} mode</span>
-            </div>
-          </Button>
         </div>
       </motion.div>
 
@@ -183,11 +146,10 @@ const Options = () => {
               className="space-y-2 sticky top-24">
               {[
                 { name: 'General', icon: <Cog6ToothIcon className="w-5 h-5" /> },
-                { name: 'OpenAI', icon: <KeyIcon className="w-5 h-5" /> },
-                { name: 'Google', icon: <CloudIcon className="w-5 h-5" /> },
-                { name: 'Anthropic', icon: <KeyIcon className="w-5 h-5" /> },
+                { name: 'OpenAI', icon: <OpenAIIcon className="w-5 h-5" /> },
+                { name: 'Google', icon: <GeminiIcon className="w-5 h-5" /> },
+                { name: 'Anthropic', icon: <AnthropicIcon className="w-5 h-5" /> },
                 { name: 'Appearance', icon: <PaintBrushIcon className="w-5 h-5" /> },
-                { name: 'Language', icon: <LanguageIcon className="w-5 h-5" /> },
               ].map(({ name: tab, icon }) => (
                 <button
                   key={tab}
@@ -262,31 +224,6 @@ const Options = () => {
               )}
 
               {activeTab === 'Appearance' && <AppearanceTab isLight={isLight} />}
-
-              {activeTab === 'Language' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Preferred Language
-                    </label>
-                    <select
-                      id="language"
-                      value={language}
-                      onChange={e => setLanguage(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="en">English</option>
-                      <option value="es">Español</option>
-                      <option value="fr">Français</option>
-                      <option value="de">Deutsch</option>
-                      <option value="zh">中文</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Save Button */}
             </motion.div>
           </div>
         </div>

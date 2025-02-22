@@ -102,8 +102,8 @@ const SidePanel = () => {
   }, []);
 
   return (
-    <div className={`flex flex-col h-screen ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`p-4 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
+    <div className="flex flex-col h-screen bg-background">
+      <header className="p-4 border-b border-border">
         <div className="flex flex-col gap-4">
           <ModelSelector
             selectedModel={selectedModel}
@@ -116,17 +116,16 @@ const SidePanel = () => {
             error={error}
           />
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>Mode:</span>
-            <div
-              className={`flex items-center gap-2 p-1 rounded-lg border ${isLight ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'}`}>
+            <span className="text-sm text-muted-foreground">Mode:</span>
+            <div className="flex items-center gap-2 p-1 rounded-lg border border-border bg-muted">
               <button
                 onClick={() => setMode('conversational')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? (isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white') : ''}`}>
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? 'bg-primary text-primary-foreground' : ''}`}>
                 Conversational
               </button>
               <button
                 onClick={() => setMode('interactive')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? (isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white') : ''}`}>
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? 'bg-primary text-primary-foreground' : ''}`}>
                 Interactive
               </button>
             </div>
@@ -157,8 +156,8 @@ export default withErrorBoundary(
   withSuspense(
     SidePanel,
     <div className="flex items-center justify-center h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>,
   ),
-  <div className="p-4 text-red-500">An error occurred</div>,
+  <div className="p-4 text-destructive">An error occurred</div>,
 );

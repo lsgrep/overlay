@@ -4,3 +4,4 @@ export * from './dialog';
 export * from './popover';
 export * from './label';
 export * from './select';
+export * from '../icons/index';

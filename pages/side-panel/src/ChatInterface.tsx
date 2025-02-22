@@ -162,14 +162,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`p-3 rounded-lg break-words max-w-full ${
-              message.role === 'user'
-                ? `${isLight ? 'bg-blue-100' : 'bg-blue-900'} ml-4`
-                : `${isLight ? 'bg-gray-100' : 'bg-gray-700'} mr-4`
-            }`}>
+            className={`p-3 rounded-lg break-words max-w-full ${message.role === 'user' ? 'bg-primary/10 ml-4' : 'bg-muted mr-4'}`}>
             <div
               style={{ fontFamily, fontSize: `${fontSize}px` }}
-              className={`text-xs font-semibold mb-1 flex items-center gap-1 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+              className="text-xs font-semibold mb-1 flex items-center gap-1 text-muted-foreground">
               {message.role === 'user' ? (
                 <>
                   <UserIcon className="w-3 h-3" />
@@ -182,7 +178,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </>
               )}
             </div>
-            <div className={`${isLight ? 'text-gray-800' : 'text-gray-100'} overflow-x-auto max-w-full`}>
+            <div className="text-foreground overflow-x-auto max-w-full">
               {mode === 'interactive' && message.role === 'assistant' ? (
                 <div className="space-y-2 max-w-full">
                   {(() => {
@@ -194,8 +190,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       try {
                         const json = JSON.parse(message.content);
                         return (
-                          <pre
-                            className={`whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
+                          <pre className="whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm bg-muted">
                             {JSON.stringify(json, null, 2)}
                           </pre>
                         );
@@ -219,7 +214,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </div>
         ))}
         {isLoading && (
-          <div className={`flex justify-center py-2 ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
+          <div className="flex justify-center py-2 text-muted-foreground">
             <div className="flex gap-1">
               <ArrowPathIcon className="w-4 h-4 animate-spin" />
               <span className="text-sm">Thinking...</span>
@@ -227,14 +222,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </div>
         )}
         {error && (
-          <div className="text-red-500 p-3 rounded-lg bg-red-100 mr-4">
+          <div className="text-destructive p-3 rounded-lg bg-destructive/10 mr-4">
             <div className="text-xs font-semibold mb-1">Error</div>
             <div>{error}</div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-border">
         <div className="flex space-x-2">
           <input
             type="text"
@@ -242,21 +237,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onChange={e => setInput(e.target.value)}
             placeholder="Type your message..."
             style={{ fontFamily, fontSize: `${fontSize}px` }}
-            className={`flex-1 p-2 rounded-lg border ${
-              isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-700 text-white'
-            }`}
+            className="flex-1 p-2 rounded-lg border border-input bg-background text-foreground"
             disabled={isLoading}
           />
           <Button
             type="submit"
             disabled={isLoading || !input.trim()}
             style={{ fontFamily, fontSize: `${fontSize}px` }}
-            // className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-            //   isLoading || !input.trim()
-            //     ? 'bg-blue-300 dark:bg-blue-600 cursor-not-allowed'
-            //     : 'bg-blue-500 hover:bg-blue-600 text-white'
-            // }`}
-          >
+            className="flex items-center gap-2"
+            variant="default">
             <span>Send</span>
             <PaperAirplaneIcon className="w-4 h-4" />
           </Button>
