@@ -1,7 +1,9 @@
 // import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
+import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
 import { ModelSelector } from './components/ModelSelector';
@@ -115,20 +117,29 @@ const SidePanel = () => {
             isLoading={loading}
             error={error}
           />
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-sm text-muted-foreground">Mode:</span>
-            <div className="flex items-center gap-2 p-1 rounded-lg border border-border bg-muted">
-              <button
-                onClick={() => setMode('conversational')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? 'bg-primary text-primary-foreground' : ''}`}>
+          <div className="flex items-center gap-4">
+            <Label htmlFor="mode-selector" className="min-w-16">
+              Mode
+            </Label>
+            <ToggleGroup
+              id="mode-selector"
+              type="single"
+              value={mode}
+              onValueChange={value => value && setMode(value as 'conversational' | 'interactive')}
+              className="flex-1">
+              <ToggleGroupItem value="conversational" className="relative flex-1 justify-center">
                 Conversational
-              </button>
-              <button
-                onClick={() => setMode('interactive')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? 'bg-primary text-primary-foreground' : ''}`}>
+                <Check
+                  className={`w-4 h-4 text-primary-foreground absolute right-2 ${mode === 'conversational' ? 'block' : 'hidden'}`}
+                />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="interactive" className="relative flex-1 justify-center">
                 Interactive
-              </button>
-            </div>
+                <Check
+                  className={`w-4 h-4 text-primary-foreground absolute right-2 ${mode === 'interactive' ? 'block' : 'hidden'}`}
+                />
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
         </div>
       </header>

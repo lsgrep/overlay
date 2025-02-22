@@ -9,7 +9,7 @@ import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
 import { AnthropicService } from './services/llm/anthropic';
 import { OpenAIService } from './services/llm/openai';
-import { Button } from '@extension/ui';
+import { Button, Textarea } from '@extension/ui';
 
 interface Message {
   role: string;
@@ -231,13 +231,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
       <form onSubmit={handleSubmit} className="p-4 border-t border-border">
         <div className="flex space-x-2">
-          <input
-            type="text"
+          <Textarea
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Type your message..."
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (input.trim() && !isLoading) {
+                  handleSubmit(e);
+                }
+              }
+            }}
+            placeholder="Type your message... (Press Enter to send, Shift + Enter for new line)"
             style={{ fontFamily, fontSize: `${fontSize}px` }}
-            className="flex-1 p-2 rounded-lg border border-input bg-background text-foreground"
+            className="flex-1 min-h-[40px] max-h-[200px] resize-none"
             disabled={isLoading}
           />
           <Button
