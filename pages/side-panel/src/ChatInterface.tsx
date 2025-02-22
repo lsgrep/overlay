@@ -4,6 +4,7 @@ import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
 import { PaperAirplaneIcon, UserIcon, ChatBubbleLeftRightIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import ReactMarkdown from 'react-markdown';
 import { TaskPlanView } from './components/TaskPlanView';
+import { ModelSelector } from './components/ModelSelector';
 import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
@@ -31,14 +32,33 @@ interface TaskPlan {
 
 interface ChatInterfaceProps {
   selectedModel: string;
+  setSelectedModel: (model: string) => void;
   isLight: boolean;
   mode: 'interactive' | 'conversational' | 'context-menu';
   initialInput?: string;
+  openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
+  googleModels: Array<{ name: string; displayName?: string; provider: string }>;
+  ollamaModels: Array<{ name: string; displayName?: string; provider: string }>;
+  anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
+  isLoadingModels?: boolean;
+  modelError?: string | null;
 }
 
 const API_URL = 'http://localhost:11434/api/chat';
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isLight, mode, initialInput }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  selectedModel,
+  setSelectedModel,
+  isLight,
+  mode,
+  initialInput,
+  openaiModels,
+  googleModels,
+  ollamaModels,
+  anthropicModels,
+  isLoadingModels,
+  modelError,
+}) => {
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -138,6 +158,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ selectedModel, isL
 
   return (
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
+      <div className="p-4">
+        <ModelSelector
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+          openaiModels={openaiModels}
+          googleModels={googleModels}
+          ollamaModels={ollamaModels}
+          anthropicModels={anthropicModels}
+          isLoadingModels={isLoadingModels}
+          modelError={modelError}
+        />
+      </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
         {messages.map((message, index) => (
           <div

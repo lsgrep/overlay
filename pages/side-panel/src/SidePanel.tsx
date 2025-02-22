@@ -4,6 +4,7 @@ import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
 import { useEffect, useState } from 'react';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
+import { ModelSelector } from './components/ModelSelector';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -110,68 +111,22 @@ const SidePanel = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="flex items-center space-x-2">
-            <select
-              value={selectedModel}
-              onChange={e => setSelectedModel(e.target.value)}
-              disabled={loading}
-              className={`flex-1 p-2 rounded border ${isLight ? 'bg-white border-gray-200 text-gray-900' : 'bg-gray-700 border-gray-600 text-white'}`}>
-              {loading ? (
-                <option>Loading models...</option>
-              ) : error ? (
-                <option>Error loading models: {error}</option>
-              ) : (
-                <>
-                  <option value="">Select a model</option>
-                  {openaiModels.length > 0 && (
-                    <optgroup label={`OpenAI Models (${openaiModels.length})`}>
-                      {openaiModels.map(model => (
-                        <option key={model.name} value={model.name}>
-                          {model.displayName || model.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                  {anthropicModels.length > 0 && (
-                    <optgroup label={`Anthropic Models (${anthropicModels.length})`}>
-                      {anthropicModels.map(model => (
-                        <option key={model.name} value={model.name}>
-                          {model.displayName}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                  {geminiModels.length > 0 && (
-                    <optgroup label={`Gemini Models (${geminiModels.length})`}>
-                      {geminiModels.map(model => {
-                        console.log('Debug: Rendering Gemini model:', model);
-                        return (
-                          <option key={model.name} value={model.name}>
-                            {model.displayName}
-                          </option>
-                        );
-                      })}
-                    </optgroup>
-                  )}
-                  {ollamaModels.length > 0 && (
-                    <optgroup label={`Ollama Models (${ollamaModels.length})`}>
-                      {ollamaModels.map(model => (
-                        <option key={model.name} value={model.name}>
-                          {model.displayName}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                </>
-              )}
-            </select>
-            <button
-              onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
-              className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
-              title="Browse Ollama Models">
-              📚
-            </button>
-          </div>
+          <ModelSelector
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            openaiModels={openaiModels}
+            geminiModels={geminiModels}
+            ollamaModels={ollamaModels}
+            anthropicModels={anthropicModels}
+            isLoading={loading}
+            error={error}
+          />
+          <button
+            onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
+            className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
+            title="Browse Ollama Models">
+            📚
+          </button>
 
           <div className="flex items-center justify-between gap-2">
             <span className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>Mode:</span>
@@ -193,7 +148,19 @@ const SidePanel = () => {
       </header>
 
       <div className="flex-1 overflow-hidden">
-        <ChatInterface selectedModel={selectedModel} isLight={isLight} mode={mode} initialInput={input} />
+        <ChatInterface
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+          isLight={isLight}
+          mode={mode}
+          initialInput={input}
+          openaiModels={openaiModels}
+          geminiModels={geminiModels}
+          ollamaModels={ollamaModels}
+          anthropicModels={anthropicModels}
+          isLoadingModels={loading}
+          modelError={error}
+        />
       </div>
     </div>
   );
