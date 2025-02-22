@@ -1,19 +1,28 @@
-export interface PageContext {
-  title?: string;
-  url?: string;
-  content?: string;
-}
+import { ChatMode, ModelInfo, PageContext, PromptGenerator } from './prompts/types';
+import { AnthropicPromptGenerator } from './prompts/anthropic';
+import { GeminiPromptGenerator } from './prompts/gemini';
+import { OpenAIPromptGenerator } from './prompts/openai';
+import { OllamaPromptGenerator } from './prompts/ollama';
 
 export class PromptManager {
-  static generateContext(mode: 'interactive' | 'conversational' | 'context-menu', pageContext: PageContext): string {
-    let context = `
-You are an AI assistant that helps users interact with web pages. When appropriate, generate a task plan with specific actions. Use these actions:
-- 'search': Perform a Google search (requires query parameter)
-- 'click': Click on an element (requires target selector)
-- 'type': Type text into a form field (requires target selector and value)
-- 'navigate': Navigate to a URL (requires target URL)
-- 'wait': Wait for a specific condition or time
-- 'extract': Extract information from the page`;
+  private static getPromptGenerator(model?: ModelInfo): PromptGenerator {
+    switch (model?.provider) {
+      case 'anthropic':
+        return new AnthropicPromptGenerator();
+      case 'gemini':
+        return new GeminiPromptGenerator();
+      case 'openai':
+        return new OpenAIPromptGenerator();
+      case 'ollama':
+        return new OllamaPromptGenerator();
+      default:
+        return new OllamaPromptGenerator(); // Default to Ollama's generic prompts
+    }
+  }
+
+  static generateContext(mode: ChatMode, pageContext: PageContext, model?: ModelInfo): string {
+    const promptGenerator = PromptManager.getPromptGenerator(model);
+    let context = promptGenerator.generateSystemPrompt();
 
     if (pageContext.title || pageContext.url) {
       context += `\n\nCurrent page: ${pageContext.title || ''} ${pageContext.url ? `(${pageContext.url})` : ''}`;
@@ -23,22 +32,11 @@ You are an AI assistant that helps users interact with web pages. When appropria
       context += `\n\nPage content:\n${pageContext.content}`;
     }
 
+    // Add mode-specific prompt
     if (mode === 'interactive') {
-      context += `\n\nYou are in interactive mode. Generate a task plan with specific steps to help the user achieve their goal.
-
-For any information seeking tasks, use the 'search' action directly with a specific query. For example:
-{
-  "goal": "Find the current price of gold",
-  "steps": [
-    {
-      "description": "Search for gold price",
-      "action": "search",
-      "query": "current price of gold per ounce"
-    }
-  ]
-}`;
+      context += '\n\n' + promptGenerator.generateInteractivePrompt();
     } else {
-      context += `\n\nYou are in conversational mode. Focus on answering questions about the page content without suggesting interactive actions.`;
+      context += '\n\n' + promptGenerator.generateConversationalPrompt();
     }
 
     return context;

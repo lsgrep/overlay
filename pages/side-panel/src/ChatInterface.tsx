@@ -127,8 +127,26 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         content: currentContent,
       };
 
+      // Get current model info
+      const modelInfo = [
+        ...(openaiModels || []),
+        ...(googleModels || []),
+        ...(anthropicModels || []),
+        ...(ollamaModels || []),
+      ].find(model => model.name === selectedModel) || {
+        name: selectedModel,
+        provider: selectedModel.startsWith('gpt')
+          ? 'openai'
+          : selectedModel.includes('gemini')
+            ? 'gemini'
+            : selectedModel.startsWith('claude')
+              ? 'anthropic'
+              : 'ollama',
+        displayName: selectedModel,
+      };
+
       // Generate prompt using PromptManager
-      const prompt = PromptManager.generateContext(mode, pageContext);
+      const prompt = PromptManager.generateContext(mode, pageContext, modelInfo);
 
       console.log('Debug: Generated prompt:', prompt);
 
