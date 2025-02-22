@@ -1,5 +1,5 @@
 import { anthropicKeyStorage } from '@extension/storage';
-import { Message } from './types';
+import { Message, LLMConfig, LLMService } from './types';
 
 interface AnthropicMessage {
   role: 'user' | 'assistant';
@@ -16,10 +16,15 @@ interface AnthropicResponse {
   }>;
 }
 
-export class AnthropicService {
-  private static API_URL = 'https://api.anthropic.com/v1/messages';
+export class AnthropicService implements LLMService {
+  private API_URL = 'https://api.anthropic.com/v1/messages';
+  private model: string;
 
-  static async chat(messages: Message[], model: string, context: string): Promise<string> {
+  constructor(model: string) {
+    this.model = model;
+  }
+
+  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
     const key = await anthropicKeyStorage.get();
     if (!key) {
       throw new Error('Anthropic API key not found');
@@ -44,12 +49,16 @@ export class AnthropicService {
           'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
-          model,
+          model: this.model,
           messages: anthropicMessages,
-          max_tokens: 4096,
+          max_tokens: config?.maxOutputTokens || 4096,
+          temperature: config?.temperature,
+          top_k: config?.topK,
+          top_p: config?.topP,
           system: systemPrompt,
         }),
       });
+      console.log('Anthropic response:', response);
 
       if (!response.ok) {
         const error = await response.json();

@@ -12,6 +12,7 @@ import { AnthropicService } from './services/llm/anthropic';
 import { OpenAIService } from './services/llm/openai';
 import { Button, Textarea } from '@extension/ui';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
+import { PageContext } from './services/llm/prompts';
 
 interface Message {
   role: string;
@@ -20,6 +21,12 @@ interface Message {
     name: string;
     displayName?: string;
     provider: string;
+  };
+  metadata?: {
+    questionId?: string; // ID to link question-response pairs
+    originalQuestion?: string; // The original question that led to this response
+    extractedData?: any; // Any data extracted from the response
+    timestamp?: number; // When the message was created
   };
 }
 
@@ -73,6 +80,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pageContext, setPageContext] = useState<PageContext | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -121,11 +129,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         }
       }
 
-      const pageContext = {
+      const pageContext: PageContext = {
         title: tab?.title,
         url: tab?.url,
         content: currentContent,
       };
+      setPageContext(pageContext);
 
       // Get current model info
       const modelInfo = [
@@ -151,17 +160,27 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       console.log('Debug: Generated prompt:', prompt);
 
       // Prepare messages for the selected model
-      const chatMessages = messages.concat({ role: 'user', content: input });
+      const questionId = Date.now().toString();
+      const chatMessages = messages.concat({
+        role: 'user',
+        content: input,
+        metadata: {
+          questionId,
+          timestamp: Date.now(),
+        },
+      });
 
       let response;
+      let llmService: LLMService;
       if (selectedModel.startsWith('claude')) {
         const anthropicMessages = chatMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.content,
         }));
-        response = await AnthropicService.chat(anthropicMessages, selectedModel, prompt);
+        llmService = new AnthropicService(selectedModel);
+        response = await llmService.generateCompletion(anthropicMessages, prompt);
       } else if (selectedModel.includes('gemini')) {
-        const llmService = new GeminiService(selectedModel);
+        llmService = new GeminiService(selectedModel);
         response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
         const modelName = selectedModel.replace('models/', '');
         const model = {
@@ -169,10 +188,22 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           provider: 'gemini',
           displayName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
         };
-        setMessages(prev => [...prev, { role: 'assistant', content: response, model }]);
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: response,
+            model,
+            metadata: {
+              questionId: chatMessages[chatMessages.length - 1].metadata?.questionId,
+              originalQuestion: chatMessages[chatMessages.length - 1].content,
+              timestamp: Date.now(),
+            },
+          },
+        ]);
         return;
       } else if (selectedModel.startsWith('gpt')) {
-        const llmService = new OpenAIService(selectedModel);
+        llmService = new OpenAIService(selectedModel);
         response = await llmService.generateCompletion(chatMessages, prompt);
       } else {
         const llmService = new OllamaService(selectedModel, API_URL);
@@ -187,7 +218,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         provider: selectedModel.startsWith('gpt') ? 'openai' : 'ollama',
         displayName: selectedModel,
       };
-      setMessages(prev => [...prev, { role: 'assistant', content: response, model }]);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: response,
+          model,
+          metadata: {
+            questionId: chatMessages[chatMessages.length - 1].metadata?.questionId,
+            originalQuestion: chatMessages[chatMessages.length - 1].content,
+            timestamp: Date.now(),
+          },
+        },
+      ]);
     } catch (err) {
       console.error('Error in chat:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -242,7 +285,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   {(() => {
                     try {
                       const plan: TaskPlan = JSON.parse(message.content);
-                      return <TaskPlanView plan={plan} isLight={isLight} />;
+                      return (
+                        <TaskPlanView
+                          plan={plan}
+                          isLight={isLight}
+                          pageContext={pageContext}
+                          llmService={new AnthropicService(selectedModel)}
+                          goal={message.metadata?.originalQuestion}
+                        />
+                      );
                     } catch {
                       // If not a valid TaskPlan JSON, try to format as regular JSON
                       try {

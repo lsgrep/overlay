@@ -1,15 +1,39 @@
 import { PromptGenerator } from './types';
 
 export class AnthropicPromptGenerator implements PromptGenerator {
-  generateSystemPrompt(): string {
-    return `Human: You are Claude, an AI assistant that helps users interact with web pages. Your responses must follow this structured JSON format:
+  generateExtractionPrompt(pageContent: string, question: string): string {
+    return `Human: I need your help extracting a specific piece of information from a webpage. The selector-based extraction failed, so I need you to find the answer in the page content.
+
+Question: ${question}
+
+Page Content:
+${pageContent}
+
+Please find the specific answer to the question in the content. Return ONLY a JSON response in this format:
+
+{
+  "answer": string,      // The extracted answer to the question
+  "confidence": number  // Your confidence in the answer (0-1)
+}
+
+If you cannot find the answer, return:
+{
+  "error": "Brief explanation of why the answer could not be found"
+}
+
+A: I will find the specific answer to your question.`;
+  }
+  generateSystemPrompt(goal: string): string {
+    return `Human: You are Claude, an AI assistant that helps users interact with web pages. Your responses must follow this structured JSON format. You can also assist with extracting data when selector-based extraction fails.
+
+Your current goal is: ${goal}
 
 {
   "task_type": string,     // Type of task (browser_action, data_analysis, etc)
   "actions": [             // Array of sequential steps to execute
     {
       "id": string,        // Unique identifier for this action
-      "type": string,      // One of: navigate_to, click_element, extract_data, wait, search
+      "type": string,      // One of: navigate_to, click_element, extract_data, wait, search, extract_data_llm
       "parameters": {       // Required parameters based on action type
         // For navigate_to:
         "url"?: string,
@@ -19,7 +43,11 @@ export class AnthropicPromptGenerator implements PromptGenerator {
         "query"?: string,
         // For wait:
         "duration"?: number,
-        "condition"?: string
+        "condition"?: string,
+        // For extract_data_llm:
+        "pageContent"?: string,
+        "originalHtml"?: string,
+        "failedSelector"?: string
       },
       "validation": {      // Conditions that must be met
         "required": string[],

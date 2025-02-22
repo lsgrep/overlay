@@ -1,6 +1,7 @@
 import { navigateTo } from '../../utils/navigation';
 import { performSearch } from '../../utils/search';
 import type { PageContext } from '../llm/prompts/types';
+import type { LLMService } from '../llm/types';
 
 export interface ActionParameters {
   url?: string;
@@ -11,17 +12,10 @@ export interface ActionParameters {
   value?: string;
 }
 
-export interface ActionValidation {
-  required: string[];
-  format?: Record<string, string>;
-  constraints?: Record<string, any>;
-}
-
 export interface Action {
   id: string;
   type: 'navigate_to' | 'click_element' | 'extract_data' | 'wait' | 'search' | 'type';
   parameters: ActionParameters;
-  validation: ActionValidation;
   description: string;
 }
 
@@ -84,18 +78,106 @@ export class TaskExecutor {
   private listeners: ((state: ExecutionState) => void)[] = [];
 
   private pageContext: PageContext | null = null;
+  private llmService: LLMService | null = null;
+  private goal: string | null = null;
 
-  constructor(pageContext?: PageContext) {
+  constructor(pageContext?: PageContext, llmService?: LLMService, goal?: string) {
     this.initializeState();
     if (pageContext) {
       this.pageContext = pageContext;
       console.log('TaskExecutor initialized with page context:', pageContext);
+    }
+    if (llmService) {
+      this.llmService = llmService;
+      console.log('TaskExecutor initialized with LLM service');
+    }
+    if (goal) {
+      this.goal = goal;
+      console.log('TaskExecutor initialized with goal:', goal);
     }
   }
 
   private resetState() {
     this.initializeState();
     this.notifyListeners();
+  }
+
+  private async handleExtractData(
+    action: Action,
+    ctx?: PageContext,
+  ): Promise<{ result: Array<{ text: string; html: string; attributes: Record<string, string> }> }> {
+    // Get the current active tab first
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) {
+      throw new Error('No active tab found');
+    }
+
+    // If no context, try to get it from the current tab
+    if (!ctx && tab.url && tab.title) {
+      const [htmlResult] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => document.documentElement.outerHTML,
+      });
+
+      ctx = {
+        url: tab.url,
+        title: tab.title,
+        content: '',
+        originalHtml: htmlResult.result,
+      };
+    }
+
+    if (!action.parameters.selector) {
+      throw new Error('Selector is required for extract_data action');
+    }
+
+    // Execute the extraction script
+    console.log('Debug: About to execute script with:', {
+      selector: action.parameters.selector,
+      tabId: tab.id,
+    });
+
+    let scriptResult;
+    try {
+      const [result] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: selector => {
+          return new Promise((resolve, reject) => {
+            try {
+              const elements = document.querySelectorAll(selector);
+              console.log('Debug: Found elements:', {
+                count: elements.length,
+                selector,
+              });
+              const results = Array.from(elements).map(element => {
+                const text = element.textContent?.trim() || '';
+                const html = element.innerHTML.trim();
+                const attributes = Array.from(element.attributes).reduce(
+                  (acc, attr) => {
+                    acc[attr.name] = attr.value;
+                    return acc;
+                  },
+                  {} as Record<string, string>,
+                );
+                return { text, html, attributes };
+              });
+              resolve(results);
+            } catch (error) {
+              console.error('Debug: Error in script execution:', error);
+              reject(error);
+            }
+          });
+        },
+        args: [action.parameters.selector],
+      });
+      console.log('Debug: Inside Script result:', result);
+      scriptResult = result;
+    } catch (error) {
+      console.error('Debug: Script execution error:', error);
+      throw error;
+    }
+    // Update state with extracted data
+    return scriptResult;
   }
 
   private setState(updates: Partial<ExecutionState>) {
@@ -121,60 +203,8 @@ export class TaskExecutor {
     };
   }
 
-  private validateAction(action: Action): boolean {
-    try {
-      console.log('Debug: Validating action:', {
-        type: action.type,
-        parameters: action.parameters,
-        validation: action.validation,
-      });
-
-      // Check required parameters
-      for (const required of action.validation.required) {
-        if (!action.parameters[required as keyof ActionParameters]) {
-          const error = `Missing required parameter: ${required}`;
-          console.log('Debug: Validation failed:', error);
-          throw new Error(error);
-        }
-      }
-
-      // Check format constraints
-      if (action.validation.format) {
-        for (const [field, pattern] of Object.entries(action.validation.format)) {
-          const value = action.parameters[field as keyof ActionParameters];
-          if (value && !new RegExp(pattern).test(value.toString())) {
-            const error = `Invalid format for ${field}: ${value}`;
-            console.log('Debug: Validation failed:', error);
-            throw new Error(error);
-          }
-        }
-      }
-
-      // Additional validation for extract_data
-      if (action.type === 'extract_data') {
-        if (!action.parameters.selector) {
-          const error = 'Selector is required for extract_data action';
-          console.log('Debug: Validation failed:', error);
-          throw new Error(error);
-        }
-        console.log('Debug: extract_data validation passed with selector:', action.parameters.selector);
-      }
-
-      console.log('Debug: Validation passed');
-      return true;
-    } catch (error) {
-      console.log('Debug: Validation failed with error:', error.message);
-      this.setState({ error: error.message });
-      return false;
-    }
-  }
-
   private async handleStepAction(action: Action, pageContext?: PageContext): Promise<boolean> {
     try {
-      if (!this.validateAction(action)) {
-        return false;
-      }
-
       this.setState({
         actionStatuses: { ...this.state.actionStatuses, [action.id]: 'loading' },
       });
@@ -192,11 +222,16 @@ export class TaskExecutor {
         case 'navigate_to':
           if (action.parameters.url) {
             try {
+              console.log('Starting navigation to:', action.parameters.url);
               const tab = await navigateTo(action.parameters.url);
+              console.log('Navigation completed, tab:', tab);
               // Add a small delay after navigation to ensure page is interactive
               await new Promise(resolve => setTimeout(resolve, 3000));
+              console.log('Delay complete, updating page context...');
               // Update page context after page is fully loaded
-              if (tab.url && tab.title) {
+              console.log('Updating page context...');
+              console.log('Tab details:', tab);
+              if (tab.id) {
                 // Get the original HTML of the page
                 const [htmlResult] = await chrome.scripting.executeScript({
                   target: { tabId: tab.id },
@@ -209,11 +244,18 @@ export class TaskExecutor {
                   content: ctx?.content, // Preserve existing content until we can fetch new content
                   originalHtml: htmlResult?.result,
                 };
+                // Mark navigation as complete
+                this.setState({
+                  actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
+                });
+                console.log('Navigation action completed successfully');
               }
             } catch (error) {
-              if (error.message === 'Navigation timeout') {
-                throw new Error(`Navigation to ${action.parameters.url} timed out`);
-              }
+              console.error('Navigation error:', error);
+              this.setState({
+                error: error.message,
+                actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
+              });
               throw error;
             }
           }
@@ -233,142 +275,29 @@ export class TaskExecutor {
           break;
 
         case 'extract_data': {
-          // Get the current active tab first
-          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-          if (!tab?.id) {
-            throw new Error('No active tab found');
+          const extractionResult = await this.handleExtractData(action, ctx);
+          if (!extractionResult || !extractionResult.result || !extractionResult.result.length) {
+            console.log('Debug: No extraction result found, attempting LLM extraction');
+            console.log('Debug: LLM service:', this.llmService);
+            console.log('Debug: Goal:', this.goal);
+            // if (!this.llmService || !this.goal) {
+            //   throw new Error('LLM service or goal not available for extraction');
+            // }
+            // TODO: Use LLM service with goal for extraction
+            // const llmResult = await this.llmService.chat([{
+            //   role: 'user',
+            //   content: `Extract data from the page with goal: ${this.goal}`
+            // }], 'claude-3', ctx?.content || '');
           }
-
-          // If no context, try to get it from the current tab
-          if (!ctx && tab.url && tab.title) {
-            const [htmlResult] = await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: () => document.documentElement.outerHTML,
-            });
-
-            this.pageContext = {
-              url: tab.url,
-              title: tab.title,
-              content: '',
-              originalHtml: htmlResult?.result,
-            };
-            console.log('Debug: Created new page context:', this.pageContext);
-          }
-
-          if (!action.parameters.selector) {
-            throw new Error('Selector is required for extract_data action');
-          }
-
-          console.log('Debug: Extracting data with selector:', action.parameters.selector);
-
-          // Execute the extraction script
-          console.log('Debug: About to execute script with:', {
-            selector: action.parameters.selector,
-            tabId: tab.id,
-            action,
-          });
-          let scriptResult;
-          try {
-            console.log('Debug: Attempting to execute script with:', {
-              tabId: tab.id,
-              selector: action.parameters.selector,
-              world: 'MAIN', // This indicates where the script runs
-            });
-
-            // First, check if the selector is valid
-            const validateSelector = (selector: string) => {
-              try {
-                document.querySelector(selector);
-                return true;
-              } catch (e) {
-                return false;
-              }
-            };
-
-            const [validationResult] = await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: validateSelector,
-              args: [action.parameters.selector],
-            });
-
-            if (!validationResult.result) {
-              throw new Error(`Invalid selector syntax: ${action.parameters.selector}`);
-            }
-
-            const [result] = await chrome.scripting.executeScript({
-              target: { tabId: tab.id },
-              func: selector => {
-                try {
-                  console.log('Debug: Inside content script with selector:', selector);
-                  console.log('Debug: Document ready state:', document.readyState);
-                  console.log('Debug: Document URL:', document.URL);
-
-                  const elements = document.querySelectorAll(selector);
-                  console.log('Debug: Found elements:', {
-                    count: elements.length,
-                    selector: selector,
-                    documentElementCount: document.getElementsByTagName('*').length,
-                  });
-
-                  if (elements.length === 0) {
-                    return { error: `No elements found matching selector: ${selector}` };
-                  }
-
-                  // Extract text content from all matching elements
-                  const results = Array.from(elements).map(el => {
-                    const data = {
-                      text: el.textContent?.trim() || '',
-                      html: el.innerHTML,
-                      attributes: Object.fromEntries(Array.from(el.attributes).map(attr => [attr.name, attr.value])),
-                      tagName: el.tagName.toLowerCase(),
-                    };
-                    console.log('Debug: Extracted element data:', data);
-                    return data;
-                  });
-
-                  return { results };
-                } catch (error) {
-                  console.error('Debug: Error in content script:', error);
-                  return { error: `Error in content script: ${error.message}` };
-                }
-              },
-              args: [action.parameters.selector],
-            });
-
-            console.log('Debug: Script execution result:', result);
-            scriptResult = result;
-          } catch (error) {
-            console.error('Debug: Script execution failed:', error);
-            throw error;
-          }
-
-          if (!scriptResult?.result) {
-            throw new Error('Failed to execute extraction script');
-          }
-
-          const extractionResult = result.result as {
-            error?: string;
-            results?: Array<{ text: string; html: string; attributes: Record<string, string> }>;
-          };
-
-          if (extractionResult.error) {
-            throw new Error(extractionResult.error);
-          }
-
-          // Store the extracted data in the state
-          console.log('Extraction successful:', {
-            actionId: action.id,
-            results: extractionResult.results,
-          });
-
+          console.log('Debug: Extraction result:', extractionResult);
+          // if this is null let's use LLM
           this.setState({
+            actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
             extractedData: {
               ...this.state.extractedData,
-              [action.id]: extractionResult.results,
+              [action.id]: extractionResult.result,
             },
           });
-
-          console.log('Updated state:', this.state);
           break;
         }
 
@@ -376,9 +305,6 @@ export class TaskExecutor {
           throw new Error(`Unknown action type: ${action.type}`);
       }
 
-      this.setState({
-        actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
-      });
       return true;
     } catch (error) {
       this.setState({
@@ -398,7 +324,6 @@ export class TaskExecutor {
           id: `${action.id}_fallback`,
           type: plan.error_handling.fallback.type as Action['type'],
           parameters: plan.error_handling.fallback.parameters,
-          validation: { required: [] }, // Simplified validation for fallback
           description: `Fallback for: ${action.description}`,
         };
         return this.handleStepAction(fallbackAction);

@@ -2,17 +2,20 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { TaskExecutor, type TaskPlan, type ExecutionState } from '../services/task/TaskExecutor';
 import type { PageContext } from '../services/llm/prompts/types';
+import type { LLMService } from '../services/llm/types';
 
 interface TaskPlanViewProps {
   plan: TaskPlan;
   isLight: boolean;
   pageContext?: PageContext;
+  llmService?: LLMService;
+  goal?: string;
 }
 
-export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageContext }) => {
+export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageContext, llmService, goal }) => {
   // Create a TaskExecutor instance
   const [executor] = useState(() => {
-    const exec = new TaskExecutor(pageContext);
+    const exec = new TaskExecutor(pageContext, llmService, goal);
     console.log('Initial executor state:', exec.getState());
     return exec;
   });
