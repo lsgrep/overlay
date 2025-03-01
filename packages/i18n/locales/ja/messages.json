@@ -1,33 +1,30 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "Overlay"
+    "message": "オーバーレイ"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "Overlay"
+    "message": "オーバーレイ"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "テーマを切り替える"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "読み込み中..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "こんにちは、私の名前は $NAME$ です",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "山田太郎"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
-  },
-  "error": {
-    "message": "An error occurred"
+    "message": "こんにちは $1"
   }
 }

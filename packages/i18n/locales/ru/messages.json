@@ -1,33 +1,33 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "Overlay"
+    "message": "Оверлей"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "Overlay"
+    "message": "Оверлей"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "Переключить тему"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "Загрузка..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "Привет, меня зовут $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "Иван Петров"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "Привет $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "Произошла ошибка"
   }
 }

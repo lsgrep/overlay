@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "叠加层",
+    "description": "扩展名称。"
+  },
+  "extensionDescription": {
+    "message": "叠加层 - 您的AI驱动的浏览器助手",
+    "description": "扩展描述。"
+  }
+}

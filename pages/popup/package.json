@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@extension/shared": "workspace:*",
+    "@extension/i18n": "workspace:*",
     "@extension/storage": "workspace:*",
     "@extension/content-runtime-script": "workspace:*"
   },

@@ -10,6 +10,8 @@ import {
   anthropicKeyStorage,
   fontFamilyStorage,
   fontSizeStorage,
+  defaultLanguageStorage,
+  defaultModelStorage,
 } from '@extension/storage';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion } from 'framer-motion';
@@ -40,24 +42,31 @@ const Options = () => {
   const [selectedModel, setSelectedModel] = useState('');
   const [maxTokens, setMaxTokens] = useState(2000);
   const [temperature, setTemperature] = useState(0.7);
-  const [language, setLanguage] = useState('english');
+  const [language, setLanguage] = useState('en');
   const [availableLanguages] = useState([
-    { code: 'english', name: 'English' },
-    { code: 'spanish', name: 'Español' },
-    { code: 'french', name: 'Français' },
-    { code: 'german', name: 'Deutsch' },
-    { code: 'italian', name: 'Italiano' },
-    { code: 'portuguese', name: 'Português' },
-    { code: 'russian', name: 'Русский' },
-    { code: 'chinese', name: '中文' },
-    { code: 'japanese', name: '日本語' },
-    { code: 'korean', name: '한국어' },
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'fr', name: 'Français' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'ru', name: 'Русский' },
+    { code: 'zh_CN', name: '中文' },
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' },
   ]);
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
 
   // State for tab navigation
   const [activeTab, setActiveTab] = useState('General');
+
+  // Functions to get default settings
+  const getDefaultLanguage = async () => {
+    return await defaultLanguageStorage.get();
+  };
+
+  const getDefaultModel = async () => {
+    return await defaultModelStorage.get();
+  };
 
   useEffect(() => {
     // Load saved settings

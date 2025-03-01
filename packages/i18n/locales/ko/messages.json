@@ -1,33 +1,33 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "Overlay"
+    "message": "오버레이"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "Overlay"
+    "message": "오버레이"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "테마 전환"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "로딩 중..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "안녕하세요, 제 이름은 $NAME$입니다",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "김철수"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "안녕하세요 $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "오류가 발생했습니다"
   }
 }

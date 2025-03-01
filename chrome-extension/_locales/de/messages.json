@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Overlay",
+    "description": "Der Name der Erweiterung."
+  },
+  "extensionDescription": {
+    "message": "Overlay - Ihr KI-gesteuerter Browser-Assistent",
+    "description": "Die Beschreibung der Erweiterung."
+  }
+}

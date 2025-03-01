@@ -8,26 +8,26 @@
     "message": "Overlay"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "Cambiar tema"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "Cargando..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "Hola, mi nombre es $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "Juan Pérez"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "Hola $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "Se ha producido un error"
   }
 }

@@ -31,18 +31,18 @@ const NewTab = () => {
       <div className="flex items-center justify-between px-8 py-6 relative z-20">
         <div className="flex items-center">
           <img src="/icon-128.png" alt="Overlay icon" className="w-8 h-8 mr-3" />
-          <h1 className={`text-xl font-bold ${isLight ? 'text-gray-800' : 'text-white'}`}>Overlay</h1>
+          <h1 className={`text-xl font-bold ${isLight ? 'text-gray-800' : 'text-white'}`}>{t('extensionName')}</h1>
         </div>
         <div className="flex items-center space-x-4">
           <a
             href="chrome://extensions"
             className={`text-sm ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
-            Extensions
+            {t('extensions', 'Extensions')}
           </a>
           <a
             href="chrome://bookmarks"
             className={`text-sm ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
-            Bookmarks
+            {t('bookmarks', 'Bookmarks')}
           </a>
         </div>
       </div>

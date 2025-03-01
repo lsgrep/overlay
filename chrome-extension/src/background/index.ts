@@ -15,17 +15,16 @@ console.log('Background service worker loaded');
 // Context menu actions
 const getLanguageName = async () => {
   const targetLang = await defaultLanguageStorage.get();
+  // Hard-coded language mapping
   const languageNames: { [key: string]: string } = {
-    english: 'English',
-    spanish: 'Spanish',
-    french: 'French',
-    german: 'German',
-    italian: 'Italian',
-    portuguese: 'Portuguese',
-    russian: 'Russian',
-    chinese: 'Chinese',
-    japanese: 'Japanese',
-    korean: 'Korean',
+    en: 'English',
+    es: 'Spanish',
+    fr: 'French',
+    de: 'German',
+    ru: 'Russian',
+    zh_CN: 'Chinese',
+    ja: 'Japanese',
+    ko: 'Korean',
   };
   return languageNames[targetLang] || 'English';
 };

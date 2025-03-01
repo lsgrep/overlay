@@ -21,6 +21,7 @@
   "dependencies": {
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
+    "@extension/i18n": "workspace:*",
     "@extension/ui": "workspace:*",
     "@radix-ui/react-popover": "^1.1.6",
     "cmdk": "^1.0.0",

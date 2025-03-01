@@ -1,33 +1,33 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "Overlay"
+    "message": "叠加层"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "Overlay"
+    "message": "叠加层"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "切换主题"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "加载中..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "你好，我的名字是 $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "张伟"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "你好 $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "发生错误"
   }
 }
