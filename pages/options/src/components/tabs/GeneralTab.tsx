@@ -1,5 +1,5 @@
 import { useStorage } from '@extension/shared';
-import { defaultLanguageStorage, defaultModelStorage } from '@extension/storage';
+import { defaultLanguageStorage, defaultModelStorage, proxyModeStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
@@ -34,6 +34,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Switch,
 } from '@extension/ui';
 
 interface GeneralTabProps {
@@ -68,6 +69,7 @@ export const GeneralTab = ({
   // Use storage hooks for language and model
   const defaultLanguage = useStorage(defaultLanguageStorage);
   const defaultModel = useStorage(defaultModelStorage);
+  const proxyMode = useStorage(proxyModeStorage);
   const [open, setOpen] = useState(false);
 
   // Update language and model when storage changes
@@ -236,6 +238,24 @@ export const GeneralTab = ({
               </Command>
             </PopoverContent>
           </Popover>
+        </div>
+
+        <div className="grid w-full max-w-sm items-center gap-1.5 pt-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="proxy-mode" className="text-sm font-medium leading-none">
+                Proxy Mode
+              </Label>
+              <p className="text-xs text-muted-foreground">Route traffic through Overlay's proxy service</p>
+            </div>
+            <Switch
+              id="proxy-mode"
+              checked={proxyMode}
+              onCheckedChange={checked => {
+                proxyModeStorage.set(checked);
+              }}
+            />
+          </div>
         </div>
       </div>
     </motion.div>

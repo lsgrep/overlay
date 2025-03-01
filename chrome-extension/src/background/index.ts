@@ -1,5 +1,5 @@
 import 'webextension-polyfill';
-import { exampleThemeStorage, defaultLanguageStorage } from '@extension/storage';
+import { exampleThemeStorage, defaultLanguageStorage, proxyModeStorage } from '@extension/storage';
 
 // Enable side panel opening on extension icon click
 chrome.sidePanel
@@ -61,10 +61,49 @@ const updateTranslateTitle = async () => {
   });
 };
 
+// Configure proxy settings
+const configureProxy = async () => {
+  const proxyEnabled = await proxyModeStorage.get();
+
+  if (proxyEnabled) {
+    // Enable proxy
+    const config = {
+      mode: 'fixed_servers',
+      rules: {
+        singleProxy: {
+          scheme: 'https',
+          host: 'proxy.overlay.ai', // Replace with actual proxy service
+          port: 443,
+        },
+        bypassList: ['localhost', '127.0.0.1'],
+      },
+    };
+
+    chrome.proxy.settings.set({ value: config, scope: 'regular' }, () => {
+      console.log('Proxy enabled');
+    });
+  } else {
+    // Disable proxy - use system settings
+    chrome.proxy.settings.set({ value: { mode: 'system' }, scope: 'regular' }, () => {
+      console.log('Proxy disabled');
+    });
+  }
+};
+
+// Initialize proxy settings
+proxyModeStorage.get().then(enabled => {
+  console.log('Proxy mode initialized:', enabled);
+  configureProxy();
+});
+
 // Listen for storage changes
 chrome.storage.onChanged.addListener(changes => {
   if (changes['default-language']) {
     updateTranslateTitle();
+  }
+
+  if (changes['proxy-mode']) {
+    configureProxy();
   }
 });
 

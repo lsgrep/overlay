@@ -4,6 +4,7 @@ export * from './dialog';
 export * from './popover';
 export * from './label';
 export * from './select';
+export * from './switch';
 export * from './toggle-group';
 export * from '../icons/index';
 export * from './textarea';

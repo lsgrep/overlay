@@ -40,7 +40,7 @@ const manifest = withSidePanel({
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: ['<all_urls>', 'http://localhost:11434/*'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'contextMenus', 'clipboardWrite'],
+  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'contextMenus', 'clipboardWrite', 'proxy'],
   web_accessible_resources: [
     {
       resources: ['new-tab/*'],
