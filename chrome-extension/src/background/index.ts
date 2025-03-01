@@ -1,5 +1,6 @@
 import 'webextension-polyfill';
 import { exampleThemeStorage, defaultLanguageStorage, proxyModeStorage } from '@extension/storage';
+import { getLanguageNameFromCode } from '@extension/i18n';
 
 // Enable side panel opening on extension icon click
 chrome.sidePanel
@@ -16,17 +17,7 @@ console.log('Background service worker loaded');
 const getLanguageName = async () => {
   const targetLang = await defaultLanguageStorage.get();
   // Hard-coded language mapping
-  const languageNames: { [key: string]: string } = {
-    en: 'English',
-    es: 'Spanish',
-    fr: 'French',
-    de: 'German',
-    ru: 'Russian',
-    zh_CN: 'Chinese',
-    ja: 'Japanese',
-    ko: 'Korean',
-  };
-  return languageNames[targetLang] || 'English';
+  return getLanguageNameFromCode(targetLang) || 'English';
 };
 
 const CONTEXT_MENU_ACTIONS = [

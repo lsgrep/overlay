@@ -1,11 +1,11 @@
 // import '@src/Options.css';
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
+import { availableLanguages } from '@extension/i18n';
 import { Cog6ToothIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
 import { OpenAIIcon, GeminiIcon, AnthropicIcon } from '@extension/ui';
 import {
   exampleThemeStorage,
-  openAIKeyStorage,
   geminiKeyStorage,
   anthropicKeyStorage,
   fontFamilyStorage,
@@ -22,7 +22,6 @@ const Options = () => {
   const isLight = theme === 'light';
 
   // API key states
-  const openAIKey = useStorage(openAIKeyStorage);
   const geminiKey = useStorage(geminiKeyStorage);
   const anthropicKey = useStorage(anthropicKeyStorage);
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
@@ -40,19 +39,7 @@ const Options = () => {
 
   // New state variables for additional settings
   const [selectedModel, setSelectedModel] = useState('');
-  const [maxTokens, setMaxTokens] = useState(2000);
-  const [temperature, setTemperature] = useState(0.7);
   const [language, setLanguage] = useState('en');
-  const [availableLanguages] = useState([
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'fr', name: 'Français' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'ru', name: 'Русский' },
-    { code: 'zh_CN', name: '中文' },
-    { code: 'ja', name: '日本語' },
-    { code: 'ko', name: '한국어' },
-  ]);
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
 
@@ -189,7 +176,6 @@ const Options = () => {
                   setLanguage={setLanguage}
                   selectedModel={selectedModel}
                   setSelectedModel={setSelectedModel}
-                  availableLanguages={availableLanguages}
                   openaiModels={openaiModels}
                   googleModels={googleModels}
                   ollamaModels={ollamaModels}

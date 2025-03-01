@@ -1,5 +1,6 @@
 import { useStorage } from '@extension/shared';
 import { defaultLanguageStorage, defaultModelStorage, proxyModeStorage } from '@extension/storage';
+import { availableLanguages as i18nAvailableLanguages } from '@extension/i18n';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
@@ -43,7 +44,7 @@ interface GeneralTabProps {
   setLanguage: (lang: string) => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
-  availableLanguages: Array<{ code: string; name: string }>;
+  availableLanguages?: Array<{ code: string; name: string }>;
   openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
   googleModels: Array<{ name: string; displayName?: string; provider: string }>;
   ollamaModels: Array<{ name: string; displayName?: string; provider: string }>;
@@ -58,7 +59,7 @@ export const GeneralTab = ({
   setLanguage,
   selectedModel,
   setSelectedModel,
-  availableLanguages,
+  availableLanguages = i18nAvailableLanguages,
   openaiModels = [],
   googleModels = [],
   ollamaModels = [],
