@@ -154,5 +154,50 @@
   "options_tab_appearance": {
     "description": "Appearance tab name",
     "message": "Apparence"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Paramètres d'apparence"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Personnalisez l'apparence visuelle de l'application"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Famille de police"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Sélectionnez une famille de police"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Polices de programmation"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "Polices système"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "Police système par défaut"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Taille de police"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Sélectionnez une taille de police"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Aperçu"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "Le rapide renard brun saute par-dessus le chien paresseux."
   }
 }

@@ -75,7 +75,9 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="font-size" className="text-blue-500">
+          <Label
+            htmlFor="font-size"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {t('options_font_size')}
           </Label>
           <Select value={`${fontSize}`} onValueChange={value => fontSizeStorage.set(parseInt(value, 10))}>
@@ -98,7 +100,7 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
         </div>
 
         <div>
-          <h4 className="text-sm font-semibold mb-2 text-blue-500">{t('options_preview')}</h4>
+          <h4 className="text-sm font-semibold mb-2">{t('options_preview')}</h4>
           <div
             className={`p-4 rounded-md border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}
             style={{ fontFamily, fontSize: `${fontSize}px` }}>

@@ -154,5 +154,50 @@
   "options_tab_appearance": {
     "description": "Appearance tab name",
     "message": "Apariencia"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Configuración de apariencia"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Personalice la apariencia visual de la aplicación"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Familia de fuente"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Seleccionar familia de fuente"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Fuentes de programación"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "Fuentes del sistema"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "Predeterminado del sistema"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Tamaño de fuente"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Seleccionar tamaño de fuente"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Vista previa"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "El zorro marrón rápido salta sobre el perro perezoso."
   }
 }
