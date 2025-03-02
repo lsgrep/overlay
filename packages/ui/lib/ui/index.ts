@@ -8,3 +8,4 @@ export * from './switch';
 export * from './toggle-group';
 export * from '../icons/index';
 export * from './textarea';
+export * from './avatar';

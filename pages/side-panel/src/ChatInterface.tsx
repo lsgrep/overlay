@@ -13,6 +13,7 @@ import { AnthropicService } from './services/llm/anthropic';
 import { OpenAIService } from './services/llm/openai';
 import { Button, Textarea } from '@extension/ui';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
+import icon from '../../../chrome-extension/public/icon-128.png';
 import { PageContext } from './services/llm/prompts';
 
 interface Message {
@@ -252,6 +253,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   return (
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
+      <div className="flex items-center justify-between p-2 border-b border-border">
+        <Button
+          size="sm"
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => window.open('https://overlay.one/en/login', '_blank')}>
+          <img src={icon} alt="Overlay" className="w-5 h-5" />
+          <span>{t('sidepanel_sign_in')}</span>
+        </Button>
+      </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
         {messages.map((message, index) => (
           <div

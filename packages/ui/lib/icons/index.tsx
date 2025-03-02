@@ -27,3 +27,16 @@ export const OllamaIcon = (props: React.SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
+
+export const OverlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg width="24" height="24" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    {/* Overlay layers */}
+    <g transform="translate(24, 24)">
+      {/* Bottom layer */}
+      <rect x="0" y="16" width="64" height="64" rx="8" fill="currentColor" fillOpacity="0.3" />
+
+      {/* Top layer */}
+      <rect x="16" y="0" width="64" height="64" rx="8" fill="currentColor" />
+    </g>
+  </svg>
+);

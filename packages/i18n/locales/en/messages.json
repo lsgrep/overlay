@@ -320,5 +320,9 @@
   "sidepanel_retries": {
     "description": "Retries counter",
     "message": "Retries: $1/$2"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Sign in to Overlay"
   }
 }
