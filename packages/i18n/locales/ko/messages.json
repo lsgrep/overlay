@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "날카로운 갈색 여우가 게으른 개를 뛰어넘습니다."
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "모드"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "모델"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "모델 선택..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "모델 검색..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "모델을 찾을 수 없습니다."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "모델 로딩 중..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "대화형"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "상호작용형"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "보내기"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "생각 중..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "오류"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "당신"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "어시스턴트"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "메시지를 입력하세요... (Enter를 누르면 전송, Shift + Enter를 누르면 줄바꿈)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "추출된 데이터 ($1 항목)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "재시도 전략: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "최대 재시도 횟수: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "대체 방안: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "모든 단계 실행"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "실행 중..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "동작: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "쿼리: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "셀렉터: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "값: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ 실행 중..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ 완료"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ 실패"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "대기 중"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "재시도: $1/$2"
   }
 }

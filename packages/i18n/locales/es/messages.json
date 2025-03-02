@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "El zorro marrón rápido salta sobre el perro perezoso."
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Modo"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Modelo"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Seleccionar un modelo..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Buscar modelos..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "No se encontró ningún modelo."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Cargando modelos..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Conversacional"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Interactivo"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Enviar"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Pensando..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Error"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "Tú"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Asistente"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Escribe tu mensaje... (Presiona Enter para enviar, Shift + Enter para nueva línea)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Datos extraídos ($1 elementos)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Estrategia de reintento: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Máximo de reintentos: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Alternativa: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Ejecutar todos los pasos"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Ejecutando..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Acción: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Consulta: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Selector: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Valor: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ Ejecutando..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Completado"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Fallido"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "Pendiente"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Reintentos: $1/$2"
   }
 }

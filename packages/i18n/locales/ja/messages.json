@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "素早い茶色の狐が怠けた犬を飛び越えます。"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "モード"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "モデル"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "モデルを選択..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "モデルを検索..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "モデルが見つかりません。"
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "モデルを読み込み中..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "会話モード"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "対話モード"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "送信"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "考え中..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "エラー"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "あなた"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "アシスタント"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "メッセージを入力...(送信は Enter、改行は Shift + Enter)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "抽出されたデータ ($1 項目)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "再試行戦略: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "最大再試行回数: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "フォールバック: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "すべてのステップを実行"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "実行中..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "アクション: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "クエリ: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "セレクタ: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "値: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ 実行中..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ 完了"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ 失敗"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "保留中"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "再試行: $1/$2"
   }
 }

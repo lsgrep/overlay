@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "敏捷的棕色狐狸跳过懒惰的狗。"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "模式"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "模型"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "选择模型..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "搜索模型..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "未找到模型。"
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "正在加载模型..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "对话模式"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "交互模式"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "发送"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "思考中..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "错误"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "您"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "助手"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "输入您的消息...(按Enter键发送，按Shift + Enter插入新行)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "提取的数据 ($1 项)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "重试策略: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "最大重试次数: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "备选方案: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "执行所有步骤"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "执行中..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "操作: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "查询: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "选择器: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "值: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ 运行中..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ 完成"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ 失败"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "等待中"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "重试: $1/$2"
   }
 }

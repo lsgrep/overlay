@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "Быстрая коричневая лиса прыгает через ленивую собаку."
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Режим"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Модель"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Выберите модель..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Поиск моделей..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "Модель не найдена."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Загрузка моделей..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Разговорный"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Интерактивный"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Отправить"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Думаю..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Ошибка"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "Вы"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Ассистент"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Введите ваше сообщение... (Нажмите Enter для отправки, Shift + Enter для новой строки)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Извлеченные данные ($1 элементов)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Стратегия повторных попыток: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Максимум повторных попыток: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Резервный вариант: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Выполнить все шаги"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Выполнение..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Действие: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Запрос: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Селектор: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Значение: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ Выполняется..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Завершено"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Ошибка"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "Ожидание"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Повторные попытки: $1/$2"
   }
 }

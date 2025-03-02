@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "Le rapide renard brun saute par-dessus le chien paresseux."
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Mode"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Modèle"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Sélectionner un modèle..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Rechercher des modèles..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "Aucun modèle trouvé."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Chargement des modèles..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Conversationnel"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Interactif"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Envoyer"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Réflexion..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Erreur"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "Vous"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Assistant"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Tapez votre message... (Appuyez sur Entrée pour envoyer, Maj + Entrée pour une nouvelle ligne)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Données extraites ($1 éléments)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Stratégie de nouvelle tentative: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Nombre maximal de tentatives: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Solution de secours: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Exécuter toutes les étapes"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Exécution..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Action: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Requête: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Sélecteur: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Valeur: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ En cours..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Terminé"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Échec"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "En attente"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Tentatives: $1/$2"
   }
 }

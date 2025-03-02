@@ -199,5 +199,126 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "The quick brown fox jumps over the lazy dog."
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Mode"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Model"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Select a model..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Search models..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "No model found."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Loading models..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Conversational"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Interactive"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Send"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Thinking..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Error"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "You"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Assistant"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Type your message... (Press Enter to send, Shift + Enter for new line)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Extracted Data ($1 items)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Retry Strategy: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Max Retries: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Fallback: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Execute All Steps"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Executing..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Action: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Query: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Selector: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Value: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ Running..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Complete"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Failed"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "Pending"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Retries: $1/$2"
   }
 }
