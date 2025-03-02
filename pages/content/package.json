@@ -19,7 +19,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@extension/shared": "workspace:*"
+    "@extension/shared": "workspace:*",
+    "@extension/i18n": "workspace:*",
+    "@extension/ui": "workspace:*"
   },
   "devDependencies": {
     "@extension/hmr": "workspace:*",

@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Оверлей",
+    "description": "Название расширения."
+  },
+  "extensionDescription": {
+    "message": "Оверлей - Ваш ИИ-помощник для браузера",
+    "description": "Описание расширения."
+  }
+}

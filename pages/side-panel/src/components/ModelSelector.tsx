@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@extension/ui/lib/utils';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
+import { t } from '@extension/i18n';
 import {
   Button,
   Popover,
@@ -43,7 +44,7 @@ export const ModelSelector = ({
   return (
     <div className="flex items-center gap-4">
       <Label htmlFor="model-selector" className="min-w-16">
-        Model
+        {t('sidepanel_model')}
       </Label>
       <Popover open={open} onOpenChange={setOpen} className="flex-1">
         <PopoverTrigger asChild>
@@ -76,7 +77,7 @@ export const ModelSelector = ({
                   </span>
                 </>
               ) : (
-                'Select a model...'
+                <>{t('sidepanel_select_model')}</>
               )}
             </div>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -84,11 +85,11 @@ export const ModelSelector = ({
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0">
           <Command>
-            <CommandInput placeholder="Search models..." />
-            <CommandEmpty>No model found.</CommandEmpty>
+            <CommandInput placeholder={t('sidepanel_search_models')} />
+            <CommandEmpty>{t('sidepanel_no_model_found')}</CommandEmpty>
             <CommandList>
               {isLoadingModels ? (
-                <div className="py-6 text-center text-sm">Loading models...</div>
+                <div className="py-6 text-center text-sm">{t('sidepanel_loading_models')}</div>
               ) : modelError ? (
                 <div className="py-6 text-center text-sm text-red-500">{modelError}</div>
               ) : (

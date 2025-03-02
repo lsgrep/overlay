@@ -1,7 +1,9 @@
 import { useStorage } from '@extension/shared';
-import { anthropicKeyStorage } from '@extension/storage';
+import { anthropicKeyStorage, defaultLanguageStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
 import { Model } from '@extension/shared';
+import { DevLocale, t } from '@extension/i18n';
+import { useEffect, useState } from 'react';
 
 interface AnthropicTabProps {
   isLight: boolean;
@@ -21,18 +23,28 @@ export const AnthropicTab = ({
   anthropicModels,
 }: AnthropicTabProps) => {
   const anthropicKey = useStorage(anthropicKeyStorage);
+  const language = useStorage(defaultLanguageStorage);
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (language) {
+      // Set the locale directly from storage
+      t.devLocale = language as DevLocale;
+      console.log('AnthropicTab: Language set to', language);
+    }
+  }, [language]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">Anthropic Settings</h2>
-        <p className="text-sm text-muted-foreground">Configure your Anthropic API key for Claude access</p>
+        <h2 className="text-2xl font-semibold tracking-tight">{t('options_anthropic_settings')}</h2>
+        <p className="text-sm text-muted-foreground">{t('options_anthropic_description')}</p>
       </div>
       <div>
         <label
           htmlFor="anthropic-key"
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-          API Key
+          {t('options_api_key')}
         </label>
         <div className="relative">
           <input
@@ -57,16 +69,16 @@ export const AnthropicTab = ({
       {/* API Key Status */}
       <div className="mt-4">
         {isLoadingModels ? (
-          <p className="text-sm text-blue-500">Validating API key...</p>
+          <p className="text-sm text-blue-500">{t('options_validating_key')}</p>
         ) : modelError ? (
           <p className="text-sm text-red-500">{modelError}</p>
         ) : anthropicModels.length > 0 ? (
           <div className="space-y-4">
-            <p className="text-sm text-green-500">✓ API key is valid ({anthropicModels.length} models available)</p>
+            <p className="text-sm text-green-500">{t('options_key_valid', anthropicModels.length.toString())}</p>
 
             {/* Models List */}
             <div>
-              <h4 className="text-sm font-semibold mb-2 text-blue-500">Available Models</h4>
+              <h4 className="text-sm font-semibold mb-2 text-blue-500">{t('options_available_models')}</h4>
               <div
                 className={`rounded-md border ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
                 {anthropicModels.map(model => (

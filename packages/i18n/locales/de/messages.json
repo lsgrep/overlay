@@ -8,136 +8,136 @@
     "message": "Overlay"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "Thema umschalten"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "Wird geladen..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "Hallo, mein Name ist $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "Hans Müller"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "Hallo $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "Ein Fehler ist aufgetreten"
   },
 
   "options_general_settings": {
     "description": "General settings tab title",
-    "message": "General Settings"
+    "message": "Allgemeine Einstellungen"
   },
   "options_general_description": {
     "description": "General settings tab description",
-    "message": "Configure your default preferences for the AI assistant"
+    "message": "Konfigurieren Sie Ihre Standardeinstellungen für den KI-Assistenten"
   },
   "options_default_language": {
     "description": "Default language setting label",
-    "message": "Default Language"
+    "message": "Standardsprache"
   },
   "options_select_language": {
     "description": "Language selection placeholder",
-    "message": "Select a language"
+    "message": "Sprache auswählen"
   },
   "options_default_model": {
     "description": "Default model setting label",
-    "message": "Default Model"
+    "message": "Standardmodell"
   },
   "options_select_model": {
     "description": "Model selection placeholder",
-    "message": "Select a model..."
+    "message": "Modell auswählen..."
   },
   "options_search_models": {
     "description": "Search models placeholder",
-    "message": "Search models..."
+    "message": "Modelle suchen..."
   },
   "options_no_model_found": {
     "description": "No model found message",
-    "message": "No model found."
+    "message": "Kein Modell gefunden."
   },
   "options_loading_models": {
     "description": "Loading models message",
-    "message": "Loading models..."
+    "message": "Modelle werden geladen..."
   },
   "options_openai_models": {
     "description": "OpenAI models group heading",
-    "message": "OpenAI Models"
+    "message": "OpenAI-Modelle"
   },
   "options_google_models": {
     "description": "Google models group heading",
-    "message": "Google Models"
+    "message": "Google-Modelle"
   },
   "options_anthropic_models": {
     "description": "Anthropic models group heading",
-    "message": "Anthropic Models"
+    "message": "Anthropic-Modelle"
   },
   "options_ollama_models": {
     "description": "Ollama models group heading",
-    "message": "Ollama Models"
+    "message": "Ollama-Modelle"
   },
   "options_proxy_mode": {
     "description": "Proxy mode setting label",
-    "message": "Proxy Mode"
+    "message": "Proxy-Modus"
   },
   "options_proxy_mode_description": {
     "description": "Proxy mode setting description",
-    "message": "Enable proxy mode to route API requests through a proxy server"
+    "message": "Aktivieren Sie den Proxy-Modus, um API-Anfragen über einen Proxy-Server zu leiten"
   },
 
   "options_google_settings": {
     "description": "Google settings tab title",
-    "message": "Google Settings"
+    "message": "Google-Einstellungen"
   },
   "options_google_description": {
     "description": "Google settings tab description",
-    "message": "Configure your Google API key and Gemini model preferences"
+    "message": "Konfigurieren Sie Ihren Google-API-Schlüssel und Gemini-Modelleinstellungen"
   },
   "options_api_key": {
     "description": "API key label",
-    "message": "API Key"
+    "message": "API-Schlüssel"
   },
   "options_validating_key": {
     "description": "Validating API key message",
-    "message": "Validating API key..."
+    "message": "API-Schlüssel wird überprüft..."
   },
   "options_key_valid": {
     "description": "API key valid message",
-    "message": "✓ API key is valid ($1 models available)"
+    "message": "✓ API-Schlüssel ist gültig ($1 Modelle verfügbar)"
   },
   "options_available_models": {
     "description": "Available models heading",
-    "message": "Available Models"
+    "message": "Verfügbare Modelle"
   },
 
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
-    "message": "OpenAI Settings"
+    "message": "OpenAI-Einstellungen"
   },
   "options_openai_description": {
     "description": "OpenAI settings tab description",
-    "message": "Configure your OpenAI API key and model preferences"
+    "message": "Konfigurieren Sie Ihren OpenAI-API-Schlüssel und Modelleinstellungen"
   },
 
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
-    "message": "Anthropic Settings"
+    "message": "Anthropic-Einstellungen"
   },
   "options_anthropic_description": {
     "description": "Anthropic settings tab description",
-    "message": "Configure your Anthropic API key for Claude access"
+    "message": "Konfigurieren Sie Ihren Anthropic-API-Schlüssel für den Zugriff auf Claude"
   },
 
   "options_tab_general": {
     "description": "General tab name",
-    "message": "General"
+    "message": "Allgemein"
   },
   "options_tab_openai": {
     "description": "OpenAI tab name",
@@ -153,141 +153,141 @@
   },
   "options_tab_appearance": {
     "description": "Appearance tab name",
-    "message": "Appearance"
+    "message": "Erscheinungsbild"
   },
 
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
-    "message": "Appearance Settings"
+    "message": "Erscheinungsbild-Einstellungen"
   },
   "options_appearance_description": {
     "description": "Appearance settings tab description",
-    "message": "Customize the visual appearance of the application"
+    "message": "Passen Sie das visuelle Erscheinungsbild der Anwendung an"
   },
   "options_font_family": {
     "description": "Font family setting label",
-    "message": "Font Family"
+    "message": "Schriftfamilie"
   },
   "options_select_font_family": {
     "description": "Font family selection placeholder",
-    "message": "Select a font family"
+    "message": "Schriftfamilie auswählen"
   },
   "options_programming_fonts": {
     "description": "Programming fonts group label",
-    "message": "Programming Fonts"
+    "message": "Programmier-Schriftarten"
   },
   "options_system_fonts": {
     "description": "System fonts group label",
-    "message": "System Fonts"
+    "message": "System-Schriftarten"
   },
   "options_system_default": {
     "description": "System default font option",
-    "message": "System Default"
+    "message": "System-Standard"
   },
   "options_font_size": {
     "description": "Font size setting label",
-    "message": "Font Size"
+    "message": "Schriftgröße"
   },
   "options_select_font_size": {
     "description": "Font size selection placeholder",
-    "message": "Select a font size"
+    "message": "Schriftgröße auswählen"
   },
   "options_preview": {
     "description": "Preview section heading",
-    "message": "Preview"
+    "message": "Vorschau"
   },
   "options_preview_text": {
     "description": "Text used in the font preview",
-    "message": "The quick brown fox jumps over the lazy dog."
+    "message": "Der schnelle braune Fuchs springt über den faulen Hund."
   },
 
   "sidepanel_mode": {
     "description": "Mode selector label",
-    "message": "Mode"
+    "message": "Modus"
   },
   "sidepanel_model": {
     "description": "Model selector label",
-    "message": "Model"
+    "message": "Modell"
   },
   "sidepanel_select_model": {
     "description": "Model selection placeholder",
-    "message": "Select a model..."
+    "message": "Wähle ein Modell..."
   },
   "sidepanel_search_models": {
     "description": "Search models placeholder",
-    "message": "Search models..."
+    "message": "Modelle suchen..."
   },
   "sidepanel_no_model_found": {
     "description": "No model found message",
-    "message": "No model found."
+    "message": "Kein Modell gefunden."
   },
   "sidepanel_loading_models": {
     "description": "Loading models message",
-    "message": "Loading models..."
+    "message": "Modelle werden geladen..."
   },
   "sidepanel_conversational_mode": {
     "description": "Conversational mode option",
-    "message": "Conversational"
+    "message": "Konversationell"
   },
   "sidepanel_interactive_mode": {
     "description": "Interactive mode option",
-    "message": "Interactive"
+    "message": "Interaktiv"
   },
   "sidepanel_send": {
     "description": "Send button text",
-    "message": "Send"
+    "message": "Senden"
   },
   "sidepanel_thinking": {
     "description": "Thinking indicator text",
-    "message": "Thinking..."
+    "message": "Denken..."
   },
   "sidepanel_error": {
     "description": "Error message label",
-    "message": "Error"
+    "message": "Fehler"
   },
   "sidepanel_you": {
     "description": "User message label",
-    "message": "You"
+    "message": "Du"
   },
   "sidepanel_assistant": {
     "description": "Assistant message label",
-    "message": "Assistant"
+    "message": "Assistent"
   },
   "sidepanel_message_placeholder": {
     "description": "Message input placeholder",
-    "message": "Type your message... (Press Enter to send, Shift + Enter for new line)"
+    "message": "Gib deine Nachricht ein... (Drücke Enter zum Senden, Umschalt + Enter für eine neue Zeile)"
   },
   "sidepanel_extracted_data": {
     "description": "Extracted data label",
-    "message": "Extracted Data ($1 items)"
+    "message": "Extrahierte Daten ($1 Elemente)"
   },
   "sidepanel_retry_strategy": {
     "description": "Retry strategy label",
-    "message": "Retry Strategy: $1"
+    "message": "Wiederholungsstrategie: $1"
   },
   "sidepanel_max_retries": {
     "description": "Max retries label",
-    "message": "Max Retries: $1"
+    "message": "Maximale Wiederholungen: $1"
   },
   "sidepanel_fallback": {
     "description": "Fallback label",
-    "message": "Fallback: $1"
+    "message": "Ausweichlösung: $1"
   },
   "sidepanel_execute_all": {
     "description": "Execute all steps button",
-    "message": "Execute All Steps"
+    "message": "Alle Schritte ausführen"
   },
   "sidepanel_executing": {
     "description": "Executing indicator text",
-    "message": "Executing..."
+    "message": "Wird ausgeführt..."
   },
   "sidepanel_action": {
     "description": "Action label",
-    "message": "Action: $1"
+    "message": "Aktion: $1"
   },
   "sidepanel_query": {
     "description": "Query label",
-    "message": "Query: $1"
+    "message": "Abfrage: $1"
   },
   "sidepanel_url": {
     "description": "URL label",
@@ -295,30 +295,30 @@
   },
   "sidepanel_selector": {
     "description": "Selector label",
-    "message": "Selector: $1"
+    "message": "Selektor: $1"
   },
   "sidepanel_value": {
     "description": "Value label",
-    "message": "Value: $1"
+    "message": "Wert: $1"
   },
   "sidepanel_running": {
     "description": "Running status",
-    "message": "⏳ Running..."
+    "message": "⏳ Läuft..."
   },
   "sidepanel_complete": {
     "description": "Complete status",
-    "message": "✓ Complete"
+    "message": "✓ Abgeschlossen"
   },
   "sidepanel_failed": {
     "description": "Failed status",
-    "message": "✗ Failed"
+    "message": "✗ Fehlgeschlagen"
   },
   "sidepanel_pending": {
     "description": "Pending status",
-    "message": "Pending"
+    "message": "Ausstehend"
   },
   "sidepanel_retries": {
     "description": "Retries counter",
-    "message": "Retries: $1/$2"
+    "message": "Wiederholungen: $1/$2"
   }
 }

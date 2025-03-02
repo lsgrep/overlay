@@ -37,8 +37,48 @@ function removePlaceholder(message: string) {
   return message.replace(/\$\d+/g, '');
 }
 
-export const t = (...args: Parameters<typeof translate>) => {
+// Update document lang attribute when locale changes
+const updateDocumentLang = (locale: DevLocale) => {
+  try {
+    // Update DOM attributes if in browser environment
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('lang', locale);
+    }
+  } catch (error) {
+    console.error('Error updating document lang:', error);
+  }
+};
+
+// Define the type for the t function with its properties
+type TranslateFunction = {
+  (...args: Parameters<typeof translate>): string;
+  devLocale: DevLocale;
+};
+
+// Create the base t function
+const baseT = (...args: Parameters<typeof translate>) => {
   return removePlaceholder(translate(...args));
 };
 
+// Cast to the extended type
+const t = baseT as TranslateFunction;
+
+// Add a setter for devLocale that updates the document lang
+let _devLocale = defaultLocale as DevLocale;
+Object.defineProperty(t, 'devLocale', {
+  get: () => _devLocale,
+  set: (value: DevLocale) => {
+    const oldValue = _devLocale;
+    _devLocale = value;
+    // Only update if the locale actually changed
+    if (oldValue !== value) {
+      updateDocumentLang(value);
+    }
+  },
+});
+
+// Export the enhanced function
+export { t };
+
+// Initialize
 t.devLocale = defaultLocale as DevLocale;

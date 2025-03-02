@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Overlay",
+    "description": "El nombre de la extensión."
+  },
+  "extensionDescription": {
+    "message": "Overlay - Tu asistente de navegador con IA",
+    "description": "La descripción de la extensión."
+  }
+}

@@ -8,136 +8,136 @@
     "message": "Overlay"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "Changer de thème"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "Chargement..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "Bonjour, je m'appelle $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "Jean Dupont"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "Bonjour $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "Une erreur s'est produite"
   },
 
   "options_general_settings": {
     "description": "General settings tab title",
-    "message": "General Settings"
+    "message": "Paramètres généraux"
   },
   "options_general_description": {
     "description": "General settings tab description",
-    "message": "Configure your default preferences for the AI assistant"
+    "message": "Configurez vos préférences par défaut pour l'assistant IA"
   },
   "options_default_language": {
     "description": "Default language setting label",
-    "message": "Default Language"
+    "message": "Langue par défaut"
   },
   "options_select_language": {
     "description": "Language selection placeholder",
-    "message": "Select a language"
+    "message": "Sélectionnez une langue"
   },
   "options_default_model": {
     "description": "Default model setting label",
-    "message": "Default Model"
+    "message": "Modèle par défaut"
   },
   "options_select_model": {
     "description": "Model selection placeholder",
-    "message": "Select a model..."
+    "message": "Sélectionnez un modèle..."
   },
   "options_search_models": {
     "description": "Search models placeholder",
-    "message": "Search models..."
+    "message": "Rechercher des modèles..."
   },
   "options_no_model_found": {
     "description": "No model found message",
-    "message": "No model found."
+    "message": "Aucun modèle trouvé."
   },
   "options_loading_models": {
     "description": "Loading models message",
-    "message": "Loading models..."
+    "message": "Chargement des modèles..."
   },
   "options_openai_models": {
     "description": "OpenAI models group heading",
-    "message": "OpenAI Models"
+    "message": "Modèles OpenAI"
   },
   "options_google_models": {
     "description": "Google models group heading",
-    "message": "Google Models"
+    "message": "Modèles Google"
   },
   "options_anthropic_models": {
     "description": "Anthropic models group heading",
-    "message": "Anthropic Models"
+    "message": "Modèles Anthropic"
   },
   "options_ollama_models": {
     "description": "Ollama models group heading",
-    "message": "Ollama Models"
+    "message": "Modèles Ollama"
   },
   "options_proxy_mode": {
     "description": "Proxy mode setting label",
-    "message": "Proxy Mode"
+    "message": "Mode proxy"
   },
   "options_proxy_mode_description": {
     "description": "Proxy mode setting description",
-    "message": "Enable proxy mode to route API requests through a proxy server"
+    "message": "Activer le mode proxy pour acheminer les requêtes API via un serveur proxy"
   },
 
   "options_google_settings": {
     "description": "Google settings tab title",
-    "message": "Google Settings"
+    "message": "Paramètres Google"
   },
   "options_google_description": {
     "description": "Google settings tab description",
-    "message": "Configure your Google API key and Gemini model preferences"
+    "message": "Configurez votre clé API Google et vos préférences pour les modèles Gemini"
   },
   "options_api_key": {
     "description": "API key label",
-    "message": "API Key"
+    "message": "Clé API"
   },
   "options_validating_key": {
     "description": "Validating API key message",
-    "message": "Validating API key..."
+    "message": "Validation de la clé API..."
   },
   "options_key_valid": {
     "description": "API key valid message",
-    "message": "✓ API key is valid ($1 models available)"
+    "message": "✓ Clé API valide ($1 modèles disponibles)"
   },
   "options_available_models": {
     "description": "Available models heading",
-    "message": "Available Models"
+    "message": "Modèles disponibles"
   },
 
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
-    "message": "OpenAI Settings"
+    "message": "Paramètres OpenAI"
   },
   "options_openai_description": {
     "description": "OpenAI settings tab description",
-    "message": "Configure your OpenAI API key and model preferences"
+    "message": "Configurez votre clé API OpenAI et vos préférences de modèles"
   },
 
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
-    "message": "Anthropic Settings"
+    "message": "Paramètres Anthropic"
   },
   "options_anthropic_description": {
     "description": "Anthropic settings tab description",
-    "message": "Configure your Anthropic API key for Claude access"
+    "message": "Configurez votre clé API Anthropic pour accéder à Claude"
   },
 
   "options_tab_general": {
     "description": "General tab name",
-    "message": "General"
+    "message": "Général"
   },
   "options_tab_openai": {
     "description": "OpenAI tab name",
@@ -153,52 +153,52 @@
   },
   "options_tab_appearance": {
     "description": "Appearance tab name",
-    "message": "Appearance"
+    "message": "Apparence"
   },
 
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
-    "message": "Appearance Settings"
+    "message": "Paramètres d'apparence"
   },
   "options_appearance_description": {
     "description": "Appearance settings tab description",
-    "message": "Customize the visual appearance of the application"
+    "message": "Personnalisez l'apparence visuelle de l'application"
   },
   "options_font_family": {
     "description": "Font family setting label",
-    "message": "Font Family"
+    "message": "Famille de police"
   },
   "options_select_font_family": {
     "description": "Font family selection placeholder",
-    "message": "Select a font family"
+    "message": "Sélectionnez une famille de police"
   },
   "options_programming_fonts": {
     "description": "Programming fonts group label",
-    "message": "Programming Fonts"
+    "message": "Polices de programmation"
   },
   "options_system_fonts": {
     "description": "System fonts group label",
-    "message": "System Fonts"
+    "message": "Polices système"
   },
   "options_system_default": {
     "description": "System default font option",
-    "message": "System Default"
+    "message": "Police système par défaut"
   },
   "options_font_size": {
     "description": "Font size setting label",
-    "message": "Font Size"
+    "message": "Taille de police"
   },
   "options_select_font_size": {
     "description": "Font size selection placeholder",
-    "message": "Select a font size"
+    "message": "Sélectionnez une taille de police"
   },
   "options_preview": {
     "description": "Preview section heading",
-    "message": "Preview"
+    "message": "Aperçu"
   },
   "options_preview_text": {
     "description": "Text used in the font preview",
-    "message": "The quick brown fox jumps over the lazy dog."
+    "message": "Le rapide renard brun saute par-dessus le chien paresseux."
   },
 
   "sidepanel_mode": {
@@ -207,47 +207,47 @@
   },
   "sidepanel_model": {
     "description": "Model selector label",
-    "message": "Model"
+    "message": "Modèle"
   },
   "sidepanel_select_model": {
     "description": "Model selection placeholder",
-    "message": "Select a model..."
+    "message": "Sélectionner un modèle..."
   },
   "sidepanel_search_models": {
     "description": "Search models placeholder",
-    "message": "Search models..."
+    "message": "Rechercher des modèles..."
   },
   "sidepanel_no_model_found": {
     "description": "No model found message",
-    "message": "No model found."
+    "message": "Aucun modèle trouvé."
   },
   "sidepanel_loading_models": {
     "description": "Loading models message",
-    "message": "Loading models..."
+    "message": "Chargement des modèles..."
   },
   "sidepanel_conversational_mode": {
     "description": "Conversational mode option",
-    "message": "Conversational"
+    "message": "Conversationnel"
   },
   "sidepanel_interactive_mode": {
     "description": "Interactive mode option",
-    "message": "Interactive"
+    "message": "Interactif"
   },
   "sidepanel_send": {
     "description": "Send button text",
-    "message": "Send"
+    "message": "Envoyer"
   },
   "sidepanel_thinking": {
     "description": "Thinking indicator text",
-    "message": "Thinking..."
+    "message": "Réflexion..."
   },
   "sidepanel_error": {
     "description": "Error message label",
-    "message": "Error"
+    "message": "Erreur"
   },
   "sidepanel_you": {
     "description": "User message label",
-    "message": "You"
+    "message": "Vous"
   },
   "sidepanel_assistant": {
     "description": "Assistant message label",
@@ -255,31 +255,31 @@
   },
   "sidepanel_message_placeholder": {
     "description": "Message input placeholder",
-    "message": "Type your message... (Press Enter to send, Shift + Enter for new line)"
+    "message": "Tapez votre message... (Appuyez sur Entrée pour envoyer, Maj + Entrée pour une nouvelle ligne)"
   },
   "sidepanel_extracted_data": {
     "description": "Extracted data label",
-    "message": "Extracted Data ($1 items)"
+    "message": "Données extraites ($1 éléments)"
   },
   "sidepanel_retry_strategy": {
     "description": "Retry strategy label",
-    "message": "Retry Strategy: $1"
+    "message": "Stratégie de nouvelle tentative: $1"
   },
   "sidepanel_max_retries": {
     "description": "Max retries label",
-    "message": "Max Retries: $1"
+    "message": "Nombre maximal de tentatives: $1"
   },
   "sidepanel_fallback": {
     "description": "Fallback label",
-    "message": "Fallback: $1"
+    "message": "Solution de secours: $1"
   },
   "sidepanel_execute_all": {
     "description": "Execute all steps button",
-    "message": "Execute All Steps"
+    "message": "Exécuter toutes les étapes"
   },
   "sidepanel_executing": {
     "description": "Executing indicator text",
-    "message": "Executing..."
+    "message": "Exécution..."
   },
   "sidepanel_action": {
     "description": "Action label",
@@ -287,7 +287,7 @@
   },
   "sidepanel_query": {
     "description": "Query label",
-    "message": "Query: $1"
+    "message": "Requête: $1"
   },
   "sidepanel_url": {
     "description": "URL label",
@@ -295,30 +295,30 @@
   },
   "sidepanel_selector": {
     "description": "Selector label",
-    "message": "Selector: $1"
+    "message": "Sélecteur: $1"
   },
   "sidepanel_value": {
     "description": "Value label",
-    "message": "Value: $1"
+    "message": "Valeur: $1"
   },
   "sidepanel_running": {
     "description": "Running status",
-    "message": "⏳ Running..."
+    "message": "⏳ En cours..."
   },
   "sidepanel_complete": {
     "description": "Complete status",
-    "message": "✓ Complete"
+    "message": "✓ Terminé"
   },
   "sidepanel_failed": {
     "description": "Failed status",
-    "message": "✗ Failed"
+    "message": "✗ Échec"
   },
   "sidepanel_pending": {
     "description": "Pending status",
-    "message": "Pending"
+    "message": "En attente"
   },
   "sidepanel_retries": {
     "description": "Retries counter",
-    "message": "Retries: $1/$2"
+    "message": "Tentatives: $1/$2"
   }
 }

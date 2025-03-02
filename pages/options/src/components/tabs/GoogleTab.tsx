@@ -1,7 +1,9 @@
 import { useStorage } from '@extension/shared';
-import { geminiKeyStorage } from '@extension/storage';
+import { geminiKeyStorage, defaultLanguageStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
 import { Model } from '@extension/shared';
+import { t, DevLocale } from '@extension/i18n';
+import { useEffect, useState } from 'react';
 
 interface GoogleTabProps {
   isLight: boolean;
@@ -21,19 +23,28 @@ export const GoogleTab = ({
   googleModels,
 }: GoogleTabProps) => {
   const geminiKey = useStorage(geminiKeyStorage);
+  const language = useStorage(defaultLanguageStorage);
+  // Update translations when language changes
+  useEffect(() => {
+    if (language) {
+      // Set the locale directly from storage
+      t.devLocale = language as DevLocale;
+      console.log('GoogleTab: Language set to', language);
+    }
+  }, [language]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">Google Settings</h2>
-        <p className="text-sm text-muted-foreground">Configure your Google API key and Gemini model preferences</p>
+        <h2 className="text-2xl font-semibold tracking-tight">{t('options_google_settings')}</h2>
+        <p className="text-sm text-muted-foreground">{t('options_google_description')}</p>
       </div>
       <div className="space-y-6">
         <div>
           <label
             htmlFor="gemini-key"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            API Key
+            {t('options_api_key')}
           </label>
           <div className="relative">
             <input
@@ -59,16 +70,16 @@ export const GoogleTab = ({
       {/* API Key Status */}
       <div className="mt-4">
         {isLoadingModels ? (
-          <p className="text-sm text-blue-500">Validating API key...</p>
+          <p className="text-sm text-blue-500">{t('options_validating_key')}</p>
         ) : modelError ? (
           <p className="text-sm text-red-500">{modelError}</p>
         ) : googleModels.length > 0 ? (
           <div className="space-y-4">
-            <p className="text-sm text-green-500">✓ API key is valid ({googleModels.length} models available)</p>
+            <p className="text-sm text-green-500">{t('options_key_valid', googleModels.length.toString())}</p>
 
             {/* Models List */}
             <div>
-              <h4 className="text-sm font-semibold mb-2 text-blue-500">Available Models</h4>
+              <h4 className="text-sm font-semibold mb-2 text-blue-500">{t('options_available_models')}</h4>
               <div
                 className={`rounded-md border ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
                 {googleModels.map(model => (

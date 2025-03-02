@@ -1,143 +1,143 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "Overlay"
+    "message": "Оверлей"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "Overlay"
+    "message": "Оверлей"
   },
   "toggleTheme": {
-    "message": "Toggle theme"
+    "message": "Переключить тему"
   },
   "loading": {
-    "message": "Loading..."
+    "message": "Загрузка..."
   },
   "greeting": {
     "description": "Greeting message",
-    "message": "Hello, My name is $NAME$",
+    "message": "Привет, меня зовут $NAME$",
     "placeholders": {
       "name": {
         "content": "$1",
-        "example": "John Doe"
+        "example": "Иван Петров"
       }
     }
   },
   "hello": {
     "description": "Placeholder example",
-    "message": "Hello $1"
+    "message": "Привет $1"
   },
   "error": {
-    "message": "An error occurred"
+    "message": "Произошла ошибка"
   },
 
   "options_general_settings": {
     "description": "General settings tab title",
-    "message": "General Settings"
+    "message": "Общие настройки"
   },
   "options_general_description": {
     "description": "General settings tab description",
-    "message": "Configure your default preferences for the AI assistant"
+    "message": "Настройте параметры по умолчанию для ИИ-ассистента"
   },
   "options_default_language": {
     "description": "Default language setting label",
-    "message": "Default Language"
+    "message": "Язык по умолчанию"
   },
   "options_select_language": {
     "description": "Language selection placeholder",
-    "message": "Select a language"
+    "message": "Выберите язык"
   },
   "options_default_model": {
     "description": "Default model setting label",
-    "message": "Default Model"
+    "message": "Модель по умолчанию"
   },
   "options_select_model": {
     "description": "Model selection placeholder",
-    "message": "Select a model..."
+    "message": "Выберите модель..."
   },
   "options_search_models": {
     "description": "Search models placeholder",
-    "message": "Search models..."
+    "message": "Поиск моделей..."
   },
   "options_no_model_found": {
     "description": "No model found message",
-    "message": "No model found."
+    "message": "Модели не найдены."
   },
   "options_loading_models": {
     "description": "Loading models message",
-    "message": "Loading models..."
+    "message": "Загрузка моделей..."
   },
   "options_openai_models": {
     "description": "OpenAI models group heading",
-    "message": "OpenAI Models"
+    "message": "Модели OpenAI"
   },
   "options_google_models": {
     "description": "Google models group heading",
-    "message": "Google Models"
+    "message": "Модели Google"
   },
   "options_anthropic_models": {
     "description": "Anthropic models group heading",
-    "message": "Anthropic Models"
+    "message": "Модели Anthropic"
   },
   "options_ollama_models": {
     "description": "Ollama models group heading",
-    "message": "Ollama Models"
+    "message": "Модели Ollama"
   },
   "options_proxy_mode": {
     "description": "Proxy mode setting label",
-    "message": "Proxy Mode"
+    "message": "Режим прокси"
   },
   "options_proxy_mode_description": {
     "description": "Proxy mode setting description",
-    "message": "Enable proxy mode to route API requests through a proxy server"
+    "message": "Включите режим прокси для маршрутизации API-запросов через прокси-сервер"
   },
 
   "options_google_settings": {
     "description": "Google settings tab title",
-    "message": "Google Settings"
+    "message": "Настройки Google"
   },
   "options_google_description": {
     "description": "Google settings tab description",
-    "message": "Configure your Google API key and Gemini model preferences"
+    "message": "Настройте ваш API-ключ Google и предпочтения для моделей Gemini"
   },
   "options_api_key": {
     "description": "API key label",
-    "message": "API Key"
+    "message": "API-ключ"
   },
   "options_validating_key": {
     "description": "Validating API key message",
-    "message": "Validating API key..."
+    "message": "Проверка API-ключа..."
   },
   "options_key_valid": {
     "description": "API key valid message",
-    "message": "✓ API key is valid ($1 models available)"
+    "message": "✓ API-ключ действителен (доступно моделей: $1)"
   },
   "options_available_models": {
     "description": "Available models heading",
-    "message": "Available Models"
+    "message": "Доступные модели"
   },
 
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
-    "message": "OpenAI Settings"
+    "message": "Настройки OpenAI"
   },
   "options_openai_description": {
     "description": "OpenAI settings tab description",
-    "message": "Configure your OpenAI API key and model preferences"
+    "message": "Настройте свой API-ключ OpenAI и предпочтения моделей"
   },
 
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
-    "message": "Anthropic Settings"
+    "message": "Настройки Anthropic"
   },
   "options_anthropic_description": {
     "description": "Anthropic settings tab description",
-    "message": "Configure your Anthropic API key for Claude access"
+    "message": "Настройте свой API-ключ Anthropic для доступа к Claude"
   },
 
   "options_tab_general": {
     "description": "General tab name",
-    "message": "General"
+    "message": "Общие"
   },
   "options_tab_openai": {
     "description": "OpenAI tab name",
@@ -153,141 +153,141 @@
   },
   "options_tab_appearance": {
     "description": "Appearance tab name",
-    "message": "Appearance"
+    "message": "Внешний вид"
   },
 
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
-    "message": "Appearance Settings"
+    "message": "Настройки внешнего вида"
   },
   "options_appearance_description": {
     "description": "Appearance settings tab description",
-    "message": "Customize the visual appearance of the application"
+    "message": "Настройте визуальный вид приложения"
   },
   "options_font_family": {
     "description": "Font family setting label",
-    "message": "Font Family"
+    "message": "Семейство шрифтов"
   },
   "options_select_font_family": {
     "description": "Font family selection placeholder",
-    "message": "Select a font family"
+    "message": "Выберите семейство шрифтов"
   },
   "options_programming_fonts": {
     "description": "Programming fonts group label",
-    "message": "Programming Fonts"
+    "message": "Шрифты для программирования"
   },
   "options_system_fonts": {
     "description": "System fonts group label",
-    "message": "System Fonts"
+    "message": "Системные шрифты"
   },
   "options_system_default": {
     "description": "System default font option",
-    "message": "System Default"
+    "message": "Системный по умолчанию"
   },
   "options_font_size": {
     "description": "Font size setting label",
-    "message": "Font Size"
+    "message": "Размер шрифта"
   },
   "options_select_font_size": {
     "description": "Font size selection placeholder",
-    "message": "Select a font size"
+    "message": "Выберите размер шрифта"
   },
   "options_preview": {
     "description": "Preview section heading",
-    "message": "Preview"
+    "message": "Предпросмотр"
   },
   "options_preview_text": {
     "description": "Text used in the font preview",
-    "message": "The quick brown fox jumps over the lazy dog."
+    "message": "Быстрая коричневая лиса прыгает через ленивую собаку."
   },
 
   "sidepanel_mode": {
     "description": "Mode selector label",
-    "message": "Mode"
+    "message": "Режим"
   },
   "sidepanel_model": {
     "description": "Model selector label",
-    "message": "Model"
+    "message": "Модель"
   },
   "sidepanel_select_model": {
     "description": "Model selection placeholder",
-    "message": "Select a model..."
+    "message": "Выберите модель..."
   },
   "sidepanel_search_models": {
     "description": "Search models placeholder",
-    "message": "Search models..."
+    "message": "Поиск моделей..."
   },
   "sidepanel_no_model_found": {
     "description": "No model found message",
-    "message": "No model found."
+    "message": "Модель не найдена."
   },
   "sidepanel_loading_models": {
     "description": "Loading models message",
-    "message": "Loading models..."
+    "message": "Загрузка моделей..."
   },
   "sidepanel_conversational_mode": {
     "description": "Conversational mode option",
-    "message": "Conversational"
+    "message": "Разговорный"
   },
   "sidepanel_interactive_mode": {
     "description": "Interactive mode option",
-    "message": "Interactive"
+    "message": "Интерактивный"
   },
   "sidepanel_send": {
     "description": "Send button text",
-    "message": "Send"
+    "message": "Отправить"
   },
   "sidepanel_thinking": {
     "description": "Thinking indicator text",
-    "message": "Thinking..."
+    "message": "Думаю..."
   },
   "sidepanel_error": {
     "description": "Error message label",
-    "message": "Error"
+    "message": "Ошибка"
   },
   "sidepanel_you": {
     "description": "User message label",
-    "message": "You"
+    "message": "Вы"
   },
   "sidepanel_assistant": {
     "description": "Assistant message label",
-    "message": "Assistant"
+    "message": "Ассистент"
   },
   "sidepanel_message_placeholder": {
     "description": "Message input placeholder",
-    "message": "Type your message... (Press Enter to send, Shift + Enter for new line)"
+    "message": "Введите ваше сообщение... (Нажмите Enter для отправки, Shift + Enter для новой строки)"
   },
   "sidepanel_extracted_data": {
     "description": "Extracted data label",
-    "message": "Extracted Data ($1 items)"
+    "message": "Извлеченные данные ($1 элементов)"
   },
   "sidepanel_retry_strategy": {
     "description": "Retry strategy label",
-    "message": "Retry Strategy: $1"
+    "message": "Стратегия повторных попыток: $1"
   },
   "sidepanel_max_retries": {
     "description": "Max retries label",
-    "message": "Max Retries: $1"
+    "message": "Максимум повторных попыток: $1"
   },
   "sidepanel_fallback": {
     "description": "Fallback label",
-    "message": "Fallback: $1"
+    "message": "Резервный вариант: $1"
   },
   "sidepanel_execute_all": {
     "description": "Execute all steps button",
-    "message": "Execute All Steps"
+    "message": "Выполнить все шаги"
   },
   "sidepanel_executing": {
     "description": "Executing indicator text",
-    "message": "Executing..."
+    "message": "Выполнение..."
   },
   "sidepanel_action": {
     "description": "Action label",
-    "message": "Action: $1"
+    "message": "Действие: $1"
   },
   "sidepanel_query": {
     "description": "Query label",
-    "message": "Query: $1"
+    "message": "Запрос: $1"
   },
   "sidepanel_url": {
     "description": "URL label",
@@ -295,30 +295,30 @@
   },
   "sidepanel_selector": {
     "description": "Selector label",
-    "message": "Selector: $1"
+    "message": "Селектор: $1"
   },
   "sidepanel_value": {
     "description": "Value label",
-    "message": "Value: $1"
+    "message": "Значение: $1"
   },
   "sidepanel_running": {
     "description": "Running status",
-    "message": "⏳ Running..."
+    "message": "⏳ Выполняется..."
   },
   "sidepanel_complete": {
     "description": "Complete status",
-    "message": "✓ Complete"
+    "message": "✓ Завершено"
   },
   "sidepanel_failed": {
     "description": "Failed status",
-    "message": "✗ Failed"
+    "message": "✗ Ошибка"
   },
   "sidepanel_pending": {
     "description": "Pending status",
-    "message": "Pending"
+    "message": "Ожидание"
   },
   "sidepanel_retries": {
     "description": "Retries counter",
-    "message": "Retries: $1/$2"
+    "message": "Повторные попытки: $1/$2"
   }
 }
