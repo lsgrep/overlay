@@ -29,5 +29,130 @@
   },
   "error": {
     "message": "오류가 발생했습니다"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "일반 설정"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "AI 어시스턴트에 대한 기본 환경설정을 구성합니다"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "기본 언어"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "언어 선택"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "기본 모델"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "모델 선택..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "모델 검색..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "모델을 찾을 수 없습니다."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "모델 로딩 중..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI 모델"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "구글 모델"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic 모델"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama 모델"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "프록시 모드"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "프록시 서버를 통해 API 요청을 라우팅하는 프록시 모드 활성화"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "구글 설정"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "구글 API 키와 Gemini 모델 설정을 구성합니다"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API 키"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "API 키 검증 중..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ 유효한 API 키 ($1 모델 사용 가능)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "사용 가능한 모델"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI 설정"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "OpenAI API 키와 모델 설정을 구성합니다"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic 설정"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Claude에 액세스하기 위한 Anthropic API 키를 구성합니다"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "일반"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "구글"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "외관"
   }
 }

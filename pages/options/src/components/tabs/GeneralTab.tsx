@@ -1,19 +1,15 @@
 import { useStorage } from '@extension/shared';
 import { defaultLanguageStorage, defaultModelStorage, proxyModeStorage } from '@extension/storage';
-import { availableLanguages as i18nAvailableLanguages } from '@extension/i18n';
+import { availableLanguages as i18nAvailableLanguages, DevLocale, t } from '@extension/i18n';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@extension/ui/lib/utils';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
   Label,
@@ -27,23 +23,10 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
   Switch,
 } from '@extension/ui';
 
 interface GeneralTabProps {
-  isLight: boolean;
-  language: string;
-  setLanguage: (lang: string) => void;
-  selectedModel: string;
-  setSelectedModel: (model: string) => void;
   availableLanguages?: Array<{ code: string; name: string }>;
   openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
   googleModels: Array<{ name: string; displayName?: string; provider: string }>;
@@ -54,11 +37,6 @@ interface GeneralTabProps {
 }
 
 export const GeneralTab = ({
-  isLight,
-  language,
-  setLanguage,
-  selectedModel,
-  setSelectedModel,
   availableLanguages = i18nAvailableLanguages,
   openaiModels = [],
   googleModels = [],
@@ -72,21 +50,21 @@ export const GeneralTab = ({
   const defaultModel = useStorage(defaultModelStorage);
   const proxyMode = useStorage(proxyModeStorage);
   const [open, setOpen] = useState(false);
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // Set the locale directly from storage
+      t.devLocale = defaultLanguage as DevLocale;
+      console.log('GeneralTab: Language set to', defaultLanguage);
+    }
+  }, [defaultLanguage]);
 
   // Update language and model when storage changes
-  useEffect(() => {
-    if (defaultLanguage) setLanguage(defaultLanguage);
-  }, [defaultLanguage, setLanguage]);
-
-  useEffect(() => {
-    if (defaultModel) setSelectedModel(defaultModel);
-  }, [defaultModel, setSelectedModel]);
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">General Settings</h2>
-        <p className="text-sm text-muted-foreground">Configure your default preferences for the AI assistant</p>
+        <h2 className="text-2xl font-semibold tracking-tight">{t('options_general_settings')}</h2>
+        <p className="text-sm text-muted-foreground">{t('options_general_description')}</p>
       </div>
 
       <div className="space-y-6">
@@ -94,16 +72,17 @@ export const GeneralTab = ({
           <Label
             htmlFor="language"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Default Language
+            {t('options_default_language')}
           </Label>
           <Select
-            value={language}
+            value={defaultLanguage}
             onValueChange={value => {
-              setLanguage(value);
               defaultLanguageStorage.set(value);
+              // Update the translation locale immediately
+              t.devLocale = value as any;
             }}>
             <SelectTrigger id="language">
-              <SelectValue placeholder="Select a language" />
+              <SelectValue placeholder={t('options_select_language')} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -118,45 +97,44 @@ export const GeneralTab = ({
         </div>
 
         <div className="grid w-full max-w-sm items-center gap-1.5">
-          <Label htmlFor="default-model">Default Model</Label>
+          <Label htmlFor="default-model">{t('options_default_model')}</Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" role="combobox" className="w-full justify-between">
-                {selectedModel
+                {defaultModel
                   ? [...openaiModels, ...googleModels, ...anthropicModels, ...ollamaModels].find(
-                      model => model.name === selectedModel,
-                    )?.displayName || selectedModel
-                  : 'Select a model...'}
+                      model => model.name === defaultModel,
+                    )?.displayName || defaultModel
+                  : t('options_select_model')}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0">
               <Command>
-                <CommandInput placeholder="Search models..." />
-                <CommandEmpty>No model found.</CommandEmpty>
+                <CommandInput placeholder={t('options_search_models')} />
+                <CommandEmpty>{t('options_no_model_found')}</CommandEmpty>
                 <CommandList>
                   {isLoadingModels ? (
-                    <div className="py-6 text-center text-sm">Loading models...</div>
+                    <div className="py-6 text-center text-sm">{t('options_loading_models')}</div>
                   ) : modelError ? (
                     <div className="py-6 text-center text-sm text-red-500">{modelError}</div>
                   ) : (
                     <>
                       {/* OpenAI Models */}
                       {openaiModels.length > 0 && (
-                        <CommandGroup heading="OpenAI Models">
+                        <CommandGroup heading={t('options_openai_models')}>
                           {openaiModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
                               onSelect={() => {
-                                setSelectedModel(model.name);
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
                               <Check
                                 className={cn(
                                   'mr-2 h-4 w-4',
-                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
                                 )}
                               />
                               {model.displayName || model.name}
@@ -166,20 +144,19 @@ export const GeneralTab = ({
                       )}
                       {/* Google Models */}
                       {googleModels.length > 0 && (
-                        <CommandGroup heading="Google Models">
+                        <CommandGroup heading={t('options_google_models')}>
                           {googleModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
                               onSelect={() => {
-                                setSelectedModel(model.name);
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
                               <Check
                                 className={cn(
                                   'mr-2 h-4 w-4',
-                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
                                 )}
                               />
                               {model.displayName || model.name}
@@ -189,20 +166,19 @@ export const GeneralTab = ({
                       )}
                       {/* Anthropic Models */}
                       {anthropicModels.length > 0 && (
-                        <CommandGroup heading="Anthropic Models">
+                        <CommandGroup heading={t('options_anthropic_models')}>
                           {anthropicModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
                               onSelect={() => {
-                                setSelectedModel(model.name);
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
                               <Check
                                 className={cn(
                                   'mr-2 h-4 w-4',
-                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
                                 )}
                               />
                               {model.displayName || model.name}
@@ -212,20 +188,19 @@ export const GeneralTab = ({
                       )}
                       {/* Ollama Models */}
                       {ollamaModels.length > 0 && (
-                        <CommandGroup heading="Ollama Models">
+                        <CommandGroup heading={t('options_ollama_models')}>
                           {ollamaModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
                               onSelect={() => {
-                                setSelectedModel(model.name);
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
                               <Check
                                 className={cn(
                                   'mr-2 h-4 w-4',
-                                  selectedModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
                                 )}
                               />
                               {model.displayName || model.name}
@@ -245,9 +220,9 @@ export const GeneralTab = ({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="proxy-mode" className="text-sm font-medium leading-none">
-                Proxy Mode
+                {t('options_proxy_mode')}
               </Label>
-              <p className="text-xs text-muted-foreground">Route traffic through Overlay's proxy service</p>
+              <p className="text-xs text-muted-foreground">{t('options_proxy_mode_description')}</p>
             </div>
             <Switch
               id="proxy-mode"

@@ -26,5 +26,133 @@
   "hello": {
     "description": "Placeholder example",
     "message": "こんにちは $1"
+  },
+  "error": {
+    "message": "エラーが発生しました"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "一般設定"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "AIアシスタントのデフォルト設定を構成します"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "デフォルト言語"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "言語を選択"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "デフォルトモデル"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "モデルを選択..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "モデルを検索..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "モデルが見つかりません。"
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "モデルを読み込み中..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAIモデル"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "グーグルモデル"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropicモデル"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollamaモデル"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "プロキシモード"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "プロキシサーバー経由でAPIリクエストをルーティングするプロキシモードを有効にします"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "グーグル設定"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "グーグルAPIキーとGeminiモデルの設定を構成します"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "APIキー"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "APIキーを検証中..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ APIキーが有効です ($1 モデル利用可能)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "利用可能なモデル"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI設定"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "OpenAI APIキーとモデル設定を構成します"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic設定"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "ClaudeにアクセスするためのAnthropic APIキーを設定します"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "一般"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "グーグル"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "外観"
   }
 }

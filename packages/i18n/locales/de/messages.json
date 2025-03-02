@@ -29,5 +29,130 @@
   },
   "error": {
     "message": "Ein Fehler ist aufgetreten"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "Allgemeine Einstellungen"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Konfigurieren Sie Ihre Standardeinstellungen für den KI-Assistenten"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Standardsprache"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Sprache auswählen"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Standardmodell"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Modell auswählen..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Modelle suchen..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "Kein Modell gefunden."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Modelle werden geladen..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI-Modelle"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Google-Modelle"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic-Modelle"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama-Modelle"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Proxy-Modus"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Aktivieren Sie den Proxy-Modus, um API-Anfragen über einen Proxy-Server zu leiten"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Google-Einstellungen"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Konfigurieren Sie Ihren Google-API-Schlüssel und Gemini-Modelleinstellungen"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API-Schlüssel"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "API-Schlüssel wird überprüft..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API-Schlüssel ist gültig ($1 Modelle verfügbar)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Verfügbare Modelle"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI-Einstellungen"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Konfigurieren Sie Ihren OpenAI-API-Schlüssel und Modelleinstellungen"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic-Einstellungen"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Konfigurieren Sie Ihren Anthropic-API-Schlüssel für den Zugriff auf Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "Allgemein"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Erscheinungsbild"
   }
 }

@@ -1,9 +1,8 @@
-// import '@src/Options.css';
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import { availableLanguages } from '@extension/i18n';
 import { Cog6ToothIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
 import { OpenAIIcon, GeminiIcon, AnthropicIcon } from '@extension/ui';
+import { t } from '@extension/i18n';
 import {
   exampleThemeStorage,
   geminiKeyStorage,
@@ -38,36 +37,22 @@ const Options = () => {
   const [modelError, setModelError] = useState<string | null>(null);
 
   // New state variables for additional settings
-  const [selectedModel, setSelectedModel] = useState('');
-  const [language, setLanguage] = useState('en');
+  const defaultModel = useStorage(defaultModelStorage);
+  const language = useStorage(defaultLanguageStorage);
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
 
   // State for tab navigation
   const [activeTab, setActiveTab] = useState('General');
 
-  // Functions to get default settings
-  const getDefaultLanguage = async () => {
-    return await defaultLanguageStorage.get();
-  };
-
-  const getDefaultModel = async () => {
-    return await defaultModelStorage.get();
-  };
-
+  // Update the translation locale when language changes
   useEffect(() => {
-    // Load saved settings
-    const loadSettings = async () => {
-      try {
-        const [defaultLang, defaultMod] = await Promise.all([getDefaultLanguage(), getDefaultModel()]);
-        if (defaultLang) setLanguage(defaultLang);
-        if (defaultMod) setSelectedModel(defaultMod);
-      } catch (error) {
-        console.error('Error loading settings:', error);
-      }
-    };
-    loadSettings();
-  }, []);
+    if (language) {
+      console.log('Options: Setting language to', language);
+      t.devLocale = language;
+      console.log('Options: Language set to', language);
+    }
+  }, [language]);
 
   // Fetch models when API keys change
   useEffect(() => {
@@ -75,7 +60,6 @@ const Options = () => {
       try {
         setIsLoadingModels(true);
         setModelError(null);
-
         const { openai, anthropic, ollama, gemini } = await ModelService.fetchAllModels();
         setOpenAIModels(openai);
         setAnthropicModels(anthropic);
@@ -141,12 +125,20 @@ const Options = () => {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-2 sticky top-24">
               {[
-                { name: 'General', icon: <Cog6ToothIcon className="w-5 h-5" /> },
-                { name: 'OpenAI', icon: <OpenAIIcon className="w-5 h-5" /> },
-                { name: 'Google', icon: <GeminiIcon className="w-5 h-5" /> },
-                { name: 'Anthropic', icon: <AnthropicIcon className="w-5 h-5" /> },
-                { name: 'Appearance', icon: <PaintBrushIcon className="w-5 h-5" /> },
-              ].map(({ name: tab, icon }) => (
+                { name: 'General', displayName: t('options_tab_general'), icon: <Cog6ToothIcon className="w-5 h-5" /> },
+                { name: 'OpenAI', displayName: t('options_tab_openai'), icon: <OpenAIIcon className="w-5 h-5" /> },
+                { name: 'Google', displayName: t('options_tab_google'), icon: <GeminiIcon className="w-5 h-5" /> },
+                {
+                  name: 'Anthropic',
+                  displayName: t('options_tab_anthropic'),
+                  icon: <AnthropicIcon className="w-5 h-5" />,
+                },
+                {
+                  name: 'Appearance',
+                  displayName: t('options_tab_appearance'),
+                  icon: <PaintBrushIcon className="w-5 h-5" />,
+                },
+              ].map(({ name: tab, displayName, icon }) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -156,7 +148,7 @@ const Options = () => {
                       : `${isLight ? 'hover:bg-gray-100 text-gray-900' : 'hover:bg-gray-900 text-gray-100'}`
                   }`}>
                   {icon}
-                  <span>{tab}</span>
+                  <span>{displayName}</span>
                 </button>
               ))}
             </motion.div>
@@ -171,11 +163,6 @@ const Options = () => {
               {/* Tab Content */}
               {activeTab === 'General' && (
                 <GeneralTab
-                  isLight={isLight}
-                  language={language}
-                  setLanguage={setLanguage}
-                  selectedModel={selectedModel}
-                  setSelectedModel={setSelectedModel}
                   openaiModels={openaiModels}
                   googleModels={googleModels}
                   ollamaModels={ollamaModels}

@@ -1,6 +1,8 @@
 import { useStorage } from '@extension/shared';
-import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
+import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
+import { DevLocale, t } from '@extension/i18n';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -19,12 +21,22 @@ interface AppearanceTabProps {
 export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
+  const language = useStorage(defaultLanguageStorage);
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (language) {
+      // Set the locale directly from storage
+      t.devLocale = language as DevLocale;
+      console.log('AppearanceTab: Language set to', language);
+    }
+  }, [language]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">Appearance Settings</h2>
-        <p className="text-sm text-muted-foreground">Customize the visual appearance of the application</p>
+        <h2 className="text-2xl font-semibold tracking-tight">{t('options_appearance_settings')}</h2>
+        <p className="text-sm text-muted-foreground">{t('options_appearance_description')}</p>
       </div>
 
       <div className="space-y-6">
@@ -32,17 +44,17 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
           <Label
             htmlFor="font-family"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            Font Family
+            {t('options_font_family')}
           </Label>
           <Select value={fontFamily} onValueChange={value => fontFamilyStorage.set(value)}>
             <SelectTrigger
               id="font-family"
               className={`w-full ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
-              <SelectValue placeholder="Select a font family" />
+              <SelectValue placeholder={t('options_select_font_family')} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Programming Fonts</SelectLabel>
+                <SelectLabel>{t('options_programming_fonts')}</SelectLabel>
                 <SelectItem value="JetBrains Mono">JetBrains Mono</SelectItem>
                 <SelectItem value="Fira Code">Fira Code</SelectItem>
                 <SelectItem value="Source Code Pro">Source Code Pro</SelectItem>
@@ -53,8 +65,8 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
                 <SelectItem value="SF Mono">SF Mono</SelectItem>
               </SelectGroup>
               <SelectGroup>
-                <SelectLabel>System Fonts</SelectLabel>
-                <SelectItem value="system-ui">System Default</SelectItem>
+                <SelectLabel>{t('options_system_fonts')}</SelectLabel>
+                <SelectItem value="system-ui">{t('options_system_default')}</SelectItem>
                 <SelectItem value="monospace">Monospace</SelectItem>
                 <SelectItem value="Courier New">Courier New</SelectItem>
               </SelectGroup>
@@ -64,13 +76,13 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="font-size" className="text-blue-500">
-            Font Size
+            {t('options_font_size')}
           </Label>
           <Select value={`${fontSize}`} onValueChange={value => fontSizeStorage.set(parseInt(value, 10))}>
             <SelectTrigger
               id="font-size"
               className={`w-full ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
-              <SelectValue placeholder="Select a font size" />
+              <SelectValue placeholder={t('options_select_font_size')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="12">12px</SelectItem>
@@ -86,11 +98,11 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
         </div>
 
         <div>
-          <h4 className="text-sm font-semibold mb-2 text-blue-500">Preview</h4>
+          <h4 className="text-sm font-semibold mb-2 text-blue-500">{t('options_preview')}</h4>
           <div
             className={`p-4 rounded-md border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}
             style={{ fontFamily, fontSize: `${fontSize}px` }}>
-            The quick brown fox jumps over the lazy dog.
+            {t('options_preview_text')}
           </div>
         </div>
       </div>

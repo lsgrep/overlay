@@ -29,5 +29,175 @@
   },
   "error": {
     "message": "An error occurred"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "General Settings"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Configure your default preferences for the AI assistant"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Default Language"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Select a language"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Default Model"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Select a model..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Search models..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "No model found."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Loading models..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI Models"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Google Models"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic Models"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama Models"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Proxy Mode"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Enable proxy mode to route API requests through a proxy server"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Google Settings"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Configure your Google API key and Gemini model preferences"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API Key"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "Validating API key..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API key is valid ($1 models available)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Available Models"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI Settings"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Configure your OpenAI API key and model preferences"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic Settings"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Configure your Anthropic API key for Claude access"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "General"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Appearance"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Appearance Settings"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Customize the visual appearance of the application"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Font Family"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Select a font family"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Programming Fonts"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "System Fonts"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "System Default"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Font Size"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Select a font size"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Preview"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "The quick brown fox jumps over the lazy dog."
   }
 }

@@ -29,5 +29,130 @@
   },
   "error": {
     "message": "Произошла ошибка"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "Общие настройки"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Настройте параметры по умолчанию для ИИ-ассистента"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Язык по умолчанию"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Выберите язык"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Модель по умолчанию"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Выберите модель..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Поиск моделей..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "Модели не найдены."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Загрузка моделей..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "Модели OpenAI"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Модели Google"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Модели Anthropic"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Модели Ollama"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Режим прокси"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Включите режим прокси для маршрутизации API-запросов через прокси-сервер"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Настройки Google"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Настройте ваш API-ключ Google и предпочтения для моделей Gemini"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API-ключ"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "Проверка API-ключа..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API-ключ действителен (доступно моделей: $1)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Доступные модели"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "Настройки OpenAI"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Настройте свой API-ключ OpenAI и предпочтения моделей"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Настройки Anthropic"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Настройте свой API-ключ Anthropic для доступа к Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "Общие"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Внешний вид"
   }
 }
