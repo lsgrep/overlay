@@ -1,9 +1,10 @@
 // import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
+import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { t, DevLocale } from '@extension/i18n';
 
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -11,6 +12,7 @@ import { ModelSelector } from './components/ModelSelector';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
+  const defaultLanguage = useStorage(defaultLanguageStorage);
   const isLight = theme === 'light';
   const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
   const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
@@ -21,6 +23,15 @@ const SidePanel = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational' | 'context-menu'>('conversational');
   const [input, setInput] = useState('');
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // Set the locale directly from storage
+      t.devLocale = defaultLanguage as DevLocale;
+      console.log('SidePanel: Language set to', defaultLanguage);
+    }
+  }, [defaultLanguage]);
 
   // Load default model from storage
   useEffect(() => {
@@ -120,7 +131,7 @@ const SidePanel = () => {
           />
           <div className="flex items-center gap-4">
             <Label htmlFor="mode-selector" className="min-w-16">
-              Mode
+              {t('sidepanel_mode')}
             </Label>
             <ToggleGroup
               id="mode-selector"
@@ -130,11 +141,11 @@ const SidePanel = () => {
               className="flex-1">
               <ToggleGroupItem value="conversational" className="flex-1">
                 <MessageCircle className="mr-2" />
-                Conversational
+                {t('sidepanel_conversational_mode')}
               </ToggleGroupItem>
               <ToggleGroupItem value="interactive" className="flex-1">
                 <Blocks className="mr-2" />
-                Interactive
+                {t('sidepanel_interactive_mode')}
               </ToggleGroupItem>
             </ToggleGroup>
           </div>

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStorage } from '@extension/shared';
-import { fontFamilyStorage, fontSizeStorage } from '@extension/storage';
+import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { PaperAirplaneIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import { Terminal } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { t, DevLocale } from '@extension/i18n';
 import { TaskPlanView } from './components/TaskPlanView';
 import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
@@ -75,6 +76,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
+  const defaultLanguage = useStorage(defaultLanguageStorage);
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // Set the locale directly from storage
+      t.devLocale = defaultLanguage as DevLocale;
+      console.log('ChatInterface: Language set to', defaultLanguage);
+    }
+  }, [defaultLanguage]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialInput || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -252,7 +263,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               {message.role === 'user' ? (
                 <>
                   <Terminal className="w-3 h-3" />
-                  <span>You</span>
+                  <span>{t('sidepanel_you')}</span>
                 </>
               ) : (
                 <>
@@ -272,7 +283,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     return (
                       <>
                         {Icon && <Icon className="w-3 h-3" />}
-                        <span>{message.model?.displayName || message.model?.name || 'Assistant'}</span>
+                        <span>{message.model?.displayName || message.model?.name || t('sidepanel_assistant')}</span>
                       </>
                     );
                   })()}
@@ -326,13 +337,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex justify-center py-2 text-muted-foreground">
             <div className="flex gap-1">
               <ArrowPathIcon className="w-4 h-4 animate-spin" />
-              <span className="text-sm">Thinking...</span>
+              <span className="text-sm">{t('sidepanel_thinking')}</span>
             </div>
           </div>
         )}
         {error && (
           <div className="text-destructive p-3 rounded-lg bg-destructive/10 mr-4">
-            <div className="text-xs font-semibold mb-1">Error</div>
+            <div className="text-xs font-semibold mb-1">{t('sidepanel_error')}</div>
             <div>{error}</div>
           </div>
         )}
@@ -351,7 +362,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 }
               }
             }}
-            placeholder="Type your message... (Press Enter to send, Shift + Enter for new line)"
+            placeholder={t('sidepanel_message_placeholder')}
             style={{ fontFamily, fontSize: `${fontSize}px` }}
             className="flex-1 min-h-[40px] max-h-[200px] resize-none"
             disabled={isLoading}
@@ -362,7 +373,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             style={{ fontFamily, fontSize: `${fontSize}px` }}
             className="flex items-center gap-2"
             variant="default">
-            <span>Send</span>
+            <span>{t('sidepanel_send')}</span>
             <PaperAirplaneIcon className="w-4 h-4" />
           </Button>
         </div>
