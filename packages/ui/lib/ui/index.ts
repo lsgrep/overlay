@@ -10,3 +10,4 @@ export * from '../icons/index';
 export * from './textarea';
 export * from './avatar';
 export * from './tooltip';
+export * from './dropdown-menu';

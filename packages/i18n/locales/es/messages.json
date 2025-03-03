@@ -321,6 +321,14 @@
     "description": "Retries counter",
     "message": "Reintentos: $1/$2"
   },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "Usuario"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Conectado como"
+  },
   "sidepanel_click_to_sign_out": {
     "description": "Tooltip text for sign out button",
     "message": "Haga clic para cerrar sesión"

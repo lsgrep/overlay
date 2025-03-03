@@ -321,9 +321,17 @@
     "description": "Retries counter",
     "message": "リトライ: $1/$2"
   },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "ユーザー"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "ログイン中："
+  },
   "sidepanel_click_to_sign_out": {
     "description": "Tooltip text for sign out button",
-    "message": "クリックしてサインアウト"
+    "message": "クリックしてログアウト"
   },
   "sidepanel_sign_in": {
     "description": "Sign in to Overlay button text",

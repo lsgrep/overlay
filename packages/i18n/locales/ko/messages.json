@@ -321,9 +321,17 @@
     "description": "Retries counter",
     "message": "재시도: $1/$2"
   },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "사용자"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "로그인 계정:"
+  },
   "sidepanel_click_to_sign_out": {
     "description": "Tooltip text for sign out button",
-    "message": "로그아웃하려면 클릭하세요"
+    "message": "클릭하여 로그아웃"
   },
   "sidepanel_sign_in": {
     "description": "Sign in to Overlay button text",

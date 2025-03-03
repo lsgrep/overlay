@@ -321,13 +321,21 @@
     "description": "Retries counter",
     "message": "Попытки: $1/$2"
   },
-  "sidepanel_click_to_sign_out": {
-    "description": "Tooltip text for sign out button",
-    "message": "Нажмите, чтобы выйти"
-  },
   "sidepanel_sign_in": {
     "description": "Sign in to Overlay button text",
     "message": "Войти в Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "Пользователь"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Вы вошли как"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Нажмите, чтобы выйти"
   },
   "extensions": {
     "description": "Link text for Chrome Extensions page",

@@ -321,13 +321,21 @@
     "description": "Retries counter",
     "message": "重试: $1/$2"
   },
-  "sidepanel_click_to_sign_out": {
-    "description": "Tooltip text for sign out button",
-    "message": "点击退出登录"
-  },
   "sidepanel_sign_in": {
     "description": "Sign in to Overlay button text",
     "message": "登录 Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "用户"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "已登录为"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "点击退出登录"
   },
   "extensions": {
     "description": "Link text for Chrome Extensions page",

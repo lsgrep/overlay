@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { PaperAirplaneIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
-import { Terminal, UserCircle, LogOut } from 'lucide-react';
+import { Terminal, UserCircle, LogOut, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { t, DevLocale } from '@extension/i18n';
 import { TaskPlanView } from './components/TaskPlanView';
@@ -17,10 +17,10 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@extension/ui';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import icon from '../../../chrome-extension/public/icon-128.png';
@@ -355,33 +355,41 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
       <div className="flex items-center justify-between p-2 border-b border-border">
         {user ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center gap-2">
-                  <div className="text-sm font-medium truncate max-w-[120px]">
-                    {user.email || user.user_metadata?.full_name || t('sidepanel_user')}
-                  </div>
-                  <Avatar className="h-8 w-8 cursor-pointer">
-                    {user.user_metadata?.avatar_url ? (
-                      <AvatarImage src={user.user_metadata.avatar_url} alt={user.email || ''} />
-                    ) : (
-                      <AvatarFallback>{user.email ? user.email.substring(0, 2).toUpperCase() : 'U'}</AvatarFallback>
-                    )}
-                  </Avatar>
-                  <Button size="sm" variant="ghost" className="p-1" onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4" />
-                  </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-2 rounded-full bg-muted/30 px-2 py-1 hover:bg-muted/50 transition-colors cursor-pointer">
+                <Avatar className="h-6 w-6">
+                  {user.user_metadata?.avatar_url ? (
+                    <AvatarImage src={user.user_metadata.avatar_url} alt={user.email || ''} />
+                  ) : (
+                    <AvatarFallback>{user.user_metadata?.full_name?.charAt(0).toUpperCase()}</AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="text-sm font-medium truncate max-w-[120px]">
+                  {user.user_metadata?.full_name || user.email || t('sidepanel_user')}
                 </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {t('sidepanel_signed_in_as')} {user.email}
-                </p>
-                <p className="text-xs text-muted-foreground">{t('sidepanel_click_to_sign_out')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                <ChevronDown className="h-3.5 w-3.5" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem>
+                <a
+                  className="flex flex-col"
+                  href="https://overlay.one/en/dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer">
+                  <span>{t('sidepanel_signed_in_as')}</span>
+                  <span className="font-medium">{user.email}</span>
+                </a>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>
+                <div className="flex items-center gap-2 w-full">
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span>{t('sidepanel_click_to_sign_out')}</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : (
           <Button size="sm" variant="outline" className="flex items-center gap-2" onClick={handleSignIn}>
             <img src={icon} alt="Overlay" className="w-5 h-5" />
