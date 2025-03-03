@@ -319,6 +319,22 @@
   },
   "sidepanel_retries": {
     "description": "Retries counter",
-    "message": "Повторные попытки: $1/$2"
+    "message": "Попытки: $1/$2"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Нажмите, чтобы выйти"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Расширения"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Закладки"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "Новая страница"
   }
 }

@@ -320,5 +320,21 @@
   "sidepanel_retries": {
     "description": "Retries counter",
     "message": "Reintentos: $1/$2"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Haga clic para cerrar sesión"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Extensiones"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Marcadores"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "Nueva Página"
   }
 }

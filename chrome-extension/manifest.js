@@ -39,8 +39,17 @@ const manifest = withSidePanel({
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  host_permissions: ['<all_urls>', 'http://localhost:11434/*'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'contextMenus', 'clipboardWrite'],
+  host_permissions: ['<all_urls>', 'http://localhost:11434/*', 'https://overlay.one/*'],
+  permissions: [
+    'storage',
+    'scripting',
+    'tabs',
+    'notifications',
+    'contextMenus',
+    'clipboardWrite',
+    'cookies',
+    'identity',
+  ],
   web_accessible_resources: [
     {
       resources: ['new-tab/*'],

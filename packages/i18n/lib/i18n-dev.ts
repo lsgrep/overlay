@@ -7,7 +7,14 @@ type I18nValue = {
 };
 
 function translate(key: MessageKey, substitutions?: string | string[]) {
+  console.log('locale:', t.devLocale);
+  console.log('key:', key);
+  console.log('substitutions:', substitutions);
   const value = getMessageFromLocale(t.devLocale)[key] as I18nValue;
+  if (value === undefined || value.message === undefined) {
+    console.log('value is undefined');
+    return key;
+  }
   let message = value.message;
   /**
    * This is a placeholder replacement logic. But it's not perfect.

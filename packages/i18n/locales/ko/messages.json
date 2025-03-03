@@ -320,5 +320,21 @@
   "sidepanel_retries": {
     "description": "Retries counter",
     "message": "재시도: $1/$2"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "로그아웃하려면 클릭하세요"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "확장 프로그램"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "북마크"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "새 페이지"
   }
 }

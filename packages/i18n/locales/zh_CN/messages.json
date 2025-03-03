@@ -1,11 +1,11 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "叠加层"
+    "message": "Overlay"
   },
   "extensionName": {
     "description": "Extension name",
-    "message": "叠加层"
+    "message": "Overlay"
   },
   "toggleTheme": {
     "message": "切换主题"
@@ -320,5 +320,21 @@
   "sidepanel_retries": {
     "description": "Retries counter",
     "message": "重试: $1/$2"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "点击退出登录"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "扩展程序"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "书签"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "新页面"
   }
 }

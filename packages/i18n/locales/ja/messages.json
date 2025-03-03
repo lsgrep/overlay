@@ -319,6 +319,22 @@
   },
   "sidepanel_retries": {
     "description": "Retries counter",
-    "message": "再試行: $1/$2"
+    "message": "リトライ: $1/$2"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "クリックしてサインアウト"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "拡張機能"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "ブックマーク"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "新しいページ"
   }
 }

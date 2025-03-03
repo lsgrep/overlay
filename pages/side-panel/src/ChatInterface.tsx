@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { PaperAirplaneIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
-import { Terminal } from 'lucide-react';
+import { Terminal, UserCircle, LogOut } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { t, DevLocale } from '@extension/i18n';
 import { TaskPlanView } from './components/TaskPlanView';
@@ -11,10 +11,22 @@ import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
 import { AnthropicService } from './services/llm/anthropic';
 import { OpenAIService } from './services/llm/openai';
-import { Button, Textarea } from '@extension/ui';
+import {
+  Button,
+  Textarea,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@extension/ui';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { PageContext } from './services/llm/prompts';
+import { createClient } from '@extension/shared';
+import type { User } from '@supabase/supabase-js';
 
 interface Message {
   role: string;
@@ -78,6 +90,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
   const defaultLanguage = useStorage(defaultLanguageStorage);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Update translations when language changes
   useEffect(() => {
@@ -87,6 +101,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       console.log('ChatInterface: Language set to', defaultLanguage);
     }
   }, [defaultLanguage]);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState(initialInput || '');
   const [isLoading, setIsLoading] = useState(false);
@@ -97,6 +112,40 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const supabase = createClient();
+  console.log('ChatInterface: Supabase client', supabase);
+  // Check for authenticated user on component mount
+  useEffect(() => {
+    async function getUser() {
+      try {
+        setLoading(true);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setUser(user);
+        console.log('ChatInterface: User', user);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
+
+      // Set up auth state change listener
+      const {
+        data: { subscription },
+      } = await supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null);
+      });
+
+      // Clean up subscription on unmount
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+
+    getUser();
+  }, [supabase]);
 
   useEffect(() => {
     scrollToBottom();
@@ -251,18 +300,63 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
       <div className="flex items-center justify-between p-2 border-b border-border">
-        <Button
-          size="sm"
-          variant="outline"
-          className="flex items-center gap-2"
-          onClick={() => window.open('https://overlay.one/en/login', '_blank')}>
+        <div className="flex items-center gap-2">
           <img src={icon} alt="Overlay" className="w-5 h-5" />
-          <span>{t('sidepanel_sign_in')}</span>
-        </Button>
+          <span className="text-sm font-medium">Overlay</span>
+        </div>
+
+        {user ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-medium truncate max-w-[120px]">
+                    {user.email || user.user_metadata?.full_name || t('sidepanel_user')}
+                  </div>
+                  <Avatar className="h-8 w-8 cursor-pointer">
+                    {user.user_metadata?.avatar_url ? (
+                      <AvatarImage src={user.user_metadata.avatar_url} alt={user.email || ''} />
+                    ) : (
+                      <AvatarFallback>{user.email ? user.email.substring(0, 2).toUpperCase() : 'U'}</AvatarFallback>
+                    )}
+                  </Avatar>
+                  <Button size="sm" variant="ghost" className="p-1" onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {t('sidepanel_signed_in_as')} {user.email}
+                </p>
+                <p className="text-xs text-muted-foreground">{t('sidepanel_click_to_sign_out')}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex items-center gap-2"
+            onClick={() => window.open('https://overlay.one/en/login', '_blank')}>
+            <UserCircle className="w-4 h-4" />
+            <span>{t('sidepanel_sign_in')}</span>
+          </Button>
+        )}
       </div>
+
       <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
         {messages.map((message, index) => (
           <div

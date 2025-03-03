@@ -9,3 +9,4 @@ export * from './toggle-group';
 export * from '../icons/index';
 export * from './textarea';
 export * from './avatar';
+export * from './tooltip';

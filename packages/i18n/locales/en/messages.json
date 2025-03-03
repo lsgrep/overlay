@@ -324,5 +324,29 @@
   "sidepanel_sign_in": {
     "description": "Sign in to Overlay button text",
     "message": "Sign in to Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default user label when no name is available",
+    "message": "User"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Signed in as"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Click to sign out"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Extensions"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Bookmarks"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "New Page"
   }
 }

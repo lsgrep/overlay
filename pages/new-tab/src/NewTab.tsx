@@ -1,16 +1,29 @@
 import '@src/NewTab.css';
 import '@src/NewTab.scss';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
-import { t } from '@extension/i18n';
+import { exampleThemeStorage, defaultLanguageStorage } from '@extension/storage';
+import { t, DevLocale } from '@extension/i18n';
 import { useState, useEffect } from 'react';
 import { AITools } from './components/AITools';
 import quotesData from './quotes.json';
 
 const NewTab = () => {
   const theme = useStorage(exampleThemeStorage);
+  const defaultLanguage = useStorage(defaultLanguageStorage);
   const isLight = theme === 'light';
   const [randomQuote, setRandomQuote] = useState({ text: '', author: '', category: '' });
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // Set the locale directly from storage
+      t.devLocale = defaultLanguage as DevLocale;
+      console.log('NewTab: Language set to', defaultLanguage);
+
+      // Update document title with translated "New Page"
+      document.title = t('new_page', 'New Page');
+    }
+  }, [defaultLanguage]);
 
   useEffect(() => {
     const categories = Object.keys(quotesData.categories);
@@ -23,7 +36,11 @@ const NewTab = () => {
       author: randomQuoteData.author,
       category: quotesData.categories[randomCategory].name,
     });
+
+    // Set document title
+    document.title = t('new_page', 'New Page');
   }, []);
+
   return (
     <div
       className={`min-h-screen flex flex-col overflow-hidden ${isLight ? 'bg-gradient-to-br from-blue-50 to-purple-50' : 'bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900'}`}>
