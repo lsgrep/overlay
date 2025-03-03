@@ -325,6 +325,10 @@
     "description": "Tooltip text for sign out button",
     "message": "Haga clic para cerrar sesión"
   },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Iniciar sesión en Overlay"
+  },
   "extensions": {
     "description": "Link text for Chrome Extensions page",
     "message": "Extensiones"

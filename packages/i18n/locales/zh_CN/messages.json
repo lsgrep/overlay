@@ -325,6 +325,10 @@
     "description": "Tooltip text for sign out button",
     "message": "点击退出登录"
   },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "登录 Overlay"
+  },
   "extensions": {
     "description": "Link text for Chrome Extensions page",
     "message": "扩展程序"

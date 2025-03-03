@@ -110,7 +110,7 @@
   },
   "options_key_valid": {
     "description": "API key valid message",
-    "message": "✓ APIキーが有効です ($1 モデル利用可能)"
+    "message": "APIキーが有効です ($1 モデル利用可能)"
   },
   "options_available_models": {
     "description": "Available models heading",
@@ -303,15 +303,15 @@
   },
   "sidepanel_running": {
     "description": "Running status",
-    "message": "⏳ 実行中..."
+    "message": "実行中..."
   },
   "sidepanel_complete": {
     "description": "Complete status",
-    "message": "✓ 完了"
+    "message": "完了"
   },
   "sidepanel_failed": {
     "description": "Failed status",
-    "message": "✗ 失敗"
+    "message": "失敗"
   },
   "sidepanel_pending": {
     "description": "Pending status",
@@ -324,6 +324,10 @@
   "sidepanel_click_to_sign_out": {
     "description": "Tooltip text for sign out button",
     "message": "クリックしてサインアウト"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Overlayにサインイン"
   },
   "extensions": {
     "description": "Link text for Chrome Extensions page",

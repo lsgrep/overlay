@@ -312,11 +312,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
       <div className="flex items-center justify-between p-2 border-b border-border">
-        <div className="flex items-center gap-2">
-          <img src={icon} alt="Overlay" className="w-5 h-5" />
-          <span className="text-sm font-medium">Overlay</span>
-        </div>
-
         {user ? (
           <TooltipProvider>
             <Tooltip>
@@ -351,7 +346,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             variant="outline"
             className="flex items-center gap-2"
             onClick={() => window.open('https://overlay.one/en/login', '_blank')}>
-            <UserCircle className="w-4 h-4" />
+            <img src={icon} alt="Overlay" className="w-5 h-5" />
             <span>{t('sidepanel_sign_in')}</span>
           </Button>
         )}

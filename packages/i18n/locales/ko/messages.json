@@ -110,7 +110,7 @@
   },
   "options_key_valid": {
     "description": "API key valid message",
-    "message": "✓ 유효한 API 키 ($1 모델 사용 가능)"
+    "message": "유효한 API 키 ($1 모델 사용 가능)"
   },
   "options_available_models": {
     "description": "Available models heading",
@@ -303,15 +303,15 @@
   },
   "sidepanel_running": {
     "description": "Running status",
-    "message": "⏳ 실행 중..."
+    "message": "실행 중..."
   },
   "sidepanel_complete": {
     "description": "Complete status",
-    "message": "✓ 완료"
+    "message": "완료"
   },
   "sidepanel_failed": {
     "description": "Failed status",
-    "message": "✗ 실패"
+    "message": "실패"
   },
   "sidepanel_pending": {
     "description": "Pending status",
@@ -324,6 +324,10 @@
   "sidepanel_click_to_sign_out": {
     "description": "Tooltip text for sign out button",
     "message": "로그아웃하려면 클릭하세요"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Overlay에 로그인"
   },
   "extensions": {
     "description": "Link text for Chrome Extensions page",

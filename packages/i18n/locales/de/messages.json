@@ -325,6 +325,10 @@
     "description": "Tooltip text for sign out button",
     "message": "Klicken Sie, um sich abzumelden"
   },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Bei Overlay anmelden"
+  },
   "extensions": {
     "description": "Link text for Chrome Extensions page",
     "message": "Erweiterungen"
