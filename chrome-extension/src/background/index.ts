@@ -1,6 +1,8 @@
 import 'webextension-polyfill';
 import { exampleThemeStorage, defaultLanguageStorage, proxyModeStorage } from '@extension/storage';
 import { getLanguageNameFromCode } from '@extension/i18n';
+// Import auth module
+import './auth';
 
 // Enable side panel opening on extension icon click
 chrome.sidePanel

@@ -348,5 +348,21 @@
   "new_page": {
     "description": "Title for the new tab page",
     "message": "New Page"
+  },
+  "popup_sign_in_description": {
+    "description": "Description text for sign in popup",
+    "message": "Sign in to access all features"
+  },
+  "popup_sign_in_with_google": {
+    "description": "Button text for Google sign in",
+    "message": "Sign in with Google"
+  },
+  "popup_sign_in_with_github": {
+    "description": "Button text for GitHub sign in",
+    "message": "Sign in with GitHub"
+  },
+  "popup_signing_in": {
+    "description": "Loading text when signing in",
+    "message": "Signing in..."
   }
 }

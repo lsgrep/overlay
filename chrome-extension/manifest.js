@@ -39,7 +39,7 @@ const manifest = withSidePanel({
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  host_permissions: ['<all_urls>', 'http://localhost:11434/*', 'https://overlay.one/*'],
+  host_permissions: ['<all_urls>', 'http://localhost:11434/*', 'https://overlay.one/*', 'https://*.supabase.co/*'],
   permissions: [
     'storage',
     'scripting',

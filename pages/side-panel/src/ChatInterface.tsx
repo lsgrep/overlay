@@ -25,8 +25,12 @@ import {
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { PageContext } from './services/llm/prompts';
-import { createClient } from '@extension/shared';
-import type { User } from '@supabase/supabase-js';
+import {
+  createClient,
+  signInWithProvider,
+  signOut,
+  getCurrentUserFromStorage,
+} from '@extension/shared/lib/services/supabase';
 
 interface Message {
   role: string;
@@ -87,10 +91,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   isLoadingModels,
   modelError,
 }) => {
+  const supabase = createClient();
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
   const defaultLanguage = useStorage(defaultLanguageStorage);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   // Update translations when language changes
@@ -102,31 +107,34 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [defaultLanguage]);
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState(initialInput || '');
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [pageContext, setPageContext] = useState<PageContext | null>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const supabase = createClient();
-  console.log('ChatInterface: Supabase client', supabase);
-  // Check for authenticated user on component mount
+  // Listen for auth completion messages from background script
   useEffect(() => {
     async function getUser() {
       try {
+        console.log('[CHAT] Getting user...');
         setLoading(true);
+        // First try to get user from current session
         const {
           data: { user },
         } = await supabase.auth.getUser();
-        setUser(user);
-        console.log('ChatInterface: User', user);
+        console.log('[CHAT] getUser: User from session', user);
+
+        if (user) {
+          setUser(user);
+          console.log('[CHAT] User set from session', user.email);
+        } else {
+          console.log('[CHAT] No user in session, trying storage');
+          // If no session, try to get user from storage tokens
+          const storageUser = await getCurrentUserFromStorage();
+          if (storageUser) {
+            setUser(storageUser);
+            console.log('[CHAT] User set from storage', storageUser.email);
+          } else {
+            console.log('[CHAT] No user found in storage');
+          }
+        }
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error('[CHAT] Error getting user:', error);
       } finally {
         setLoading(false);
       }
@@ -134,33 +142,76 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Set up auth state change listener
       const {
         data: { subscription },
-      } = await supabase.auth.onAuthStateChange((_event, session) => {
+      } = await supabase.auth.onAuthStateChange((event, session) => {
+        console.log('[CHAT] Auth state changed:', event, session?.user?.email);
         setUser(session?.user ?? null);
       });
 
       // Clean up subscription on unmount
       return () => {
+        console.log('[CHAT] Cleaning up auth subscription');
         subscription.unsubscribe();
       };
     }
 
-    getUser();
+    const handleAuthComplete = (message: any) => {
+      console.log('[CHAT] Received message:', message);
+      if (message.action === 'authComplete' && message.payload.success) {
+        console.log('[CHAT] Auth complete message received, refreshing user');
+        // Refresh user data
+        getUser();
+      }
+    };
+
+    if (chrome?.runtime?.onMessage) {
+      console.log('[CHAT] Setting up message listener');
+      chrome.runtime.onMessage.addListener(handleAuthComplete);
+
+      // Initial user fetch
+      console.log('[CHAT] Initial user fetch');
+      getUser();
+
+      return () => {
+        console.log('[CHAT] Removing message listener');
+        chrome.runtime.onMessage.removeListener(handleAuthComplete);
+      };
+    } else {
+      console.log('[CHAT] Chrome runtime not available, fetching user directly');
+      getUser();
+    }
   }, [supabase]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    if (initialInput) {
-      setInput(initialInput);
-      // Auto-submit for context-menu mode
-      if (mode === 'context-menu') {
-        const event = new Event('submit') as any;
-        handleSubmit(event);
-      }
+  const handleSignIn = async () => {
+    try {
+      console.log('[CHAT] Initiating sign in with GitHub');
+      await signInWithProvider('github');
+    } catch (error) {
+      console.error('[CHAT] Error signing in:', error);
     }
-  }, [initialInput, mode]);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      console.log('[CHAT] Signing out');
+      await signOut();
+      setUser(null);
+      console.log('[CHAT] Sign out complete, user cleared');
+    } catch (error) {
+      console.error('[CHAT] Error signing out:', error);
+    }
+  };
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState(initialInput || '');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [pageContext, setPageContext] = useState<PageContext | null>(null);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -300,15 +351,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
   return (
     <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
       <div className="flex items-center justify-between p-2 border-b border-border">
@@ -341,11 +383,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </Tooltip>
           </TooltipProvider>
         ) : (
-          <Button
-            size="sm"
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={() => window.open('https://overlay.one/en/login', '_blank')}>
+          <Button size="sm" variant="outline" className="flex items-center gap-2" onClick={handleSignIn}>
             <img src={icon} alt="Overlay" className="w-5 h-5" />
             <span>{t('sidepanel_sign_in')}</span>
           </Button>
