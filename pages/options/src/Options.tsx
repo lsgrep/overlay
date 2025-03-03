@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { Cog6ToothIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
+import { UserIcon } from '@heroicons/react/24/outline';
 import { OpenAIIcon, GeminiIcon, AnthropicIcon } from '@extension/ui';
 import { t } from '@extension/i18n';
 import {
@@ -15,7 +16,8 @@ import {
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
-import { GeneralTab, OpenAITab, GoogleTab, AnthropicTab, AppearanceTab } from './components/tabs';
+import { GeneralTab, OpenAITab, GoogleTab, AnthropicTab, AppearanceTab, ProfileTab } from './components/tabs';
+
 const Options = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
@@ -134,6 +136,11 @@ const Options = () => {
                   icon: <AnthropicIcon className="w-5 h-5" />,
                 },
                 {
+                  name: 'Profile',
+                  displayName: t('options_tab_profile'),
+                  icon: <UserIcon className="w-5 h-5" />,
+                },
+                {
                   name: 'Appearance',
                   displayName: t('options_tab_appearance'),
                   icon: <PaintBrushIcon className="w-5 h-5" />,
@@ -204,6 +211,8 @@ const Options = () => {
                   anthropicModels={anthropicModels}
                 />
               )}
+
+              {activeTab === 'Profile' && <ProfileTab isLight={isLight} />}
 
               {activeTab === 'Appearance' && <AppearanceTab isLight={isLight} />}
             </motion.div>

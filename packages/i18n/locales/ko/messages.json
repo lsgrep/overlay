@@ -155,6 +155,10 @@
     "description": "Appearance tab name",
     "message": "외관"
   },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "프로필"
+  },
 
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
@@ -199,6 +203,67 @@
   "options_preview_text": {
     "description": "Text used in the font preview",
     "message": "날카로운 갈색 여우가 게으른 개를 뛰어넘습니다."
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "프로필 설정"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "웹 페이지에서 사용할 개인 정보를 구성하세요"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "이름"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "이름을 입력하세요"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "성"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "성을 입력하세요"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "이메일"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "이메일 주소를 입력하세요"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "자기소개"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "자신에 대한 간단한 소개를 작성하세요"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "웹사이트에서 사용할 수 있는 자신에 대한 간단한 설명"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "이력서"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "이력서 또는 직업 경험을 입력하세요"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "구직 신청에 사용할 수 있는 직업 경험"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "프로필 저장"
   },
 
   "sidepanel_mode": {
@@ -327,11 +392,11 @@
   },
   "sidepanel_signed_in_as": {
     "description": "Text showing which account is signed in",
-    "message": "로그인 계정:"
+    "message": "로그인 계정"
   },
   "sidepanel_click_to_sign_out": {
     "description": "Tooltip text for sign out button",
-    "message": "클릭하여 로그아웃"
+    "message": "로그아웃하려면 클릭하세요"
   },
   "sidepanel_sign_in": {
     "description": "Sign in to Overlay button text",
