@@ -261,6 +261,30 @@
     "description": "Resume field description",
     "message": "Your professional experience that can be used for job applications"
   },
+  "options_profile_resume_file": {
+    "description": "Resume file upload label",
+    "message": "Resume PDF"
+  },
+  "options_profile_resume_file_upload": {
+    "description": "Resume file upload button text",
+    "message": "Upload PDF Resume (max 5MB)"
+  },
+  "options_profile_resume_file_description": {
+    "description": "Resume file upload description",
+    "message": "Upload your resume as a PDF file for easier sharing with potential employers"
+  },
+  "options_profile_resume_file_remove": {
+    "description": "Resume file remove button tooltip",
+    "message": "Remove resume file"
+  },
+  "options_profile_resume_file_type_error": {
+    "description": "Resume file type error message",
+    "message": "Only PDF files are supported"
+  },
+  "options_profile_resume_file_size_error": {
+    "description": "Resume file size error message",
+    "message": "File size must be less than 5MB"
+  },
   "options_profile_save": {
     "description": "Save profile button text",
     "message": "Save Profile"

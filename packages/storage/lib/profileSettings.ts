@@ -5,3 +5,9 @@ export const lastNameStorage = createStorage<string>('profile-last-name', '', { 
 export const emailStorage = createStorage<string>('profile-email', '', { liveUpdate: true });
 export const bioStorage = createStorage<string>('profile-bio', '', { liveUpdate: true });
 export const resumeStorage = createStorage<string>('profile-resume', '', { liveUpdate: true });
+export const resumeFileStorage = createStorage<{
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  data: string; // base64 encoded file data
+} | null>('profile-resume-file', null, { liveUpdate: true });

@@ -261,6 +261,30 @@
     "description": "Resume field description",
     "message": "Su experiencia profesional que puede usarse para solicitudes de empleo"
   },
+  "options_profile_resume_file": {
+    "description": "Resume file upload label",
+    "message": "PDF del Currículum"
+  },
+  "options_profile_resume_file_upload": {
+    "description": "Resume file upload button text",
+    "message": "Subir Currículum PDF (máx 5MB)"
+  },
+  "options_profile_resume_file_description": {
+    "description": "Resume file upload description",
+    "message": "Suba su currículum como un archivo PDF para compartirlo más fácilmente con posibles empleadores"
+  },
+  "options_profile_resume_file_remove": {
+    "description": "Resume file remove button tooltip",
+    "message": "Eliminar archivo de currículum"
+  },
+  "options_profile_resume_file_type_error": {
+    "description": "Resume file type error message",
+    "message": "Solo se admiten archivos PDF"
+  },
+  "options_profile_resume_file_size_error": {
+    "description": "Resume file size error message",
+    "message": "El tamaño del archivo debe ser menor a 5MB"
+  },
   "options_profile_save": {
     "description": "Save profile button text",
     "message": "Guardar Perfil"
