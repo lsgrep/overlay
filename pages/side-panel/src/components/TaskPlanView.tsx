@@ -1,8 +1,16 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { TaskExecutor, type TaskPlan, type ExecutionState } from '../services/task/TaskExecutor';
+import { TaskExecutor, type TaskPlan, type ExecutionState, type ActionStatus } from '../services/task/TaskExecutor';
 import type { PageContext } from '../services/llm/prompts/types';
 import type { LLMService } from '../services/llm/types';
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClockIcon,
+  InformationCircleIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/solid';
 
 interface TaskPlanViewProps {
   plan: TaskPlan;
@@ -65,6 +73,29 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
         <div>
           <h3 className={`text-lg font-medium ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>{plan.task_type}</h3>
           {state.error && <p className="text-sm text-red-500 mt-1">{state.error}</p>}
+
+          {/* Task metadata */}
+          <div className="flex flex-wrap gap-2 mt-2">
+            {plan.metadata?.complexity && (
+              <span className={`text-xs px-2 py-1 rounded-full ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
+                Complexity: {plan.metadata.complexity}
+              </span>
+            )}
+            {plan.metadata?.estimated_time && (
+              <span
+                className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
+                <ClockIcon className="w-3 h-3" />
+                {plan.metadata.estimated_time}
+              </span>
+            )}
+            {plan.metadata?.requires_permissions && (
+              <span
+                className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 text-amber-700 ${isLight ? 'bg-amber-100' : 'bg-amber-900/30'}`}>
+                <ExclamationTriangleIcon className="w-3 h-3" />
+                Requires permissions
+              </span>
+            )}
+          </div>
         </div>
         <button
           onClick={executeAllSteps}
@@ -74,13 +105,24 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
           {state.executing ? (
             <>
               <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
-              Executing...
+              <span>Executing{state.progress ? ` (${state.progress}%)` : '...'}</span>
             </>
           ) : (
             'Execute All Steps'
           )}
         </button>
       </div>
+
+      {/* Plan explanation if available */}
+      {plan.explanation && (
+        <div
+          className={`mb-4 p-3 text-sm rounded-lg ${isLight ? 'bg-blue-50 text-blue-800' : 'bg-blue-900/20 text-blue-100'}`}>
+          <div className="flex items-start gap-2">
+            <InformationCircleIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <div>{plan.explanation}</div>
+          </div>
+        </div>
+      )}
       <div className="space-y-3">
         {plan.actions.map((action, i) => (
           <div
@@ -105,20 +147,48 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
                   {action.parameters.value && <span className="ml-2">Value: {action.parameters.value}</span>}
                   {state.actionStatuses[action.id] && (
                     <span
-                      className={`ml-2 ${
+                      className={`ml-2 flex items-center gap-1 ${
                         {
                           loading: 'text-blue-500',
                           complete: 'text-green-500',
                           error: 'text-red-500',
                           pending: 'text-gray-500',
+                          skipped: 'text-gray-400',
+                          canceled: 'text-amber-500',
                         }[state.actionStatuses[action.id]]
                       }`}>
                       {
                         {
-                          loading: '⏳ Running...',
-                          complete: '✓ Complete',
-                          error: '✗ Failed',
-                          pending: 'Pending',
+                          loading: (
+                            <>
+                              <ArrowPathIcon className="w-3 h-3 animate-spin" /> Running...
+                            </>
+                          ),
+                          complete: (
+                            <>
+                              <CheckCircleIcon className="w-3 h-3" /> Complete
+                            </>
+                          ),
+                          error: (
+                            <>
+                              <XCircleIcon className="w-3 h-3" /> Failed
+                            </>
+                          ),
+                          pending: (
+                            <>
+                              <ClockIcon className="w-3 h-3" /> Pending
+                            </>
+                          ),
+                          skipped: (
+                            <>
+                              <InformationCircleIcon className="w-3 h-3" /> Skipped
+                            </>
+                          ),
+                          canceled: (
+                            <>
+                              <ExclamationTriangleIcon className="w-3 h-3" /> Canceled
+                            </>
+                          ),
                         }[state.actionStatuses[action.id]]
                       }
                     </span>
@@ -157,14 +227,43 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
                               <div className={isLight ? 'text-gray-800' : 'text-gray-200'}>{item.text}</div>
                               {Object.entries(item.attributes).length > 0 && (
                                 <div className="mt-1 flex flex-wrap gap-1">
-                                  {Object.entries(item.attributes).map(([key, value]) => (
+                                  {/* Special highlight for LLM-extracted data */}
+                                  {item.attributes.method === 'llm' && (
                                     <span
-                                      key={key}
                                       className={`inline-flex items-center px-2 py-0.5 rounded text-xs
-                                  ${isLight ? 'bg-gray-100 text-gray-600' : 'bg-gray-600 text-gray-300'}`}>
-                                      {key}="{value}"
+                                      ${isLight ? 'bg-purple-100 text-purple-800' : 'bg-purple-900 text-purple-200'}`}>
+                                      🤖 LLM Extracted
                                     </span>
-                                  ))}
+                                  )}
+
+                                  {/* Display confidence more prominently if available */}
+                                  {item.attributes.confidence && (
+                                    <span
+                                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs
+                                      ${
+                                        parseFloat(item.attributes.confidence) > 0.7
+                                          ? isLight
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-green-900 text-green-200'
+                                          : isLight
+                                            ? 'bg-yellow-100 text-yellow-800'
+                                            : 'bg-yellow-900 text-yellow-200'
+                                      }`}>
+                                      Confidence: {Number(parseFloat(item.attributes.confidence) * 100).toFixed(0)}%
+                                    </span>
+                                  )}
+
+                                  {/* Display other attributes */}
+                                  {Object.entries(item.attributes)
+                                    .filter(([key]) => !['method', 'confidence'].includes(key))
+                                    .map(([key, value]) => (
+                                      <span
+                                        key={key}
+                                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs
+                                      ${isLight ? 'bg-gray-100 text-gray-600' : 'bg-gray-600 text-gray-300'}`}>
+                                        {key}="{value}"
+                                      </span>
+                                    ))}
                                 </div>
                               )}
                             </div>
@@ -179,10 +278,48 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
           </div>
         ))}
       </div>
-      <div className="mt-3 text-sm text-gray-500">
-        <div>Retry Strategy: {plan.error_handling.retry_strategy}</div>
-        <div>Max Retries: {plan.error_handling.max_retries}</div>
-        {plan.error_handling.fallback && <div>Fallback: {plan.error_handling.fallback.type}</div>}
+      <div className="mt-3">
+        {/* Progress bar for ongoing executions */}
+        {state.executing && state.progress !== undefined && (
+          <div className="mb-3">
+            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-500 transition-all duration-300 ease-in-out rounded-full"
+                style={{ width: `${state.progress}%` }}></div>
+            </div>
+            <div className="mt-1 text-xs text-center text-gray-500">
+              {state.elapsedTime ? `Elapsed: ${Math.round(state.elapsedTime / 1000)}s` : ''}
+            </div>
+          </div>
+        )}
+
+        {/* Error handling info */}
+        <div className="text-sm text-gray-500 grid grid-cols-2 gap-2">
+          <div>
+            <span className="font-medium">Retry Strategy:</span> {plan.error_handling.retry_strategy}
+          </div>
+          <div>
+            <span className="font-medium">Max Retries:</span> {plan.error_handling.max_retries}
+          </div>
+          {plan.error_handling.delay && (
+            <div>
+              <span className="font-medium">Retry Delay:</span> {plan.error_handling.delay}ms
+            </div>
+          )}
+          {plan.error_handling.fallback && (
+            <div>
+              <span className="font-medium">Fallback:</span> {plan.error_handling.fallback.type}
+            </div>
+          )}
+          {plan.metadata?.success_criteria && (
+            <div className="col-span-2">
+              <span className="font-medium">Success Criteria:</span> {plan.metadata.success_criteria}
+            </div>
+          )}
+        </div>
+
+        {/* Version info if available */}
+        {plan.version && <div className="mt-2 text-xs text-gray-400 text-right">Plan version: {plan.version}</div>}
       </div>
     </div>
   );

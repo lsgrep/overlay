@@ -15,9 +15,28 @@ export interface ActionParameters {
 
 export interface Action {
   id: string;
-  type: 'navigate_to' | 'click_element' | 'extract_data' | 'wait' | 'search' | 'type';
+  type: // Basic actions
+  | 'navigate_to'
+    | 'click_element'
+    | 'extract_data'
+    | 'wait'
+    | 'search'
+    | 'type'
+    // Advanced actions
+    | 'extract_data_llm'
+    | 'submit_form'
+    | 'take_screenshot'
+    | 'scroll'
+    | 'hover'
+    | 'execute_script';
   parameters: ActionParameters;
+  validation?: {
+    required?: string[];
+    format?: Record<string, string>;
+    constraints?: Record<string, any>;
+  };
   description: string;
+  dependsOn?: string[]; // IDs of actions this action depends on
 }
 
 export interface ErrorHandling {
@@ -33,9 +52,17 @@ export interface TaskPlan {
   task_type: string;
   actions: Action[];
   error_handling: ErrorHandling;
+  metadata?: {
+    estimated_time?: string;
+    complexity?: 'simple' | 'medium' | 'complex';
+    success_criteria?: string;
+    user_confirmation_required?: boolean;
+  };
+  explanation?: string;
+  version?: string;
 }
 
-export type ActionStatus = 'pending' | 'loading' | 'complete' | 'error';
+export type ActionStatus = 'pending' | 'loading' | 'complete' | 'error' | 'skipped' | 'canceled';
 
 export interface ExecutionState {
   currentStep: number | null;
@@ -51,6 +78,15 @@ export interface ExecutionState {
       attributes: Record<string, string>;
     }>
   >;
+  results?: Record<string, any>; // Store action results for later use
+  progress?: number; // Progress indicator (0-100)
+  startTime?: number; // When execution started
+  elapsedTime?: number; // Time elapsed since execution started
+  executionGraph?: {
+    // Represent dependency relationships
+    nodes: string[]; // Action IDs
+    edges: [string, string][]; // [from, to] pairs
+  };
 }
 
 export class TaskExecutor {
@@ -72,6 +108,11 @@ export class TaskExecutor {
       actionStatuses: {},
       retryCount: {},
       extractedData: {},
+      results: {},
+      progress: 0,
+      startTime: 0,
+      elapsedTime: 0,
+      executionGraph: { nodes: [], edges: [] },
     };
     console.log('Initial state:', this.state);
   }
@@ -128,8 +169,9 @@ export class TaskExecutor {
       };
     }
 
-    if (!action.parameters.selector) {
-      throw new Error('Selector is required for extract_data action');
+    // For LLM-based extraction, we don't need a selector
+    if (action.type !== 'extract_data_llm' && !action.parameters.selector) {
+      throw new Error('Selector is required for selector-based extraction actions');
     }
 
     // Execute the extraction script
@@ -204,11 +246,78 @@ export class TaskExecutor {
     };
   }
 
+  /**
+   * Handle LLM-based data extraction
+   */
+  private async handleLLMExtraction(
+    action: Action,
+    ctx?: PageContext,
+  ): Promise<Array<{ text: string; html: string; attributes: Record<string, string> }>> {
+    console.log('Debug: Starting LLM extraction with action:', action);
+
+    if (!this.llmService) {
+      throw new Error('LLM service not available for extraction');
+    }
+
+    // Determine the question/goal for extraction
+    const extractionGoal =
+      action.parameters.extractionGoal ||
+      action.description ||
+      this.goal ||
+      'Extract the main information from this page';
+
+    // Get the content to extract from
+    const contentToExtract = action.parameters.pageContent || ctx?.content || this.pageContext?.content || '';
+
+    if (!contentToExtract) {
+      throw new Error('No content available for LLM extraction');
+    }
+
+    // Create the extraction prompt
+    const promptManager = new AnthropicPromptGenerator();
+    const prompt = promptManager.generateExtractionPrompt(contentToExtract, extractionGoal);
+
+    console.log('Attempting LLM extraction with prompt:', prompt);
+    const llmResult = await this.llmService.generateCompletion(
+      [{ role: 'user', content: prompt }],
+      '', // No additional context needed since it's in the prompt
+    );
+
+    console.log('LLM extraction result:', llmResult);
+
+    try {
+      const parsedResult = JSON.parse(llmResult);
+
+      if (parsedResult.error) {
+        console.warn('LLM extraction failed:', parsedResult.error);
+        throw new Error(parsedResult.error);
+      }
+
+      return [
+        {
+          text: parsedResult.answer,
+          html: parsedResult.answer, // Since this is LLM-extracted, we use the same text
+          attributes: {
+            confidence: parsedResult.confidence?.toString() || '0.8',
+            method: 'llm',
+            goal: extractionGoal,
+          },
+        },
+      ];
+    } catch (parseError) {
+      console.error('Failed to parse LLM result:', parseError);
+      throw new Error('Failed to parse LLM extraction result');
+    }
+  }
+
   private async handleStepAction(action: Action, pageContext?: PageContext): Promise<boolean> {
     try {
       this.setState({
         actionStatuses: { ...this.state.actionStatuses, [action.id]: 'loading' },
       });
+
+      // Track start time for timing metrics
+      const startTime = Date.now();
 
       // Get the current page context
       const ctx = pageContext || this.pageContext;
@@ -287,42 +396,57 @@ export class TaskExecutor {
           }
           break;
 
+        // Direct LLM-based extraction
+        case 'extract_data_llm': {
+          try {
+            console.log('Debug: Starting direct LLM extraction');
+            const extractedData = await this.handleLLMExtraction(action, ctx);
+
+            // Update state with LLM extraction result
+            this.setState({
+              actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
+              extractedData: {
+                ...this.state.extractedData,
+                [action.id]: extractedData,
+              },
+              results: {
+                ...this.state.results,
+                [action.id]: extractedData?.[0]?.text || '',
+              },
+            });
+
+            console.log('LLM extraction completed successfully:', extractedData);
+            break;
+          } catch (llmError) {
+            console.error('Direct LLM extraction failed:', llmError);
+            this.setState({
+              error: llmError.message,
+              actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
+            });
+            throw llmError;
+          }
+        }
+
         case 'extract_data': {
-          const extractionResult = await this.handleExtractData(action, ctx);
-          if (!extractionResult || !extractionResult.result || !extractionResult.result.length) {
-            console.log('Debug: No extraction result found, attempting LLM extraction');
-            console.log('Debug: LLM service:', this.llmService);
-            console.log('Debug: Goal:', this.goal);
-            if (!this.llmService || !this.goal) {
-              throw new Error('LLM service or goal not available for extraction');
-            }
-            const promptManager = new AnthropicPromptGenerator();
-            const prompt = promptManager.generateExtractionPrompt(this.pageContext?.content || '', this.goal);
-            try {
-              console.log('Attempting LLM extraction with prompt:', prompt);
-              const llmResult = await this.llmService.generateCompletion(
-                [{ role: 'user', content: prompt }],
-                '', // No additional context needed since it's in the prompt
-              );
-              console.log('LLM extraction result:', llmResult);
-              let extractedData;
-              try {
-                const parsedResult = JSON.parse(llmResult);
-                if (parsedResult.error) {
-                  console.warn('LLM extraction failed:', parsedResult.error);
-                  throw new Error(parsedResult.error);
-                }
-                extractedData = [
-                  {
-                    text: parsedResult.answer,
-                    html: parsedResult.answer, // Since this is LLM-extracted, we use the same text
-                    attributes: { confidence: parsedResult.confidence.toString() },
-                  },
-                ];
-              } catch (parseError) {
-                console.error('Failed to parse LLM result:', parseError);
-                throw new Error('Failed to parse LLM extraction result');
-              }
+          try {
+            const extractionResult = await this.handleExtractData(action, ctx);
+            if (!extractionResult || !extractionResult.result || !extractionResult.result.length) {
+              console.log('Debug: No extraction result found with selector, attempting LLM fallback extraction');
+
+              // Create a fallback action for LLM extraction
+              const llmFallbackAction = {
+                ...action,
+                type: 'extract_data_llm' as Action['type'],
+                parameters: {
+                  ...action.parameters,
+                  failedSelector: action.parameters.selector,
+                  extractionGoal: `Extract data that should have been found with selector "${action.parameters.selector}": ${action.description}`,
+                },
+              };
+
+              // Run the LLM extraction
+              const extractedData = await this.handleLLMExtraction(llmFallbackAction, ctx);
+
               // Update state with LLM extraction result
               this.setState({
                 actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
@@ -330,33 +454,52 @@ export class TaskExecutor {
                   ...this.state.extractedData,
                   [action.id]: extractedData,
                 },
+                results: {
+                  ...this.state.results,
+                  [action.id]: extractedData?.[0]?.text || '',
+                },
               });
-              return { result: extractedData };
-            } catch (llmError) {
-              console.error('LLM extraction failed:', llmError);
-              // Update state to reflect error
+
+              console.log('Fallback LLM extraction completed successfully');
+            } else {
+              console.log('Debug: Extraction result with selector:', extractionResult);
+              // Update state with selector-based extraction result
               this.setState({
-                actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
-                error: llmError.message,
+                actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
+                extractedData: {
+                  ...this.state.extractedData,
+                  [action.id]: extractionResult.result,
+                },
+                results: {
+                  ...this.state.results,
+                  [action.id]: extractionResult.result.map(item => item.text).join(', '),
+                },
               });
-              throw llmError;
             }
-          } else {
-            console.log('Debug: Extraction result:', extractionResult);
-            // Update state with selector-based extraction result
-            this.setState({
-              actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
-              extractedData: {
-                ...this.state.extractedData,
-                [action.id]: extractionResult.result,
-              },
-            });
             break;
+          } catch (error) {
+            console.error('Extraction failed:', error);
+            this.setState({
+              error: error.message,
+              actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
+            });
+            throw error;
           }
         }
 
         default:
           throw new Error(`Unknown action type: ${action.type}`);
+      }
+
+      // Calculate execution time and update progress
+      const executionTime = Date.now() - startTime;
+      console.log(`Action ${action.id} completed in ${executionTime}ms`);
+
+      // For actions that complete without explicitly setting a status, mark as complete
+      if (this.state.actionStatuses[action.id] === 'loading') {
+        this.setState({
+          actionStatuses: { ...this.state.actionStatuses, [action.id]: 'complete' },
+        });
       }
 
       return true;

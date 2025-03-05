@@ -6,6 +6,7 @@ import { Terminal, UserCircle, LogOut, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { t, DevLocale } from '@extension/i18n';
 import { TaskPlanView } from './components/TaskPlanView';
+import { type TaskPlan } from './services/task/TaskExecutor';
 import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
@@ -266,8 +267,39 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         displayName: selectedModel,
       };
 
+      // Create an action context for enhanced interactive mode
+      const actionContext = {
+        sessionId: Date.now().toString(),
+        previousActions: messages
+          .filter(msg => msg.role === 'assistant')
+          .slice(-3)
+          .map(msg => {
+            try {
+              const json = JSON.parse(msg.content);
+              return json.task_type || 'unknown';
+            } catch (e) {
+              return 'conversational';
+            }
+          }),
+        availableTools: ['navigation', 'extraction', 'search', 'interaction'],
+        userPreferences: {
+          language: defaultLanguage || 'en',
+          autoExecute: true,
+        },
+      };
+
+      // Generate prompt using PromptManager with enhanced options
+      const promptOptions = {
+        goal: input,
+        actionContext,
+        truncateContent: true,
+        includeMetadata: true,
+        maxContentLength: 10000,
+        enhancedMode: true,
+      };
+
       // Generate prompt using PromptManager
-      const prompt = PromptManager.generateContext(mode, pageContext, modelInfo);
+      const prompt = PromptManager.generateContext(mode, pageContext, modelInfo, promptOptions);
 
       console.log('Debug: Generated prompt:', prompt);
 
@@ -441,7 +473,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 <div className="space-y-2 max-w-full">
                   {(() => {
                     try {
+                      console.log('Attempting to parse as TaskPlan:', message.content);
                       const plan: TaskPlan = JSON.parse(message.content);
+                      console.log('Successfully parsed TaskPlan:', plan);
+
+                      // Validate required properties before rendering
+                      if (!plan.task_type || !Array.isArray(plan.actions) || !plan.error_handling) {
+                        console.warn('JSON parsed but missing required TaskPlan properties:', plan);
+                        throw new Error('Invalid TaskPlan structure');
+                      }
+
                       return (
                         <TaskPlanView
                           plan={plan}
@@ -451,16 +492,36 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           goal={message.metadata?.originalQuestion}
                         />
                       );
-                    } catch {
+                    } catch (error) {
+                      console.error('Error parsing as TaskPlan:', error);
                       // If not a valid TaskPlan JSON, try to format as regular JSON
                       try {
+                        console.log('Attempting to parse as generic JSON');
                         const json = JSON.parse(message.content);
+                        console.log('Successfully parsed as generic JSON');
+
+                        // If JSON contains task_type but failed validation earlier, show formatted with warning
+                        if (json.task_type) {
+                          return (
+                            <div>
+                              <div className="mb-2 p-2 bg-amber-100 text-amber-800 rounded-md text-sm">
+                                This appears to be a task plan but is missing required properties. Displaying as raw
+                                JSON.
+                              </div>
+                              <pre className="whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm bg-muted">
+                                {JSON.stringify(json, null, 2)}
+                              </pre>
+                            </div>
+                          );
+                        }
+
                         return (
                           <pre className="whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm bg-muted">
                             {JSON.stringify(json, null, 2)}
                           </pre>
                         );
-                      } catch {
+                      } catch (error) {
+                        console.error('Error parsing as generic JSON:', error);
                         // If not JSON at all, render as markdown
                         return (
                           <div className="prose dark:prose-invert max-w-full break-words overflow-wrap-anywhere">
