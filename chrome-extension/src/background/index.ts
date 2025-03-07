@@ -1,5 +1,8 @@
 import 'webextension-polyfill';
-import { exampleThemeStorage, getDefaultLanguage } from '@extension/storage';
+import { exampleThemeStorage, defaultLanguageStorage, proxyModeStorage } from '@extension/storage';
+import { getLanguageNameFromCode } from '@extension/i18n';
+// Import auth module
+import './auth';
 
 // Enable side panel opening on extension icon click
 chrome.sidePanel
@@ -14,20 +17,9 @@ exampleThemeStorage.get().then(theme => {
 console.log('Background service worker loaded');
 // Context menu actions
 const getLanguageName = async () => {
-  const targetLang = await getDefaultLanguage();
-  const languageNames: { [key: string]: string } = {
-    english: 'English',
-    spanish: 'Spanish',
-    french: 'French',
-    german: 'German',
-    italian: 'Italian',
-    portuguese: 'Portuguese',
-    russian: 'Russian',
-    chinese: 'Chinese',
-    japanese: 'Japanese',
-    korean: 'Korean',
-  };
-  return languageNames[targetLang] || 'English';
+  const targetLang = await defaultLanguageStorage.get();
+  // Hard-coded language mapping
+  return getLanguageNameFromCode(targetLang) || 'English';
 };
 
 const CONTEXT_MENU_ACTIONS = [
@@ -51,6 +43,11 @@ const CONTEXT_MENU_ACTIONS = [
     title: '📋 Summarize',
     contexts: ['selection'],
   },
+  {
+    id: 'take-note',
+    title: '📝 Take Note',
+    contexts: ['selection'],
+  },
 ];
 
 // Update translate menu title
@@ -61,10 +58,49 @@ const updateTranslateTitle = async () => {
   });
 };
 
+// Configure proxy settings
+const configureProxy = async () => {
+  const proxyEnabled = await proxyModeStorage.get();
+
+  if (proxyEnabled) {
+    // Enable proxy
+    const config = {
+      mode: 'fixed_servers',
+      rules: {
+        singleProxy: {
+          scheme: 'https',
+          host: 'proxy.overlay.ai', // Replace with actual proxy service
+          port: 443,
+        },
+        bypassList: ['localhost', '127.0.0.1'],
+      },
+    };
+
+    chrome.proxy.settings.set({ value: config, scope: 'regular' }, () => {
+      console.log('Proxy enabled');
+    });
+  } else {
+    // Disable proxy - use system settings
+    chrome.proxy.settings.set({ value: { mode: 'system' }, scope: 'regular' }, () => {
+      console.log('Proxy disabled');
+    });
+  }
+};
+
+// Initialize proxy settings
+proxyModeStorage.get().then(enabled => {
+  console.log('Proxy mode initialized:', enabled);
+  configureProxy();
+});
+
 // Listen for storage changes
 chrome.storage.onChanged.addListener(changes => {
   if (changes['default-language']) {
     updateTranslateTitle();
+  }
+
+  if (changes['proxy-mode']) {
+    configureProxy();
   }
 });
 
@@ -101,8 +137,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
           type: 'CONTEXT_MENU_ACTION',
           actionId,
           text: info.selectionText,
+          url: tab.url, // Pass the current URL
         });
-        console.log('Sent context menu action:', { actionId, text: info.selectionText });
+        console.log('Sent context menu action:', { actionId, text: info.selectionText, url: tab.url });
       } catch (error) {
         console.error('Error sending message:', error);
         // Try sending to all tabs if direct message fails
@@ -114,6 +151,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 type: 'CONTEXT_MENU_ACTION',
                 actionId,
                 text: info.selectionText,
+                url: tab.url,
               });
               console.log('Sent message to tab:', tab.id);
             } catch (e) {

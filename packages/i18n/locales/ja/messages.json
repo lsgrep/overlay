@@ -1,0 +1,352 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "オーバーレイ"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "オーバーレイ"
+  },
+  "toggleTheme": {
+    "message": "テーマを切り替える"
+  },
+  "loading": {
+    "message": "読み込み中..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "こんにちは、私の名前は $NAME$ です",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "山田太郎"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "こんにちは $1"
+  },
+  "error": {
+    "message": "エラーが発生しました"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "一般設定"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "AIアシスタントのデフォルト設定を構成します"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "デフォルト言語"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "言語を選択"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "デフォルトモデル"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "モデルを選択..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "モデルを検索..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "モデルが見つかりません。"
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "モデルを読み込み中..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAIモデル"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "グーグルモデル"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropicモデル"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollamaモデル"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "プロキシモード"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "プロキシサーバー経由でAPIリクエストをルーティングするプロキシモードを有効にします"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "グーグル設定"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "グーグルAPIキーとGeminiモデルの設定を構成します"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "APIキー"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "APIキーを検証中..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "APIキーが有効です ($1 モデル利用可能)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "利用可能なモデル"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI設定"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "OpenAI APIキーとモデル設定を構成します"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic設定"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "ClaudeにアクセスするためのAnthropic APIキーを設定します"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "一般"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "グーグル"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "外観"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "外観設定"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "アプリケーションの視覚的な外観をカスタマイズします"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "フォントファミリー"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "フォントファミリーを選択"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "プログラミングフォント"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "システムフォント"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "システムデフォルト"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "フォントサイズ"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "フォントサイズを選択"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "プレビュー"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "素早い茶色の狐が怠けた犬を飛び越えます。"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "モード"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "モデル"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "モデルを選択..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "モデルを検索..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "モデルが見つかりません。"
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "モデルを読み込み中..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "会話モード"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "対話モード"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "送信"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "考え中..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "エラー"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "あなた"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "アシスタント"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "メッセージを入力...(送信は Enter、改行は Shift + Enter)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "抽出されたデータ ($1 項目)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "再試行戦略: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "最大再試行回数: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "フォールバック: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "すべてのステップを実行"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "実行中..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "アクション: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "クエリ: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "セレクタ: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "値: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "実行中..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "完了"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "失敗"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "保留中"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "リトライ: $1/$2"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "ユーザー"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "ログイン中："
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "クリックしてログアウト"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Overlayにサインイン"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "拡張機能"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "ブックマーク"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "新しいページ"
+  }
+}

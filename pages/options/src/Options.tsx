@@ -1,167 +1,82 @@
-import '@src/Options.css';
 import { useEffect, useState } from 'react';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import {
-  SunIcon,
-  MoonIcon,
-  Cog6ToothIcon,
-  KeyIcon,
-  CloudIcon,
-  SparklesIcon,
-  PaintBrushIcon,
-  LanguageIcon,
-} from '@heroicons/react/24/solid';
+import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
+import { Cog6ToothIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
+import { UserIcon } from '@heroicons/react/24/outline';
+import { OpenAIIcon, GeminiIcon, AnthropicIcon } from '@extension/ui';
+import { t } from '@extension/i18n';
 import {
   exampleThemeStorage,
-  getOpenAIKey,
-  getGeminiKey,
-  setOpenAIKey,
-  setGeminiKey,
-  getDefaultLanguage,
-  setDefaultLanguage,
-  getDefaultModel,
-  setDefaultModel,
+  geminiKeyStorage,
+  anthropicKeyStorage,
   fontFamilyStorage,
   fontSizeStorage,
+  defaultLanguageStorage,
+  defaultModelStorage,
 } from '@extension/storage';
-import { Button } from '@extension/ui';
 import icon from '../../../chrome-extension/public/icon-128.png';
 import { motion } from 'framer-motion';
 import { Tooltip } from 'react-tooltip';
+import { GeneralTab, OpenAITab, GoogleTab, AnthropicTab, AppearanceTab, ProfileTab } from './components/tabs';
 
 const Options = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
-  // Existing API key states
-  const [openAIKey, setOpenAIKeyState] = useState('');
-  const [geminiKey, setGeminiKeyState] = useState('');
+  // API key states
+  const geminiKey = useStorage(geminiKeyStorage);
+  const anthropicKey = useStorage(anthropicKeyStorage);
   const [showOpenAIKey, setShowOpenAIKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [showAnthropicKey, setShowAnthropicKey] = useState(false);
 
+  const [openaiModels, setOpenAIModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [googleModels, setGoogleModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [ollamaModels, setOllamaModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
+  const [anthropicModels, setAnthropicModels] = useState<
+    Array<{ name: string; displayName?: string; provider: string }>
+  >([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelError, setModelError] = useState<string | null>(null);
 
   // New state variables for additional settings
-  const [selectedModel, setSelectedModel] = useState('');
-  const [maxTokens, setMaxTokens] = useState(2000);
-  const [temperature, setTemperature] = useState(0.7);
-  const [language, setLanguage] = useState('english');
-  const [availableLanguages] = useState([
-    { code: 'english', name: 'English' },
-    { code: 'spanish', name: 'Español' },
-    { code: 'french', name: 'Français' },
-    { code: 'german', name: 'Deutsch' },
-    { code: 'italian', name: 'Italiano' },
-    { code: 'portuguese', name: 'Português' },
-    { code: 'russian', name: 'Русский' },
-    { code: 'chinese', name: '中文' },
-    { code: 'japanese', name: '日本語' },
-    { code: 'korean', name: '한국어' },
-  ]);
+  const defaultModel = useStorage(defaultModelStorage);
+  const language = useStorage(defaultLanguageStorage);
   const fontFamily = useStorage(fontFamilyStorage);
   const fontSize = useStorage(fontSizeStorage);
 
   // State for tab navigation
   const [activeTab, setActiveTab] = useState('General');
 
-  // Saving state
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'success' | 'error' | null>(null);
-
-  const fetchGoogleModels = async (key: string) => {
-    if (!key) return;
-
-    setIsLoadingModels(true);
-    setModelError(null);
-
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Gemini models: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const models = (data.models || []).map((model: any) => ({
-        name: model.name,
-        displayName: model.displayName,
-        provider: 'gemini',
-      }));
-      setGoogleModels(models);
-    } catch (error) {
-      console.error('Error fetching Gemini models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to fetch Gemini models');
-    } finally {
-      setIsLoadingModels(false);
-    }
-  };
-
-  const fetchOllamaModels = async () => {
-    setIsLoadingModels(true);
-    setModelError(null);
-
-    try {
-      const response = await fetch('http://localhost:11434/api/tags');
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch Ollama models: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const models =
-        data.models?.map((model: any) => ({
-          name: model.name,
-          displayName: model.name,
-          provider: 'ollama',
-        })) || [];
-      setOllamaModels(models);
-    } catch (error) {
-      console.error('Error fetching Ollama models:', error);
-      setModelError(error instanceof Error ? error.message : 'Failed to fetch Ollama models');
-    } finally {
-      setIsLoadingModels(false);
-    }
-  };
-
+  // Update the translation locale when language changes
   useEffect(() => {
-    // Load saved settings
-    const loadSettings = async () => {
+    if (language) {
+      console.log('Options: Setting language to', language);
+      t.devLocale = language;
+      console.log('Options: Language set to', language);
+    }
+  }, [language]);
+
+  // Fetch models when API keys change
+  useEffect(() => {
+    const fetchModels = async () => {
       try {
-        const [openai, gemini, defaultLang, defaultMod] = await Promise.all([
-          getOpenAIKey(),
-          getGeminiKey(),
-          getDefaultLanguage(),
-          getDefaultModel(),
-        ]);
-
-        if (openai) setOpenAIKeyState(openai);
-        if (gemini) {
-          setGeminiKeyState(gemini);
-          fetchGoogleModels(gemini);
-        }
-        if (defaultLang) setLanguage(defaultLang);
-        if (defaultMod) setSelectedModel(defaultMod);
-
-        // Fetch Ollama models on startup
-        fetchOllamaModels();
+        setIsLoadingModels(true);
+        setModelError(null);
+        const { openai, anthropic, ollama, gemini } = await ModelService.fetchAllModels();
+        setOpenAIModels(openai);
+        setAnthropicModels(anthropic);
+        setOllamaModels(ollama);
+        setGoogleModels(gemini);
       } catch (error) {
-        console.error('Error loading settings:', error);
+        console.error('Error fetching models:', error);
+        setModelError(error instanceof Error ? error.message : 'Failed to fetch models');
+      } finally {
+        setIsLoadingModels(false);
       }
     };
-    loadSettings();
-  }, []);
 
-  // Fetch models when Gemini key changes
-  useEffect(() => {
-    if (geminiKey) {
-      fetchGoogleModels(geminiKey);
-    } else {
-      setGoogleModels([]);
-    }
-  }, [geminiKey]);
+    fetchModels();
+  }, [geminiKey, anthropicKey]);
 
   // Apply font settings to the document
   useEffect(() => {
@@ -175,28 +90,6 @@ const Options = () => {
       document.documentElement.style.setProperty('--font-size', `${fontSize}px`);
     }
   }, [fontSize]);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    setSaveStatus(null);
-    try {
-      // Save all settings
-      await Promise.all(
-        [
-          openAIKey && setOpenAIKey(openAIKey),
-          geminiKey && setGeminiKey(geminiKey),
-          language && setDefaultLanguage(language),
-          selectedModel && setDefaultModel(selectedModel),
-        ].filter(Boolean),
-      );
-      setSaveStatus('success');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      setSaveStatus('error');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   return (
     <div
@@ -221,17 +114,6 @@ const Options = () => {
               Overlay
             </h1>
           </div>
-          <Button
-            onClick={exampleThemeStorage.toggle}
-            theme={theme}
-            className="transition-all duration-300 hover:scale-105"
-            data-tooltip-id="theme-tooltip"
-            data-tooltip-content={`Switch to ${isLight ? 'Dark' : 'Light'} mode`}>
-            <div className="flex items-center gap-2">
-              {isLight ? <MoonIcon className="w-4 h-4" /> : <SunIcon className="w-4 h-4" />}
-              <span>{isLight ? 'Dark' : 'Light'} mode</span>
-            </div>
-          </Button>
         </div>
       </motion.div>
 
@@ -245,23 +127,35 @@ const Options = () => {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-2 sticky top-24">
               {[
-                { name: 'General', icon: <Cog6ToothIcon className="w-5 h-5" /> },
-                { name: 'OpenAI', icon: <KeyIcon className="w-5 h-5" /> },
-                { name: 'Google', icon: <CloudIcon className="w-5 h-5" /> },
-                { name: 'AI Models', icon: <SparklesIcon className="w-5 h-5" /> },
-                { name: 'Appearance', icon: <PaintBrushIcon className="w-5 h-5" /> },
-                { name: 'Language', icon: <LanguageIcon className="w-5 h-5" /> },
-              ].map(({ name: tab, icon }) => (
+                { name: 'General', displayName: t('options_tab_general'), icon: <Cog6ToothIcon className="w-5 h-5" /> },
+                { name: 'OpenAI', displayName: t('options_tab_openai'), icon: <OpenAIIcon className="w-5 h-5" /> },
+                { name: 'Google', displayName: t('options_tab_google'), icon: <GeminiIcon className="w-5 h-5" /> },
+                {
+                  name: 'Anthropic',
+                  displayName: t('options_tab_anthropic'),
+                  icon: <AnthropicIcon className="w-5 h-5" />,
+                },
+                {
+                  name: 'Profile',
+                  displayName: t('options_tab_profile'),
+                  icon: <UserIcon className="w-5 h-5" />,
+                },
+                {
+                  name: 'Appearance',
+                  displayName: t('options_tab_appearance'),
+                  icon: <PaintBrushIcon className="w-5 h-5" />,
+                },
+              ].map(({ name: tab, displayName, icon }) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium flex items-center gap-3 ${
                     activeTab === tab
                       ? 'bg-blue-500 text-white'
-                      : `${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-900'} text-gray-500`
+                      : `${isLight ? 'hover:bg-gray-100 text-gray-900' : 'hover:bg-gray-900 text-gray-100'}`
                   }`}>
                   {icon}
-                  <span>{tab}</span>
+                  <span>{displayName}</span>
                 </button>
               ))}
             </motion.div>
@@ -275,311 +169,52 @@ const Options = () => {
               className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
               {/* Tab Content */}
               {activeTab === 'General' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-blue-500">General Settings</h2>
-                    <p className="text-sm opacity-60">Configure your general extension preferences</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
-                        Default Language
-                      </label>
-                      <select
-                        id="language"
-                        value={language}
-                        onChange={e => setLanguage(e.target.value)}
-                        className={`w-full p-2 rounded border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-800 text-white'}`}>
-                        {availableLanguages.map(lang => (
-                          <option key={lang.code} value={lang.code}>
-                            {lang.name}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="mt-1 text-sm opacity-60">
-                        Select your preferred language for the extension interface
-                      </p>
-                    </div>
-
-                    <div className="mb-4">
-                      <label htmlFor="model" className="block text-sm font-medium mb-1">
-                        Default Model
-                      </label>
-                      <select
-                        id="model"
-                        value={selectedModel}
-                        onChange={e => setSelectedModel(e.target.value)}
-                        className={`w-full p-2 rounded border ${isLight ? 'border-gray-300 bg-white text-gray-900' : 'border-gray-600 bg-gray-800 text-white'}`}>
-                        <option value="">Select a model</option>
-                        {googleModels.length > 0 && (
-                          <optgroup label="Gemini Models">
-                            {googleModels.map(model => (
-                              <option key={model.name} value={model.name}>
-                                {model.displayName || model.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                        {ollamaModels.length > 0 && (
-                          <optgroup label="Ollama Models">
-                            {ollamaModels.map(model => (
-                              <option key={model.name} value={model.name}>
-                                {model.displayName}
-                              </option>
-                            ))}
-                          </optgroup>
-                        )}
-                      </select>
-                      <p className="mt-1 text-sm opacity-60">Select your preferred AI model for chat interactions</p>
-                    </div>
-                  </div>
-                </motion.div>
+                <GeneralTab
+                  openaiModels={openaiModels}
+                  googleModels={googleModels}
+                  ollamaModels={ollamaModels}
+                  anthropicModels={anthropicModels}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                />
               )}
 
               {activeTab === 'OpenAI' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">OpenAI Settings</h3>
-                    <p className="text-sm opacity-60">Configure your OpenAI API key and model preferences</p>
-                  </div>
-                  <div>
-                    <label htmlFor="openai-key-2" className="block text-sm font-semibold mb-2 text-blue-500">
-                      API Key
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="openai-key"
-                        type={showOpenAIKey ? 'text' : 'password'}
-                        value={openAIKey}
-                        onChange={e => setOpenAIKeyState(e.target.value)}
-                        className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                          isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-                        }`}
-                        placeholder="sk-..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowOpenAIKey(!showOpenAIKey)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        {showOpenAIKey ? '👁️' : '👁️‍🗨️'}
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                <OpenAITab
+                  isLight={isLight}
+                  showOpenAIKey={showOpenAIKey}
+                  setShowOpenAIKey={setShowOpenAIKey}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                  openaiModels={openaiModels}
+                />
               )}
 
               {activeTab === 'Google' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-1">Google Settings</h3>
-                    <p className="text-sm opacity-60">Configure your Google API key and Gemini model preferences</p>
-                  </div>
-                  <div className="space-y-6">
-                    <div>
-                      <label htmlFor="gemini-key" className="block text-sm font-semibold mb-2 text-blue-500">
-                        API Key
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="gemini-key"
-                          type={showGeminiKey ? 'text' : 'password'}
-                          value={geminiKey}
-                          onChange={e => setGeminiKeyState(e.target.value)}
-                          className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                            isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-                          }`}
-                          placeholder="AI..."
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowGeminiKey(!showGeminiKey)}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          {showGeminiKey ? '👁️' : '👁️‍🗨️'}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="available-models" className="block text-sm font-semibold mb-2 text-blue-500">
-                        Available Models
-                      </label>
-                      <div
-                        id="available-models"
-                        className={`rounded-md border ${isLight ? 'border-black/10' : 'border-white/10'}`}>
-                        {isLoadingModels ? (
-                          <div className="p-4 text-center text-sm opacity-60">Loading models...</div>
-                        ) : modelError ? (
-                          <div className="p-4 text-center text-sm text-red-500">{modelError}</div>
-                        ) : googleModels.length === 0 ? (
-                          <div className="p-4 text-center text-sm opacity-60">
-                            {geminiKey ? 'No models found' : 'Enter API key to view available models'}
-                          </div>
-                        ) : (
-                          <div className="divide-y divide-black/10 dark:divide-white/10">
-                            {googleModels.map(model => (
-                              <div key={model.name} className="p-3 text-sm">
-                                <div className="font-medium">{model.displayName || model.name.split('/').pop()}</div>
-                                <div className="text-xs opacity-60 mt-1">{model.name}</div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                <GoogleTab
+                  isLight={isLight}
+                  showGeminiKey={showGeminiKey}
+                  setShowGeminiKey={setShowGeminiKey}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                  googleModels={googleModels}
+                />
               )}
 
-              {activeTab === 'AI Models' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <label htmlFor="default-model" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Default Model
-                    </label>
-                    <select
-                      id="default-model"
-                      value={selectedModel}
-                      onChange={e => setSelectedModel(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="gpt-4">GPT-4</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                      <option value="gemini-pro">Gemini Pro</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="max-tokens" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Max Tokens
-                    </label>
-                    <input
-                      id="max-tokens"
-                      type="range"
-                      min="100"
-                      max="4000"
-                      step="100"
-                      value={maxTokens}
-                      onChange={e => setMaxTokens(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="text-sm opacity-60">{maxTokens} tokens</div>
-                  </div>
-                  <div>
-                    <label htmlFor="temperature" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Temperature
-                    </label>
-                    <input
-                      id="temperature"
-                      type="range"
-                      min="0"
-                      max="2"
-                      step="0.1"
-                      value={temperature}
-                      onChange={e => setTemperature(Number(e.target.value))}
-                      className="w-full"
-                    />
-                    <div className="text-sm opacity-60">{temperature}</div>
-                  </div>
-                </motion.div>
+              {activeTab === 'Anthropic' && (
+                <AnthropicTab
+                  isLight={isLight}
+                  showAnthropicKey={showAnthropicKey}
+                  setShowAnthropicKey={setShowAnthropicKey}
+                  isLoadingModels={isLoadingModels}
+                  modelError={modelError}
+                  anthropicModels={anthropicModels}
+                />
               )}
 
-              {activeTab === 'Appearance' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <label htmlFor="font-family" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Font Family
-                    </label>
-                    <select
-                      id="font-family"
-                      value={fontFamily}
-                      onChange={e => fontFamilyStorage.set(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="Inter">Inter</option>
-                      <option value="SF Pro Display">SF Pro Display</option>
-                      <option value="Roboto">Roboto</option>
-                      <option value="Open Sans">Open Sans</option>
-                      <option value="JetBrains Mono">JetBrains Mono</option>
-                      <option value="Fira Code">Fira Code</option>
-                      <option value="system-ui">System Default</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="font-size" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Font Size
-                    </label>
-                    <select
-                      id="font-size"
-                      value={fontSize}
-                      onChange={e => fontSizeStorage.set(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="14">Small</option>
-                      <option value="16">Medium</option>
-                      <option value="18">Large</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
+              {activeTab === 'Profile' && <ProfileTab isLight={isLight} />}
 
-              {activeTab === 'Language' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                  <div>
-                    <label htmlFor="language" className="block text-sm font-semibold mb-2 text-blue-500">
-                      Preferred Language
-                    </label>
-                    <select
-                      id="language"
-                      value={language}
-                      onChange={e => setLanguage(e.target.value)}
-                      className={`w-full p-3 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                        isLight ? 'bg-white border-gray-300' : 'bg-gray-700 border-gray-600'
-                      }`}>
-                      <option value="en">English</option>
-                      <option value="es">Español</option>
-                      <option value="fr">Français</option>
-                      <option value="de">Deutsch</option>
-                      <option value="zh">中文</option>
-                    </select>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Save Button */}
-              <div className="flex items-center justify-end mt-8 pt-4 border-t dark:border-gray-700">
-                <Button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  theme={theme}
-                  className={`px-6 py-2.5 font-medium transition-all ${!isSaving && 'hover:scale-105'}`}>
-                  {isSaving ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          fill="none"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        />
-                      </svg>
-                      Saving...
-                    </span>
-                  ) : (
-                    'Save Changes'
-                  )}
-                </Button>
-              </div>
+              {activeTab === 'Appearance' && <AppearanceTab isLight={isLight} />}
             </motion.div>
           </div>
         </div>
@@ -597,6 +232,7 @@ const OptionsWithTooltips = () => (
     <Tooltip id="theme-tooltip" />
     <Tooltip id="openai-tooltip" />
     <Tooltip id="gemini-tooltip" />
+    <Tooltip id="anthropic-tooltip" />
   </>
 );
 

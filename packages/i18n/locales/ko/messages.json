@@ -1,0 +1,417 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "오버레이"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "오버레이"
+  },
+  "toggleTheme": {
+    "message": "테마 전환"
+  },
+  "loading": {
+    "message": "로딩 중..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "안녕하세요, 제 이름은 $NAME$입니다",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "김철수"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "안녕하세요 $1"
+  },
+  "error": {
+    "message": "오류가 발생했습니다"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "일반 설정"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "AI 어시스턴트에 대한 기본 환경설정을 구성합니다"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "기본 언어"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "언어 선택"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "기본 모델"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "모델 선택..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "모델 검색..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "모델을 찾을 수 없습니다."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "모델 로딩 중..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI 모델"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "구글 모델"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic 모델"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama 모델"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "프록시 모드"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "프록시 서버를 통해 API 요청을 라우팅하는 프록시 모드 활성화"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "구글 설정"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "구글 API 키와 Gemini 모델 설정을 구성합니다"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API 키"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "API 키 검증 중..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "유효한 API 키 ($1 모델 사용 가능)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "사용 가능한 모델"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI 설정"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "OpenAI API 키와 모델 설정을 구성합니다"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic 설정"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Claude에 액세스하기 위한 Anthropic API 키를 구성합니다"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "일반"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "구글"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "외관"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "프로필"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "외관 설정"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "애플리케이션의 시각적 외관을 사용자 정의합니다"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "글꼴 패밀리"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "글꼴 패밀리 선택"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "프로그래밍 글꼴"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "시스템 글꼴"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "시스템 기본값"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "글꼴 크기"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "글꼴 크기 선택"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "미리보기"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "날카로운 갈색 여우가 게으른 개를 뛰어넘습니다."
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "프로필 설정"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "웹 페이지에서 사용할 개인 정보를 구성하세요"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "이름"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "이름을 입력하세요"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "성"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "성을 입력하세요"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "이메일"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "이메일 주소를 입력하세요"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "자기소개"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "자신에 대한 간단한 소개를 작성하세요"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "웹사이트에서 사용할 수 있는 자신에 대한 간단한 설명"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "이력서"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "이력서 또는 직업 경험을 입력하세요"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "구직 신청에 사용할 수 있는 직업 경험"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "프로필 저장"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "모드"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "모델"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "모델 선택..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "모델 검색..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "모델을 찾을 수 없습니다."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "모델 로딩 중..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "대화형"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "상호작용형"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "보내기"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "생각 중..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "오류"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "당신"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "어시스턴트"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "메시지를 입력하세요... (Enter를 누르면 전송, Shift + Enter를 누르면 줄바꿈)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "추출된 데이터 ($1 항목)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "재시도 전략: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "최대 재시도 횟수: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "대체 방안: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "모든 단계 실행"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "실행 중..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "동작: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "쿼리: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "셀렉터: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "값: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "실행 중..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "완료"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "실패"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "대기 중"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "재시도: $1/$2"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "사용자"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "로그인 계정"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "로그아웃하려면 클릭하세요"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Overlay에 로그인"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "확장 프로그램"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "북마크"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "새 페이지"
+  }
+}

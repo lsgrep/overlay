@@ -21,5 +21,8 @@ export default withPageConfig({
       fileName: 'index',
     },
     outDir: resolve(rootDir, '..', '..', 'dist', 'content-ui'),
+    rollupOptions: {
+      external: ['chrome'],
+    },
   },
 });

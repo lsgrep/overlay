@@ -15,6 +15,10 @@ export default defineConfig({
       '@root': rootDir,
       '@src': srcDir,
       '@assets': resolve(srcDir, 'assets'),
+      '@extension/i18n': resolve(rootDir, '..', 'packages', 'i18n'),
+      '@extension/shared': resolve(rootDir, '..', 'packages', 'shared'),
+      '@extension/storage': resolve(rootDir, '..', 'packages', 'storage'),
+      '@extension/ui': resolve(rootDir, '..', 'packages', 'ui'),
     },
   },
   plugins: [

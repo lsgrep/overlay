@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import '@src/index.css';
+// import '@src/index.css';
 import '@extension/ui/lib/global.css';
 import NewTab from '@src/NewTab';
 

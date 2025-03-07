@@ -1,5 +1,13 @@
 export type { BaseStorage } from './base/types';
 export * from './impl';
-export { getOpenAIKey, setOpenAIKey, getGeminiKey, setGeminiKey } from './apiKeys';
-export { getDefaultLanguage, setDefaultLanguage, getDefaultModel, setDefaultModel } from './generalSettings';
+export { openAIKeyStorage, geminiKeyStorage, anthropicKeyStorage } from './apiKeys';
 export { fontFamilyStorage, fontSizeStorage } from './appearanceSettings';
+export { defaultLanguageStorage, defaultModelStorage, proxyModeStorage } from './generalSettings';
+export {
+  firstNameStorage,
+  lastNameStorage,
+  emailStorage,
+  bioStorage,
+  resumeStorage,
+  resumeFileStorage,
+} from './profileSettings';

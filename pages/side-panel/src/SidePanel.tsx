@@ -1,43 +1,67 @@
-import '@src/SidePanel.css';
-import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, getGeminiKey, getDefaultModel, setDefaultModel } from '@extension/storage';
+// import '@src/SidePanel.css';
+import { useStorage, withErrorBoundary, withSuspense, ModelService, saveNote } from '@extension/shared';
+import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
+import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
+import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { t, DevLocale } from '@extension/i18n';
+
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
-
-interface OllamaModel {
-  id: string;
-  object: string;
-  created: number;
-  owned_by: string;
-}
-
-interface OllamaResponse {
-  object: string;
-  data: OllamaModel[];
-}
-
-interface GeminiModel {
-  name: string;
-  displayName: string;
-}
+import { ModelSelector } from './components/ModelSelector';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
+  const defaultLanguage = useStorage(defaultLanguageStorage);
   const isLight = theme === 'light';
-
   const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
   const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
+  const [anthropicModels, setAnthropicModels] = useState<AnthropicModel[]>([]);
+  const [openaiModels, setOpenAIModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational' | 'context-menu'>('conversational');
   const [input, setInput] = useState('');
 
+  // We'll use Chrome's native notifications instead of custom UI notifications
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // Set the locale directly from storage
+      t.devLocale = defaultLanguage as DevLocale;
+      console.log('SidePanel: Language set to', defaultLanguage);
+    }
+  }, [defaultLanguage]);
+
+  // Function to show Chrome notifications
+  const showNotification = (message: string, type: 'success' | 'error') => {
+    // Create a unique ID for the notification
+    const notificationId = `overlay-note-${Date.now()}`;
+
+    // Set notification options
+    const options: chrome.notifications.NotificationOptions = {
+      type: 'basic',
+      iconUrl: chrome.runtime.getURL('icon-128.png'),
+      title: type === 'success' ? t('Note saved') : t('Error'),
+      message: message,
+      priority: 2,
+    };
+
+    // Show the notification
+    chrome.notifications.create(notificationId, options);
+
+    // Auto-clear notification after 5 seconds
+    setTimeout(() => {
+      chrome.notifications.clear(notificationId);
+    }, 5000);
+  };
+
   // Load default model from storage
   useEffect(() => {
     const loadDefaultModel = async () => {
-      const defaultModel = await getDefaultModel();
+      const defaultModel = await defaultModelStorage.get();
       if (defaultModel) {
         setSelectedModel(defaultModel);
       }
@@ -48,14 +72,14 @@ const SidePanel = () => {
   // Save selected model to storage when it changes
   useEffect(() => {
     if (selectedModel) {
-      setDefaultModel(selectedModel);
+      defaultModelStorage.set(selectedModel);
     }
   }, [selectedModel]);
 
   // Helper function to log both to console and UI
   // Listen for messages
   useEffect(() => {
-    const handleMessage = async (message: { type: string; text: string; actionId?: string }) => {
+    const handleMessage = async (message: { type: string; text: string; actionId?: string; url?: string }) => {
       console.log('Debug: Received message:', message);
       if (!selectedModel) {
         console.log('Debug: No model selected, ignoring message');
@@ -66,16 +90,40 @@ const SidePanel = () => {
         console.log('Debug: Processing context menu action:', message.actionId);
         const action = CONTEXT_MENU_ACTIONS.find(a => a.id === message.actionId);
         console.log('Debug: Found action:', action);
+
         if (action) {
           try {
-            const chatInput = await action.prompt(message.text);
-            if (chatInput) {
-              console.log('Debug: Setting chat input:', chatInput);
-              setMode('context-menu');
-              setInput(chatInput);
+            // Handle the 'take-note' action differently
+            if (action.id === 'take-note') {
+              const sourceUrl = message.url || 'Unknown source';
+              const result = await saveNote(message.text, sourceUrl);
+
+              if (result.success) {
+                console.log('[SidePanel] Note saved successfully');
+                // Show success notification
+                showNotification(`${t('Note saved')}: ${t('Your note has been saved successfully.')}`, 'success');
+              } else {
+                console.error('[SidePanel] Failed to save note:', result.error);
+                // Show error notification
+                showNotification(
+                  `${t('Failed to save note')}: ${result.error || t('An error occurred while saving your note.')}`,
+                  'error',
+                );
+              }
+            } else {
+              // Handle other actions as before
+              const chatInput = await action.prompt(message.text);
+              if (chatInput) {
+                console.log('Debug: Setting chat input:', chatInput);
+                setMode('context-menu');
+                setInput(chatInput);
+              }
             }
           } catch (error) {
-            console.error('Error getting prompt:', error);
+            console.error('Error handling action:', error);
+            console.error('[SidePanel] Error:', (error as Error).message);
+            // Show error notification
+            showNotification(`${t('Error')}: ${(error as Error).message || t('An error occurred.')}`, 'error');
           }
         }
       }
@@ -99,60 +147,15 @@ const SidePanel = () => {
       try {
         setLoading(true);
         setError('');
-        console.log('Debug: Fetching models...');
 
-        // Fetch Ollama models
-        try {
-          const ollamaResponse = await fetch('http://localhost:11434/v1/models');
-          const ollamaData: OllamaResponse = await ollamaResponse.json();
-          console.log('Ollama models:', ollamaData.data);
-          setOllamaModels(ollamaData.data);
-        } catch (err) {
-          console.error('Error fetching Ollama models:', err);
-        }
-
-        // Fetch Gemini models
-        try {
-          const geminiKey = await getGeminiKey();
-          console.log('Debug: Got Gemini key:', geminiKey ? 'yes' : 'no');
-          if (geminiKey) {
-            const geminiResponse = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`,
-            );
-            if (!geminiResponse.ok) {
-              const errorText = await geminiResponse.text();
-              console.error('Gemini API Error:', {
-                status: geminiResponse.status,
-                statusText: geminiResponse.statusText,
-                error: errorText,
-              });
-              throw new Error(`Failed to fetch Gemini models: ${geminiResponse.statusText}`);
-            }
-            const geminiData = await geminiResponse.json();
-            console.log('Debug: Gemini API response:', geminiData);
-
-            const formattedGeminiModels = (geminiData.models || [])
-              .filter((model: any) => {
-                const isGemini = model.name.includes('gemini') || model.displayName?.toLowerCase().includes('gemini');
-                console.log('Debug: Checking model:', model.name, isGemini);
-                return isGemini;
-              })
-              .map((model: any) => {
-                const formattedModel = {
-                  name: model.name,
-                  displayName: model.displayName || model.name.split('/').pop(),
-                };
-                console.log('Debug: Formatted model:', formattedModel);
-                return formattedModel;
-              });
-
-            console.log('Debug: Final Gemini models:', formattedGeminiModels);
-            setGeminiModels(formattedGeminiModels);
-          }
-        } catch (err) {
-          console.error('Error fetching Gemini models:', err);
-          setError('Failed to fetch Gemini models: ' + (err as Error).message);
-        }
+        const { anthropic, ollama, gemini, openai } = await ModelService.fetchAllModels();
+        setAnthropicModels(anthropic);
+        setOllamaModels(ollama);
+        setGeminiModels(gemini);
+        setOpenAIModels(openai);
+      } catch (err) {
+        console.error('Error fetching models:', err);
+        setError('Failed to fetch models: ' + (err as Error).message);
       } finally {
         setLoading(false);
       }
@@ -161,96 +164,61 @@ const SidePanel = () => {
     fetchModels();
   }, []);
 
+  // We're using Chrome's native notifications instead of a custom component
+
   return (
-    <div className={`flex flex-col h-screen ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`p-4 border-b ${isLight ? 'border-gray-200' : 'border-gray-700'}`}>
-        <div className="flex items-center justify-between mb-4">
-          <h1 className={`text-lg font-semibold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>Overlay</h1>
-          <ThemeToggle />
-        </div>
-
+    <div className="flex flex-col h-screen bg-background">
+      <header className="p-4 border-b border-border">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center space-x-2">
-            <select
-              value={selectedModel}
-              onChange={e => setSelectedModel(e.target.value)}
-              disabled={loading}
-              className={`flex-1 p-2 rounded border ${isLight ? 'bg-white border-gray-200 text-gray-900' : 'bg-gray-700 border-gray-600 text-white'}`}>
-              {loading ? (
-                <option>Loading models...</option>
-              ) : error ? (
-                <option>Error loading models: {error}</option>
-              ) : (
-                <>
-                  <option value="">Select a model</option>
-                  {geminiModels.length > 0 && (
-                    <optgroup label={`Gemini Models (${geminiModels.length})`}>
-                      {geminiModels.map(model => {
-                        console.log('Debug: Rendering Gemini model:', model);
-                        return (
-                          <option key={model.name} value={model.name}>
-                            {model.displayName}
-                          </option>
-                        );
-                      })}
-                    </optgroup>
-                  )}
-                  {ollamaModels.length > 0 && (
-                    <optgroup label={`Ollama Models (${ollamaModels.length})`}>
-                      {ollamaModels.map(model => (
-                        <option key={model.id} value={model.id}>
-                          {model.id}
-                        </option>
-                      ))}
-                    </optgroup>
-                  )}
-                </>
-              )}
-            </select>
-            <button
-              onClick={() => chrome.tabs.create({ url: 'https://ollama.ai/library' })}
-              className={`p-2 rounded ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}
-              title="Browse Ollama Models">
-              📚
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between gap-2">
-            <span className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>Mode:</span>
-            <div
-              className={`flex items-center gap-2 p-1 rounded-lg border ${isLight ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'}`}>
-              <button
-                onClick={() => setMode('conversational')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'conversational' ? (isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white') : ''}`}>
-                Conversational
-              </button>
-              <button
-                onClick={() => setMode('interactive')}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${mode === 'interactive' ? (isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white') : ''}`}>
-                Interactive
-              </button>
-            </div>
+          <ModelSelector
+            selectedModel={selectedModel}
+            setSelectedModel={setSelectedModel}
+            openaiModels={openaiModels}
+            geminiModels={geminiModels}
+            ollamaModels={ollamaModels}
+            anthropicModels={anthropicModels}
+            isLoading={loading}
+            error={error}
+          />
+          <div className="flex items-center gap-4">
+            <Label htmlFor="mode-selector" className="min-w-16">
+              {t('sidepanel_mode')}
+            </Label>
+            <ToggleGroup
+              id="mode-selector"
+              type="single"
+              value={mode}
+              onValueChange={value => value && setMode(value as 'conversational' | 'interactive')}
+              className="flex-1">
+              <ToggleGroupItem value="conversational" className="flex-1">
+                <MessageCircle className="mr-2" />
+                {t('sidepanel_conversational_mode')}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="interactive" className="flex-1">
+                <Blocks className="mr-2" />
+                {t('sidepanel_interactive_mode')}
+              </ToggleGroupItem>
+            </ToggleGroup>
           </div>
         </div>
       </header>
 
       <div className="flex-1 overflow-hidden">
-        <ChatInterface selectedModel={selectedModel} isLight={isLight} mode={mode} initialInput={input} />
+        <ChatInterface
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+          isLight={isLight}
+          mode={mode}
+          initialInput={input}
+          openaiModels={openaiModels}
+          geminiModels={geminiModels}
+          ollamaModels={ollamaModels}
+          anthropicModels={anthropicModels}
+          isLoadingModels={loading}
+          modelError={error}
+        />
       </div>
     </div>
-  );
-};
-
-const ThemeToggle = () => {
-  const theme = useStorage(exampleThemeStorage);
-  const isLight = theme === 'light';
-
-  return (
-    <button
-      onClick={exampleThemeStorage.toggle}
-      className={`p-2 rounded-full ${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-700'}`}>
-      {isLight ? '🌙' : '☀️'}
-    </button>
   );
 };
 
@@ -258,8 +226,8 @@ export default withErrorBoundary(
   withSuspense(
     SidePanel,
     <div className="flex items-center justify-center h-screen">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-500"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>,
   ),
-  <div className="p-4 text-red-500">An error occurred</div>,
+  <div className="p-4 text-destructive">An error occurred</div>,
 );

@@ -1,9 +1,5 @@
 import { createStorage } from './base/base';
 
-const openAIStorage = createStorage<string>('openai-api-key', '');
-const geminiStorage = createStorage<string>('gemini-api-key', '');
-
-export const getOpenAIKey = () => openAIStorage.get();
-export const setOpenAIKey = (key: string) => openAIStorage.set(key);
-export const getGeminiKey = () => geminiStorage.get();
-export const setGeminiKey = (key: string) => geminiStorage.set(key);
+export const openAIKeyStorage = createStorage<string>('openai-api-key', '', { liveUpdate: true });
+export const geminiKeyStorage = createStorage<string>('gemini-api-key', '', { liveUpdate: true });
+export const anthropicKeyStorage = createStorage<string>('anthropic-api-key', '', { liveUpdate: true });

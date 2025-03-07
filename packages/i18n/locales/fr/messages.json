@@ -1,0 +1,417 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Overlay"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "Overlay"
+  },
+  "toggleTheme": {
+    "message": "Changer de thème"
+  },
+  "loading": {
+    "message": "Chargement..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "Bonjour, je m'appelle $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Jean Dupont"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "Bonjour $1"
+  },
+  "error": {
+    "message": "Une erreur s'est produite"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "Paramètres généraux"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Configurez vos préférences par défaut pour l'assistant IA"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Langue par défaut"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Sélectionnez une langue"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Modèle par défaut"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Sélectionnez un modèle..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Rechercher des modèles..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "Aucun modèle trouvé."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Chargement des modèles..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "Modèles OpenAI"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Modèles Google"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Modèles Anthropic"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Modèles Ollama"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Mode proxy"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Activer le mode proxy pour acheminer les requêtes API via un serveur proxy"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Paramètres Google"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Configurez votre clé API Google et vos préférences pour les modèles Gemini"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "Clé API"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "Validation de la clé API..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ Clé API valide ($1 modèles disponibles)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Modèles disponibles"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "Paramètres OpenAI"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Configurez votre clé API OpenAI et vos préférences de modèles"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Paramètres Anthropic"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Configurez votre clé API Anthropic pour accéder à Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "Général"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Apparence"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "Profil"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Paramètres d'apparence"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Personnalisez l'apparence visuelle de l'application"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Famille de police"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Sélectionnez une famille de police"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Polices de programmation"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "Polices système"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "Police système par défaut"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Taille de police"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Sélectionnez une taille de police"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Aperçu"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "Le rapide renard brun saute par-dessus le chien paresseux."
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "Paramètres du Profil"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "Configurez vos informations personnelles pour une utilisation avec les pages web"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "Prénom"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "Entrez votre prénom"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "Nom"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "Entrez votre nom"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "Email"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "Entrez votre adresse email"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "Biographie"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "Écrivez une courte biographie sur vous-même"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "Une brève description de vous-même qui peut être utilisée sur les sites web"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "CV"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "Entrez votre CV ou expérience professionnelle"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "Votre expérience professionnelle qui peut être utilisée pour les candidatures d'emploi"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "Enregistrer le Profil"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Mode"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Modèle"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Sélectionner un modèle..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Rechercher des modèles..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "Aucun modèle trouvé."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Chargement des modèles..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Conversationnel"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Interactif"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Envoyer"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Réflexion..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Erreur"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "Vous"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Assistant"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Tapez votre message... (Appuyez sur Entrée pour envoyer, Maj + Entrée pour une nouvelle ligne)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Données extraites ($1 éléments)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Stratégie de nouvelle tentative: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Nombre maximal de tentatives: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Solution de secours: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Exécuter toutes les étapes"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Exécution..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Action: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Requête: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Sélecteur: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Valeur: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ En cours..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Terminé"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Échec"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "En attente"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Tentatives : $1/$2"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "Utilisateur"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Connecté en tant que"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Cliquez pour vous déconnecter"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Se connecter à Overlay"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Extensions"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Favoris"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "Nouvelle Page"
+  }
+}

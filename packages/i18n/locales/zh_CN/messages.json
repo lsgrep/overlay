@@ -1,0 +1,417 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Overlay"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "Overlay"
+  },
+  "toggleTheme": {
+    "message": "切换主题"
+  },
+  "loading": {
+    "message": "加载中..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "你好，我的名字是 $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "张伟"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "你好 $1"
+  },
+  "error": {
+    "message": "发生错误"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "通用设置"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "配置人工智能助手的默认选项"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "默认语言"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "选择语言"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "默认模型"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "选择模型..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "搜索模型..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "未找到模型。"
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "正在加载模型..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI 模型"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "谷歌模型"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic 模型"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama 模型"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "代理模式"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "启用代理模式以通过代理服务器路由 API 请求"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "谷歌设置"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "配置您的谷歌 API 密钥和 Gemini 模型偏好设置"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API 密钥"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "正在验证 API 密钥..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API 密钥有效（可用模型：$1）"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "可用模型"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI 设置"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "配置您的 OpenAI API 密钥和模型偏好设置"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic 设置"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "配置您的 Anthropic API 密钥以访问 Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "通用"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "谷歌"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "外观"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "个人资料"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "外观设置"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "自定义应用程序的视觉外观"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "字体家族"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "选择字体家族"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "编程字体"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "系统字体"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "系统默认"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "字体大小"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "选择字体大小"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "预览"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "敏捷的棕色狐狸跳过懒惰的狗。"
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "个人资料设置"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "配置您的个人信息以便在网页中使用"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "名字"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "输入您的名字"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "姓氏"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "输入您的姓氏"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "电子邮件"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "输入您的电子邮件地址"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "个人简介"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "写一段关于您自己的简短介绍"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "一段关于您自己的简短描述，可用于网站"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "简历"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "输入您的简历或专业经验"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "您的专业经验，可用于求职申请"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "保存个人资料"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "模式"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "模型"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "选择模型..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "搜索模型..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "未找到模型。"
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "正在加载模型..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "对话模式"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "交互模式"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "发送"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "思考中..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "错误"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "您"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "助手"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "输入您的消息...(按Enter键发送，按Shift + Enter插入新行)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "提取的数据 ($1 项)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "重试策略: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "最大重试次数: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "备选方案: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "执行所有步骤"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "执行中..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "操作: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "查询: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "选择器: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "值: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ 运行中..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ 完成"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ 失败"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "等待中"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "重试: $1/$2"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "登录 Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "用户"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "已登录为"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "点击登出"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "扩展程序"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "书签"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "新页面"
+  }
+}
