@@ -163,3 +163,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     }, 500);
   }
 });
+
+// Handle messages from content script
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (message.type === 'OPEN_SIDE_PANEL' && sender.tab?.windowId) {
+    try {
+      await chrome.sidePanel.open({ windowId: sender.tab.windowId });
+      sendResponse({ success: true });
+    } catch (error) {
+      console.error('Error opening side panel:', error);
+      sendResponse({ success: false, error });
+    }
+    return true; // Required for async sendResponse
+  }
+});

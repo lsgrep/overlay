@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { Database } from '../database.types';
+import type { Database } from '../database.types';
 
 // Replace with your Supabase project URL and anon key
 const supabaseUrl = 'https://qwmoocakwkzdifssijdh.supabase.co';
