@@ -2,8 +2,8 @@ import { navigateTo } from '../../utils/navigation';
 import { performSearch } from '../../utils/search';
 import type { Action, TaskPlan } from './types';
 import type { PageContext } from '../llm/prompts/types';
-import { LLMExtractionHandler } from './LLMExtractionHandler';
 import type { ExecutionStateManager } from './ExecutionStateManager';
+import type { LLMExtractionHandler } from './LLMExtractionHandler';
 
 /**
  * Handles the execution of different types of actions
@@ -78,6 +78,13 @@ export class ActionHandler {
    * Execute an action based on its type
    */
   private async executeActionByType(action: Action, ctx?: PageContext): Promise<boolean> {
+    // Log the action and context for debugging
+    console.log('Executing action by type:', { actionType: action.type, contextExists: !!ctx });
+
+    // Add a safe check - if no context is available for actions that need it, provide a warning
+    if (!ctx && ['click_element', 'extract_data_llm', 'extract_data'].includes(action.type)) {
+      console.warn(`Warning: Action ${action.type} may require page context, but none was provided.`);
+    }
     switch (action.type) {
       case 'search':
         return this.handleSearchAction(action);
@@ -198,6 +205,12 @@ export class ActionHandler {
    * Handle LLM extraction action
    */
   private async handleLLMExtractionAction(action: Action, ctx?: PageContext): Promise<boolean> {
+    // Safety check - if context is missing, we can't extract data
+    if (!ctx) {
+      console.warn('LLM extraction action skipped: No page context available');
+      this.stateManager.updateActionStatus(action.id, 'skipped');
+      return true; // Return true to continue with other actions
+    }
     try {
       console.log('Debug: Starting direct LLM extraction');
       const extractedData = await this.llmExtractionHandler.handleLLMExtraction(action, ctx);
@@ -218,6 +231,12 @@ export class ActionHandler {
    * Handle data extraction action
    */
   private async handleDataExtractionAction(action: Action, ctx?: PageContext): Promise<boolean> {
+    // Safety check - if context is missing, we can't extract data
+    if (!ctx) {
+      console.warn('Data extraction action skipped: No page context available');
+      this.stateManager.updateActionStatus(action.id, 'skipped');
+      return true; // Return true to continue with other actions
+    }
     try {
       const extractionResult = await this.handleExtractData(action, ctx);
 

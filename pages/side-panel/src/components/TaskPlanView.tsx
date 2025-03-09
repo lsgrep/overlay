@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import { TaskExecutor, type TaskPlan, type ExecutionState, type ActionStatus } from '../services/task/TaskExecutor';
+import { TaskExecutor } from '../services/task/TaskExecutor';
+import type { TaskPlan, ExecutionState } from '../services/task/types';
 import type { PageContext } from '../services/llm/prompts/types';
 import type { LLMService } from '../services/llm/types';
 import {
@@ -23,7 +24,8 @@ interface TaskPlanViewProps {
 export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageContext, llmService, goal }) => {
   // Create a TaskExecutor instance
   const [executor] = useState(() => {
-    const exec = new TaskExecutor(pageContext, llmService, goal);
+    // Safely pass pageContext to TaskExecutor
+    const exec = new TaskExecutor(pageContext || undefined, llmService, goal);
     console.log('Initial executor state:', exec.getState());
     return exec;
   });
@@ -45,7 +47,8 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
     const timer = setTimeout(() => {
       if (!hasExecuted) {
         console.log('Auto-executing task plan');
-        executor.executeTask(plan, pageContext);
+        // Safely pass pageContext to executor
+        executor.executeTask(plan, pageContext || undefined);
         setHasExecuted(true);
       }
     }, 3000);
@@ -88,11 +91,11 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
                 {plan.metadata.estimated_time}
               </span>
             )}
-            {plan.metadata?.requires_permissions && (
+            {plan.metadata?.user_confirmation_required && (
               <span
                 className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 text-amber-700 ${isLight ? 'bg-amber-100' : 'bg-amber-900/30'}`}>
                 <ExclamationTriangleIcon className="w-3 h-3" />
-                Requires permissions
+                Requires confirmation
               </span>
             )}
           </div>

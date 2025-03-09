@@ -22,7 +22,7 @@ export interface ActionParameters {
   pageContent?: string;
   originalHtml?: string;
   failedSelector?: string;
-  extractionSchema?: Record<string, any>;
+  extractionSchema?: Record<string, unknown>;
 
   // Form handling
   formData?: Record<string, string>;
@@ -30,7 +30,7 @@ export interface ActionParameters {
 
   // DOM manipulation
   eventType?: string;
-  eventOptions?: Record<string, any>;
+  eventOptions?: Record<string, unknown>;
 
   // Validation
   validationFn?: string;
@@ -40,7 +40,7 @@ export interface ActionParameters {
 export interface ValidationRule {
   required?: string[];
   format?: Record<string, string>; // Regex patterns for validation
-  constraints?: Record<string, any>;
+  constraints?: Record<string, unknown>;
   custom?: string; // Custom validation function as string
 }
 
@@ -100,7 +100,7 @@ export interface TaskPlan {
   version?: string;
 }
 
-export type ActionStatus = 'pending' | 'loading' | 'complete' | 'error';
+export type ActionStatus = 'pending' | 'loading' | 'complete' | 'error' | 'skipped' | 'canceled';
 
 export interface ExecutionState {
   currentStep: number | null;
@@ -116,7 +116,7 @@ export interface ExecutionState {
       attributes: Record<string, string>;
     }>
   >;
-  results?: Record<string, any>; // Store action results for later use
+  results?: Record<string, unknown>; // Store action results for later use
   progress?: number; // Progress indicator (0-100)
   startTime?: number; // When execution started
   elapsedTime?: number; // Time elapsed since execution started

@@ -42,7 +42,7 @@ export class LLMExtractionHandler {
 
     // Determine the question/goal for extraction
     const extractionGoal =
-      action.parameters.extractionGoal ||
+      (action.parameters.query as string) ||
       action.description ||
       this.goal ||
       'Extract the main information from this page';
@@ -50,13 +50,29 @@ export class LLMExtractionHandler {
     // Get the content to extract from
     const contentToExtract = action.parameters.pageContent || ctx?.content || this.pageContext?.content || '';
 
+    // Check if we have enough content to extract from
+    if (!contentToExtract && !action.parameters.extractionSchema) {
+      console.warn('LLM extraction attempted with no content or schema to extract from');
+      return [];
+    }
+
     if (!contentToExtract) {
       throw new Error('No content available for LLM extraction');
     }
 
     // Create the extraction prompt
     const promptManager = new AnthropicPromptGenerator();
-    const prompt = promptManager.generateExtractionPrompt(contentToExtract, extractionGoal);
+
+    // Add page details context if available
+    const pageDetails = {
+      url: ctx?.url || this.pageContext?.url || 'No URL available',
+      title: ctx?.title || this.pageContext?.title || 'No title available',
+    };
+
+    console.log('Using page details for extraction:', pageDetails);
+    // Include page details in the extraction goal text since the API might not support additional parameters
+    const enhancedGoal = `${extractionGoal}\nPage URL: ${pageDetails.url}\nPage Title: ${pageDetails.title}`;
+    const prompt = promptManager.generateExtractionPrompt(contentToExtract, enhancedGoal);
 
     console.log('Attempting LLM extraction with prompt:', prompt);
     const llmResult = await this.llmService.generateCompletion(

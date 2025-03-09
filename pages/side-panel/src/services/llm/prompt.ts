@@ -1,4 +1,4 @@
-import { ActionContext, ChatMode, ModelInfo, PageContext, PromptGenerator } from './prompts/types';
+import type { ActionContext, ChatMode, ModelInfo, PageContext, PromptGenerator } from './prompts/types';
 import { AnthropicPromptGenerator } from './prompts/anthropic';
 import { GeminiPromptGenerator } from './prompts/gemini';
 import { OpenAIPromptGenerator } from './prompts/openai';
@@ -18,18 +18,29 @@ export class PromptManager {
   private static getPromptGenerator(model?: ModelInfo, options?: PromptOptions): PromptGenerator {
     const useEnhanced = options?.enhancedMode === true;
 
+    // Default to Anthropic which has the most complete implementation
+    let generator: PromptGenerator;
+
     switch (model?.provider) {
       case 'anthropic':
-        return useEnhanced ? new EnhancedAnthropicPromptGenerator() : new AnthropicPromptGenerator();
+        generator = useEnhanced ? new EnhancedAnthropicPromptGenerator() : new AnthropicPromptGenerator();
+        break;
       case 'gemini':
-        return new GeminiPromptGenerator();
+        generator = new GeminiPromptGenerator();
+        break;
       case 'openai':
-        return new OpenAIPromptGenerator();
+        generator = new OpenAIPromptGenerator() as PromptGenerator;
+        break;
       case 'ollama':
-        return new OllamaPromptGenerator();
+        generator = new OllamaPromptGenerator() as PromptGenerator;
+        break;
       default:
-        return new OllamaPromptGenerator(); // Default to Ollama's generic prompts
+        // Fall back to Anthropic which has all the required methods
+        generator = new AnthropicPromptGenerator();
+        break;
     }
+
+    return generator;
   }
 
   private static truncateContent(content: string, maxLength: number = 8000): string {
@@ -47,20 +58,20 @@ export class PromptManager {
 
   static generateContext(
     mode: ChatMode,
-    pageContext: PageContext,
+    pageContext: PageContext | null | undefined,
     model?: ModelInfo,
     options: PromptOptions = {},
   ): string {
     const promptGenerator = PromptManager.getPromptGenerator(model, options);
     let context = promptGenerator.generateSystemPrompt(options.goal);
 
-    // Add page information with formatting
-    if (pageContext.title || pageContext.url) {
+    // Add page information with formatting if pageContext exists
+    if (pageContext && (pageContext.title || pageContext.url)) {
       context += `\n\n## Current Page\nTitle: ${pageContext.title || 'Unknown'}\nURL: ${pageContext.url || 'Unknown'}`;
     }
 
     // Add page metadata if available and requested
-    if (options.includeMetadata && pageContext.metadata) {
+    if (pageContext && options.includeMetadata && pageContext.metadata) {
       context += '\n\n## Page Metadata\n';
 
       if (pageContext.metadata.description) {
@@ -81,7 +92,7 @@ export class PromptManager {
     }
 
     // Add page content with potential truncation
-    if (pageContext.content) {
+    if (pageContext && pageContext.content) {
       const contentToInclude = options.truncateContent
         ? PromptManager.truncateContent(pageContext.content, options.maxContentLength)
         : pageContext.content;
@@ -97,7 +108,7 @@ export class PromptManager {
       if (options.enhancedMode && options.goal && promptGenerator.generateTaskDecompositionPrompt) {
         context += '\n\n' + promptGenerator.generateTaskDecompositionPrompt(options.goal);
       }
-    } else if (mode === 'context-menu' && pageContext.metadata?.selectedText) {
+    } else if (mode === 'context-menu' && pageContext && pageContext.metadata?.selectedText) {
       // Special handling for context-menu mode with selected text
       context += `\n\nYou are in context-menu mode. The user has selected text and wants you to help with it.`;
       context += `\n\nSelected text: ${pageContext.metadata.selectedText}`;
@@ -109,19 +120,35 @@ export class PromptManager {
     return context;
   }
 
-  static generateExtractionPrompt(pageContext: PageContext, question: string, model?: ModelInfo): string {
+  static generateExtractionPrompt(
+    pageContext: PageContext | null | undefined,
+    question: string,
+    model?: ModelInfo,
+  ): string {
     const promptGenerator = PromptManager.getPromptGenerator(model);
-    return promptGenerator.generateExtractionPrompt(pageContext.content || '', question);
+
+    // Check if the generator supports extraction, fall back to Anthropic if not
+    let actualGenerator = promptGenerator;
+    if (!('generateExtractionPrompt' in actualGenerator)) {
+      console.warn('Selected prompt generator does not support extraction, falling back to Anthropic');
+      actualGenerator = new AnthropicPromptGenerator();
+    }
+
+    // Safe access to pageContext content
+    const content = pageContext?.content || '';
+    return actualGenerator.generateExtractionPrompt(content, question);
   }
 
-  static generateWebNavigationPrompt(pageContext: PageContext, model?: ModelInfo): string {
+  static generateWebNavigationPrompt(pageContext: PageContext | null | undefined, model?: ModelInfo): string {
     const promptGenerator = PromptManager.getPromptGenerator(model);
-    if (promptGenerator.generateWebNavigationPrompt) {
+
+    // Only use the generator's method if pageContext exists and method is available
+    if (pageContext && promptGenerator.generateWebNavigationPrompt) {
       return promptGenerator.generateWebNavigationPrompt(pageContext);
     }
 
-    // Fallback to generic navigation prompt
+    // Fallback to generic navigation prompt with safe property access
     return `You are a web navigation assistant. Help the user navigate to their desired destination.
-    Current page: ${pageContext.title || ''} (${pageContext.url || ''})`;
+Current page: ${pageContext?.title || 'Unknown'} (${pageContext?.url || 'Unknown URL'})`;
   }
 }
