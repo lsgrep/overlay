@@ -1,5 +1,5 @@
 import { geminiKeyStorage } from '@extension/storage';
-import { LLMConfig, LLMService, Message } from './types';
+import type { JSONSchema, LLMConfig, LLMService, Message, StructuredOutputConfig } from './types';
 
 export class GeminiService implements LLMService {
   private modelName: string;
@@ -14,6 +14,7 @@ export class GeminiService implements LLMService {
     context: string,
     config?: LLMConfig,
     mode: 'interactive' | 'conversational' = 'conversational',
+    structuredOutput?: StructuredOutputConfig,
   ): Promise<string> {
     // Adjust temperature based on the mode
     // Interactive mode uses lower temperature for more focused responses
@@ -29,7 +30,27 @@ export class GeminiService implements LLMService {
     }
 
     const apiUrl = `${this.baseUrl}/${this.modelName}:generateContent?key=${geminiKey}`;
-    const requestBody = {
+    // Define type for request body with generationConfig
+    interface RequestBody {
+      contents: Array<{
+        role: string;
+        parts: Array<{ text: string }>;
+      }>;
+      generationConfig: {
+        temperature: number;
+        topK: number;
+        topP: number;
+        maxOutputTokens: number;
+        response_mime_type?: string;
+        response_schema?: JSONSchema;
+      };
+      safetySettings: Array<{
+        category: string;
+        threshold: string;
+      }>;
+    }
+    // Prepare request body with base configuration
+    const requestBody: RequestBody = {
       contents: messages.concat({ role: 'user', content: context }).map(msg => ({
         role: msg.role === 'user' ? 'user' : 'model',
         parts: [{ text: msg.content }],
@@ -59,6 +80,14 @@ export class GeminiService implements LLMService {
         },
       ],
     };
+    // Add structured output configuration if provided
+    if (structuredOutput) {
+      requestBody.generationConfig.response_mime_type = 'application/json';
+      // If a schema is provided, add it to the configuration
+      if (structuredOutput.schema) {
+        requestBody.generationConfig.response_schema = structuredOutput.schema;
+      }
+    }
 
     let response;
     let retryCount = 0;
@@ -94,10 +123,11 @@ export class GeminiService implements LLMService {
         const delay = baseDelay * Math.pow(2, retryCount - 1);
         console.log(`Attempt ${retryCount} failed, retrying in ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorObj = error as { message?: string };
         if (
           retryCount === maxRetries ||
-          (!error.message?.includes('429') && !error.message?.includes('RESOURCE_EXHAUSTED'))
+          (!errorObj.message?.includes('429') && !errorObj.message?.includes('RESOURCE_EXHAUSTED'))
         ) {
           throw error;
         }
@@ -108,7 +138,44 @@ export class GeminiService implements LLMService {
       throw new Error('Failed to get response from Gemini API');
     }
 
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
+    const data = (await response.json()) as {
+      candidates?: Array<{
+        content?: {
+          parts?: Array<{ text?: string }>;
+        };
+      }>;
+    };
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
+    // If structured output was requested but the response isn't valid JSON,
+    // try to ensure we return valid JSON
+    if (structuredOutput && responseText !== 'No response generated') {
+      try {
+        // Test if the response is already valid JSON
+        JSON.parse(responseText);
+        return responseText;
+      } catch {
+        // Non-JSON response - attempt to extract
+        // Not valid JSON, try to extract JSON from the text if there's any
+        const jsonMatch =
+          responseText.match(/```json\n([\s\S]*?)\n```/) ||
+          responseText.match(/{[\s\S]*}/) ||
+          responseText.match(/\[[\s\S]*\]/);
+
+        if (jsonMatch) {
+          const extractedJson = jsonMatch[1] || jsonMatch[0];
+
+          try {
+            // Validate the extracted JSON
+            JSON.parse(extractedJson);
+            return extractedJson;
+          } catch {
+            // Invalid JSON in extraction
+            // If extraction failed, return the original response
+            console.warn('Could not extract valid JSON from response');
+          }
+        }
+      }
+    }
+    return responseText;
   }
 }

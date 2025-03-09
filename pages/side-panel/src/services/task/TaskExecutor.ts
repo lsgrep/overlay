@@ -11,6 +11,9 @@ export interface ActionParameters {
   duration?: number;
   condition?: string;
   value?: string;
+  // Properties for LLM extraction tasks
+  extractionGoal?: string;
+  pageContent?: string;
 }
 
 export interface Action {
@@ -33,7 +36,7 @@ export interface Action {
   validation?: {
     required?: string[];
     format?: Record<string, string>;
-    constraints?: Record<string, any>;
+    constraints?: Record<string, string | number | boolean | RegExp | null | undefined>;
   };
   description: string;
   dependsOn?: string[]; // IDs of actions this action depends on
@@ -78,7 +81,7 @@ export interface ExecutionState {
       attributes: Record<string, string>;
     }>
   >;
-  results?: Record<string, any>; // Store action results for later use
+  results?: Record<string, unknown>; // Store action results for later use
   progress?: number; // Progress indicator (0-100)
   startTime?: number; // When execution started
   elapsedTime?: number; // Time elapsed since execution started
@@ -119,9 +122,9 @@ export class TaskExecutor {
 
   private listeners: ((state: ExecutionState) => void)[] = [];
 
-  private pageContext: PageContext | null = null;
-  private llmService: LLMService | null = null;
-  private goal: string | null = null;
+  private pageContext?: PageContext;
+  private llmService?: LLMService;
+  private goal?: string;
 
   constructor(pageContext?: PageContext, llmService?: LLMService, goal?: string) {
     this.initializeState();
@@ -184,7 +187,7 @@ export class TaskExecutor {
     try {
       const [result] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: selector => {
+        func: (selector: string) => {
           return new Promise((resolve, reject) => {
             try {
               const elements = document.querySelectorAll(selector);
@@ -211,10 +214,12 @@ export class TaskExecutor {
             }
           });
         },
-        args: [action.parameters.selector],
+        // Ensure selector is always a string. This is safe because we check for selector existence earlier
+        args: [action.parameters.selector || ''],
       });
       console.log('Debug: Inside Script result:', result);
-      scriptResult = result;
+      // Ensure scriptResult has the correct type structure
+      scriptResult = result as { result: Array<{ text: string; html: string; attributes: Record<string, string> }> };
     } catch (error) {
       console.error('Debug: Script execution error:', error);
       throw error;
@@ -281,6 +286,8 @@ export class TaskExecutor {
     const llmResult = await this.llmService.generateCompletion(
       [{ role: 'user', content: prompt }],
       '', // No additional context needed since it's in the prompt
+      undefined, // Use default config
+      'interactive', // Always use interactive mode for task extraction
     );
 
     console.log('LLM extraction result:', llmResult);
@@ -305,7 +312,10 @@ export class TaskExecutor {
         },
       ];
     } catch (parseError) {
-      console.error('Failed to parse LLM result:', parseError);
+      console.error(
+        'Failed to parse LLM result:',
+        parseError instanceof Error ? parseError.message : String(parseError),
+      );
       throw new Error('Failed to parse LLM extraction result');
     }
   }
@@ -373,9 +383,9 @@ export class TaskExecutor {
                 console.log('Navigation action completed successfully');
               }
             } catch (error) {
-              console.error('Navigation error:', error);
+              console.error('Navigation error:', error instanceof Error ? error.message : String(error));
               this.setState({
-                error: error.message,
+                error: error instanceof Error ? error.message : String(error),
                 actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
               });
               throw error;
@@ -384,8 +394,16 @@ export class TaskExecutor {
           break;
 
         case 'wait':
-          if (action.parameters.duration) {
-            await new Promise(resolve => setTimeout(resolve, action.parameters.duration! * 1000));
+          // Handle duration with proper null/undefined check
+          if (action.parameters.duration !== undefined && action.parameters.duration !== null) {
+            const durationMs =
+              typeof action.parameters.duration === 'number'
+                ? action.parameters.duration * 1000
+                : Number(action.parameters.duration) * 1000;
+            await new Promise(resolve => setTimeout(resolve, durationMs));
+          } else {
+            // Default timeout if no duration is provided
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
           break;
 
@@ -418,9 +436,12 @@ export class TaskExecutor {
             console.log('LLM extraction completed successfully:', extractedData);
             break;
           } catch (llmError) {
-            console.error('Direct LLM extraction failed:', llmError);
+            console.error(
+              'Direct LLM extraction failed:',
+              llmError instanceof Error ? llmError.message : String(llmError),
+            );
             this.setState({
-              error: llmError.message,
+              error: llmError instanceof Error ? llmError.message : String(llmError),
               actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
             });
             throw llmError;
@@ -430,7 +451,16 @@ export class TaskExecutor {
         case 'extract_data': {
           try {
             const extractionResult = await this.handleExtractData(action, ctx);
-            if (!extractionResult || !extractionResult.result || !extractionResult.result.length) {
+            // Handle result type explicitly
+            // Ensure the extraction result has the correct type structure
+            const typedResult = {
+              result: extractionResult.result as Array<{
+                text: string;
+                html: string;
+                attributes: Record<string, string>;
+              }>,
+            };
+            if (!typedResult || !typedResult.result || !typedResult.result.length) {
               console.log('Debug: No extraction result found with selector, attempting LLM fallback extraction');
 
               // Create a fallback action for LLM extraction
@@ -480,7 +510,7 @@ export class TaskExecutor {
           } catch (error) {
             console.error('Extraction failed:', error);
             this.setState({
-              error: error.message,
+              error: error instanceof Error ? error.message : String(error),
               actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
             });
             throw error;
@@ -505,7 +535,7 @@ export class TaskExecutor {
       return true;
     } catch (error) {
       this.setState({
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         actionStatuses: { ...this.state.actionStatuses, [action.id]: 'error' },
       });
       return false;
@@ -542,7 +572,7 @@ export class TaskExecutor {
     this.pageContext = pageContext;
   }
 
-  public getPageContext(): PageContext | null {
+  public getPageContext(): PageContext | undefined {
     return this.pageContext;
   }
 
@@ -572,7 +602,7 @@ export class TaskExecutor {
         await new Promise(resolve => setTimeout(resolve, 500));
       }
     } catch (error) {
-      this.setState({ error: error.message });
+      this.setState({ error: error instanceof Error ? error.message : String(error) });
       console.error('Error executing steps:', error);
     } finally {
       this.setState({ executing: false, currentStep: null });

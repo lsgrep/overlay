@@ -10,11 +10,35 @@ export interface LLMConfig {
   maxOutputTokens?: number;
 }
 
+export type JSONSchemaType = 'STRING' | 'NUMBER' | 'INTEGER' | 'BOOLEAN' | 'ARRAY' | 'OBJECT';
+
+export interface JSONSchemaProperty {
+  type: JSONSchemaType;
+  description?: string;
+  enum?: string[];
+  items?: JSONSchemaProperty; // For ARRAY type
+  properties?: Record<string, JSONSchemaProperty>; // For OBJECT type
+  required?: string[]; // For OBJECT type
+}
+
+export interface JSONSchema {
+  type: JSONSchemaType;
+  description?: string;
+  properties?: Record<string, JSONSchemaProperty>; // For OBJECT type
+  items?: JSONSchemaProperty; // For ARRAY type
+  required?: string[]; // For OBJECT type
+}
+
+export interface StructuredOutputConfig {
+  schema?: JSONSchema;
+}
+
 export interface LLMService {
   generateCompletion(
     messages: Message[],
     context: string,
     config?: LLMConfig,
     mode?: 'interactive' | 'conversational',
+    structuredOutput?: StructuredOutputConfig,
   ): Promise<string>;
 }

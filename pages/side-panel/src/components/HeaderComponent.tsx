@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type { FC } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -19,21 +20,25 @@ import {
   getCurrentUserFromStorage,
 } from '@extension/shared/lib/services/supabase';
 
-interface HeaderComponentProps {
-  fontFamily: string;
-  fontSize: number;
-}
+// Using Record<never, never> instead of empty interface
+type HeaderComponentProps = Record<never, never>;
 
-export const HeaderComponent: React.FC<HeaderComponentProps> = ({ fontFamily, fontSize }) => {
+export const HeaderComponent: FC<HeaderComponentProps> = () => {
   const supabase = createClient();
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<{
+    id: string;
+    email?: string;
+    user_metadata?: {
+      avatar_url?: string;
+      full_name?: string;
+      [key: string]: unknown;
+    };
+  } | null>(null);
 
   useEffect(() => {
     async function getUser() {
       try {
         console.log('[CHAT] Getting user...');
-        setLoading(true);
         // First try to get user from current session
         const {
           data: { user },
@@ -57,7 +62,7 @@ export const HeaderComponent: React.FC<HeaderComponentProps> = ({ fontFamily, fo
       } catch (error) {
         console.error('[CHAT] Error getting user:', error);
       } finally {
-        setLoading(false);
+        // Complete
       }
 
       // Set up auth state change listener
@@ -75,7 +80,7 @@ export const HeaderComponent: React.FC<HeaderComponentProps> = ({ fontFamily, fo
       };
     }
 
-    const handleAuthComplete = (message: any) => {
+    const handleAuthComplete = (message: { action: string; payload: { success: boolean } }) => {
       console.log('[CHAT] Received message:', message);
       if (message.action === 'authComplete' && message.payload.success) {
         console.log('[CHAT] Auth complete message received, refreshing user');
@@ -132,7 +137,9 @@ export const HeaderComponent: React.FC<HeaderComponentProps> = ({ fontFamily, fo
                 {user.user_metadata?.avatar_url ? (
                   <AvatarImage src={user.user_metadata.avatar_url} alt={user.email || ''} />
                 ) : (
-                  <AvatarFallback>{user.user_metadata?.full_name?.charAt(0).toUpperCase()}</AvatarFallback>
+                  <AvatarFallback>
+                    {user.user_metadata?.full_name ? user.user_metadata.full_name.charAt(0).toUpperCase() : '?'}
+                  </AvatarFallback>
                 )}
               </Avatar>
               <div className="text-sm font-medium truncate max-w-[120px]">
