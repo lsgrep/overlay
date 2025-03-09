@@ -1,4 +1,4 @@
-export type ChatMode = 'conversational' | 'interactive' | 'context-menu';
+export type ChatMode = 'conversational' | 'interactive';
 
 export interface Message {
   role: string;
@@ -76,7 +76,6 @@ export const CONTEXT_MENU_ACTIONS: ContextMenuAction[] = [
 export interface ChatConfig {
   mode: ChatMode;
   selectedModel: string;
-  contextMenuAction?: ContextMenuAction;
 }
 
 export interface ChatState {
@@ -89,6 +88,5 @@ export interface ChatContextValue {
   state: ChatState;
   config: ChatConfig;
   sendMessage: (content: string) => Promise<void>;
-  setContextMenuAction: (action: ContextMenuAction | undefined) => void;
   setMode: (mode: ChatMode) => void;
 }

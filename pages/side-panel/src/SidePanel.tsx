@@ -4,7 +4,7 @@ import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { t, type DevLocale } from '@extension/i18n';
+import { t } from '@extension/i18n';
 
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -14,14 +14,16 @@ const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const defaultLanguage = useStorage(defaultLanguageStorage);
   const isLight = theme === 'light';
-  const [ollamaModels, setOllamaModels] = useState<OllamaModel[]>([]);
-  const [geminiModels, setGeminiModels] = useState<GeminiModel[]>([]);
-  const [anthropicModels, setAnthropicModels] = useState<AnthropicModel[]>([]);
+  // Define model types
+  type ModelType = { name: string; displayName?: string; provider: string };
+  const [ollamaModels, setOllamaModels] = useState<ModelType[]>([]);
+  const [geminiModels, setGeminiModels] = useState<ModelType[]>([]);
+  const [anthropicModels, setAnthropicModels] = useState<ModelType[]>([]);
   const [openaiModels, setOpenAIModels] = useState<Array<{ name: string; displayName?: string; provider: string }>>([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [mode, setMode] = useState<'interactive' | 'conversational' | 'context-menu'>('conversational');
+  const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
   const [input, setInput] = useState('');
 
   // We'll use Chrome's native notifications instead of custom UI notifications
@@ -30,7 +32,8 @@ const SidePanel = () => {
   useEffect(() => {
     if (defaultLanguage) {
       // Set the locale directly from storage
-      t.devLocale = defaultLanguage as DevLocale;
+      // @ts-expect-error - DevLocale type not available from @extension/i18n
+      t.devLocale = defaultLanguage;
       console.log('SidePanel: Language set to', defaultLanguage);
     }
   }, [defaultLanguage]);
@@ -44,7 +47,7 @@ const SidePanel = () => {
     const options: chrome.notifications.NotificationOptions = {
       type: 'basic',
       iconUrl: chrome.runtime.getURL('icon-128.png'),
-      title: type === 'success' ? t('Note saved') : t('Error'),
+      title: type === 'success' ? 'Note saved' : 'Error',
       message: message,
       priority: 2,
     };
@@ -119,12 +122,12 @@ const SidePanel = () => {
               if (result.success) {
                 console.log('[SidePanel] Note saved successfully');
                 // Show success notification
-                showNotification(`${t('Note saved')}: ${t('Your note has been saved successfully.')}`, 'success');
+                showNotification('Note saved: Your note has been saved successfully.', 'success');
               } else {
                 console.error('[SidePanel] Failed to save note:', result.error);
                 // Show error notification
                 showNotification(
-                  `${t('Failed to save note')}: ${result.error || t('An error occurred while saving your note.')}`,
+                  `Failed to save note: ${result.error || 'An error occurred while saving your note.'}`,
                   'error',
                 );
               }
@@ -134,7 +137,7 @@ const SidePanel = () => {
                 const chatInput = await action.prompt(message.text);
                 if (chatInput) {
                   console.log('Debug: Setting chat input:', chatInput);
-                  setMode('context-menu'); // Set mode to context-menu for selection actions
+                  // Just set the input to process the text, no need to change mode
                   setInput(chatInput);
                 }
               } else {
@@ -145,7 +148,7 @@ const SidePanel = () => {
             console.error('Error handling action:', error);
             console.error('[SidePanel] Error:', (error as Error).message);
             // Show error notification
-            showNotification(`${t('Error')}: ${(error as Error).message || t('An error occurred.')}`, 'error');
+            showNotification(`Error: ${(error as Error).message || 'An error occurred.'}`, 'error');
           }
         }
       }
@@ -216,11 +219,7 @@ const SidePanel = () => {
               id="mode-selector"
               type="single"
               value={mode}
-              onValueChange={value => {
-                if (value && (value === 'conversational' || value === 'interactive')) {
-                  setMode(value);
-                }
-              }}
+              onValueChange={value => value && setMode(value as 'conversational' | 'interactive')}
               className="flex-1">
               <ToggleGroupItem value="conversational" className="flex-1">
                 <MessageCircle className="mr-2" />

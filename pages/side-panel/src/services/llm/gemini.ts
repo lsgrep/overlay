@@ -9,7 +9,20 @@ export class GeminiService implements LLMService {
     this.modelName = modelName.includes('/') ? modelName : `models/${modelName}`.replace('//', '/');
   }
 
-  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
+  async generateCompletion(
+    messages: Message[],
+    context: string,
+    config?: LLMConfig,
+    mode: 'interactive' | 'conversational' = 'conversational',
+  ): Promise<string> {
+    // Adjust temperature based on the mode
+    // Interactive mode uses lower temperature for more focused responses
+    // Conversational mode uses higher temperature for more creative responses
+    const temperatureAdjustment = mode === 'interactive' ? 0.2 : 0.0;
+    const adjustedConfig = {
+      ...config,
+      temperature: (config?.temperature ?? 0.7) - temperatureAdjustment,
+    };
     const geminiKey = await geminiKeyStorage.get();
     if (!geminiKey) {
       throw new Error('Gemini API key not found');
@@ -22,7 +35,7 @@ export class GeminiService implements LLMService {
         parts: [{ text: msg.content }],
       })),
       generationConfig: {
-        temperature: config?.temperature ?? 0.7,
+        temperature: adjustedConfig.temperature,
         topK: config?.topK ?? 40,
         topP: config?.topP ?? 0.95,
         maxOutputTokens: config?.maxOutputTokens ?? 2048,

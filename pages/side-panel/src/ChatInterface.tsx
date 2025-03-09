@@ -4,9 +4,11 @@ import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@ext
 import { PaperAirplaneIcon, ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 import { Terminal, UserCircle, LogOut, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { t, DevLocale } from '@extension/i18n';
+
+import { t } from '@extension/i18n';
 import { TaskPlanView } from './components/TaskPlanView';
 import { type TaskPlan } from './services/task/TaskExecutor';
+import type { LLMService } from './services/llm/types';
 import { PromptManager } from './services/llm/prompt';
 import { GeminiService } from './services/llm/gemini';
 import { OllamaService } from './services/llm/ollama';
@@ -67,10 +69,10 @@ interface ChatInterfaceProps {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
   isLight: boolean;
-  mode: 'interactive' | 'conversational' | 'context-menu';
+  mode: 'interactive' | 'conversational';
   initialInput?: string;
   openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
-  googleModels: Array<{ name: string; displayName?: string; provider: string }>;
+  geminiModels: Array<{ name: string; displayName?: string; provider: string }>;
   ollamaModels: Array<{ name: string; displayName?: string; provider: string }>;
   anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
   isLoadingModels?: boolean;
@@ -86,7 +88,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   mode,
   initialInput,
   openaiModels,
-  googleModels,
+  geminiModels,
   ollamaModels,
   anthropicModels,
   isLoadingModels,
@@ -102,8 +104,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   // Update translations when language changes
   useEffect(() => {
     if (defaultLanguage) {
-      // Set the locale directly from storage
-      t.devLocale = defaultLanguage as DevLocale;
+      // Set the locale directly from storage - use string type for defaultLanguage
+      // @ts-expect-error - DevLocale type not available from @extension/i18n
+      t.devLocale = defaultLanguage;
       console.log('ChatInterface: Language set to', defaultLanguage);
     }
   }, [defaultLanguage]);
@@ -214,22 +217,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Process initialInput when in context-menu mode
+  // Process initialInput if provided
   useEffect(() => {
-    const processInitialInput = async () => {
-      if (initialInput && mode === 'context-menu' && !isLoading) {
-        console.log('Debug: Processing initial input in context-menu mode:', initialInput);
-        setInput(initialInput);
-        // Trigger a form submission after a short delay to ensure state updates
-        setTimeout(() => {
-          const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-          handleSubmit(fakeEvent);
-        }, 500);
-      }
-    };
-
-    processInitialInput();
-  }, [initialInput, mode, isLoading]);
+    if (initialInput && !isLoading) {
+      console.log('Debug: Setting input from initialInput:', initialInput);
+      setInput(initialInput);
+    }
+  }, [initialInput, isLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,7 +263,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Get current model info
       const modelInfo = [
         ...(openaiModels || []),
-        ...(googleModels || []),
+        ...(geminiModels || []),
         ...(anthropicModels || []),
         ...(ollamaModels || []),
       ].find(model => model.name === selectedModel) || {
@@ -316,6 +310,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       };
 
       // Generate prompt using PromptManager
+      // Only conversational and interactive modes are supported now
       const prompt = PromptManager.generateContext(mode, pageContext, modelInfo, promptOptions);
 
       console.log('Debug: Generated prompt:', prompt);
@@ -331,8 +326,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         },
       });
 
-      let response;
-      let llmService: LLMService;
+      let response: string;
+      let llmService: LLMService; // Will be instantiated as a proper LLM service
       if (selectedModel.startsWith('claude')) {
         const anthropicMessages = chatMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
@@ -372,9 +367,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
 
       console.log('Debug: Response:', response);
-      const model = [...(openaiModels || []), ...(anthropicModels || []), ...(ollamaModels || [])].find(
-        model => model.name === selectedModel,
-      ) || {
+      const model = [
+        ...(openaiModels || []),
+        ...(geminiModels || []),
+        ...(anthropicModels || []),
+        ...(ollamaModels || []),
+      ].find(model => model.name === selectedModel) || {
         name: selectedModel,
         provider: selectedModel.startsWith('gpt') ? 'openai' : 'ollama',
         displayName: selectedModel,
@@ -596,13 +594,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       <ReactMarkdown
                         components={{
                           // Enhanced code blocks with syntax highlighting
-                          code: ({ node, inline, className, children, ...props }) => {
+                          code: props => {
+                            const { inline, className, children, ...otherProps } = props as {
+                              inline?: boolean;
+                              className?: string;
+                              children: React.ReactNode;
+                            };
                             const match = /language-(\w+)/.exec(className || '');
                             return !inline ? (
                               <div className="relative group">
                                 <pre
                                   className={`p-3 rounded-md bg-gray-900 dark:bg-gray-800 overflow-x-auto text-xs ${match ? `language-${match[1]}` : ''}`}>
-                                  <code className={className} {...props}>
+                                  <code className={className} {...otherProps}>
                                     {children}
                                   </code>
                                 </pre>
@@ -623,7 +626,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             );
                           },
                           // Enhanced links
-                          a: ({ node, className, children, ...props }) => (
+                          a: ({ children, ...props }) => (
                             <a
                               className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
                               target="_blank"
@@ -633,7 +636,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             </a>
                           ),
                           // Enhanced lists
-                          ul: ({ node, className, children, ...props }) => (
+                          ul: ({ className, children, ...props }) => (
                             <ul className="pl-5 list-disc space-y-1 my-2" {...props}>
                               {children}
                             </ul>
