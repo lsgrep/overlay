@@ -4,7 +4,7 @@ import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { t, DevLocale } from '@extension/i18n';
+import { t, type DevLocale } from '@extension/i18n';
 
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
@@ -79,7 +79,7 @@ const SidePanel = () => {
   // Helper function to log both to console and UI
   // Listen for messages
   useEffect(() => {
-    const handleMessage = async (message: { type: string; text: string; actionId?: string; url?: string }) => {
+    const handleMessage = async (message: { type: string; text?: string; actionId?: string; url?: string }) => {
       console.log('Debug: Received message:', message);
       if (!selectedModel) {
         console.log('Debug: No model selected, ignoring message');
@@ -94,10 +94,28 @@ const SidePanel = () => {
         if (action) {
           try {
             // Handle the 'take-note' action differently
-            if (action.id === 'take-note') {
+            if (action.id === 'take-note' && message.text) {
               const sourceUrl = message.url || 'Unknown source';
               const result = await saveNote(message.text, sourceUrl);
 
+              // Send result back to content script for toast notification
+              try {
+                // Get the active tab to send message back to content script
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                const activeTab = tabs[0];
+                if (activeTab && activeTab.id) {
+                  await chrome.tabs.sendMessage(activeTab.id, {
+                    type: 'NOTE_SAVE_RESULT',
+                    success: result.success,
+                    error: result.error,
+                  });
+                  console.log('[SidePanel] Sent note save result to content script');
+                }
+              } catch (msgError) {
+                console.error('[SidePanel] Error sending message to content script:', msgError);
+              }
+
+              // Also show notification in side panel
               if (result.success) {
                 console.log('[SidePanel] Note saved successfully');
                 // Show success notification
@@ -112,11 +130,15 @@ const SidePanel = () => {
               }
             } else {
               // Handle other actions as before
-              const chatInput = await action.prompt(message.text);
-              if (chatInput) {
-                console.log('Debug: Setting chat input:', chatInput);
-                setMode('context-menu');
-                setInput(chatInput);
+              if (message.text) {
+                const chatInput = await action.prompt(message.text);
+                if (chatInput) {
+                  console.log('Debug: Setting chat input:', chatInput);
+                  setMode('context-menu');
+                  setInput(chatInput);
+                }
+              } else {
+                console.warn('Debug: No text provided for action:', action.id);
               }
             }
           } catch (error) {
@@ -129,7 +151,13 @@ const SidePanel = () => {
       }
     };
 
-    const listener = (message: any, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
+    const listener = (
+      message: { type: string; text?: string; actionId?: string; url?: string },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _sender: chrome.runtime.MessageSender,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _sendResponse: (response?: unknown) => void,
+    ) => {
       console.log('Debug: Message listener called with:', message);
       handleMessage(message).catch(error => {
         console.error('Error handling message:', error);

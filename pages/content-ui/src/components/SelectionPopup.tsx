@@ -1,36 +1,87 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Languages, HelpCircle, Sparkles, FileText, Pencil, Check, X } from 'lucide-react';
 
 type PopupPosition = {
   top: number;
   left: number;
 };
 
-// Define menu actions directly in this component to avoid import issues
-const MENU_ACTIONS = [
+type ToastProps = {
+  message: string;
+  type: 'success' | 'error';
+  onClose: () => void;
+};
+
+// Simple Toast component for notifications
+const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
+  useEffect(() => {
+    // Auto-dismiss toast after 3 seconds
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div
+      className={`fixed bottom-4 right-4 z-[10000] flex items-center rounded-lg shadow-lg px-4 py-3 transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 ${type === 'success' ? 'bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-100' : 'bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-100'}`}>
+      <div className="mr-3">
+        {type === 'success' ? (
+          <Check size={18} className="text-green-500 dark:text-green-300" />
+        ) : (
+          <X size={18} className="text-red-500 dark:text-red-300" />
+        )}
+      </div>
+      <p className="text-sm font-medium">{message}</p>
+      <button
+        onClick={onClose}
+        className="ml-4 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+        aria-label="Close notification">
+        <X size={14} />
+      </button>
+    </div>
+  );
+};
+
+type MenuAction = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  className?: string;
+};
+
+// Define menu actions with Lucid React icons
+const MENU_ACTIONS: MenuAction[] = [
   {
     id: 'translate',
     title: 'Translate',
-    icon: '🔄',
+    icon: <Languages size={16} />,
+    className: 'text-blue-500',
   },
   {
     id: 'explain',
     title: 'Explain This',
-    icon: '🤖',
+    icon: <HelpCircle size={16} />,
+    className: 'text-purple-500',
   },
   {
     id: 'improve',
     title: 'Improve Writing',
-    icon: '✨',
+    icon: <Sparkles size={16} />,
+    className: 'text-amber-500',
   },
   {
     id: 'summarize',
     title: 'Summarize',
-    icon: '📋',
+    icon: <FileText size={16} />,
+    className: 'text-green-500',
   },
   {
     id: 'take-note',
     title: 'Take Note',
-    icon: '📝',
+    icon: <Pencil size={16} />,
+    className: 'text-red-500',
   },
 ];
 
@@ -38,6 +89,7 @@ export default function SelectionPopup() {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<PopupPosition>({ top: 0, left: 0 });
   const [selectedText, setSelectedText] = useState('');
+  const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' } | null>(null);
   const selectionRef = useRef<Selection | null>(null);
   const rangeRef = useRef<Range | null>(null);
   // Reference to selection coordinates to improve scroll behavior
@@ -184,54 +236,111 @@ export default function SelectionPopup() {
     };
   }, [handleSelection, updatePopupPosition, visible]);
 
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({
+      visible: true,
+      message,
+      type,
+    });
+  };
+
+  const closeToast = () => {
+    setToast(null);
+  };
+
+  // Set up listener for note save confirmation
+  useEffect(() => {
+    interface NoteSaveResult {
+      type: string;
+      success: boolean;
+      error?: string;
+    }
+
+    const handleMessage = (message: NoteSaveResult) => {
+      if (message.type === 'NOTE_SAVE_RESULT') {
+        if (message.success) {
+          showToast('Note saved successfully', 'success');
+        } else {
+          showToast(`Failed to save note: ${message.error || 'Unknown error'}`, 'error');
+        }
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(handleMessage);
+    return () => chrome.runtime.onMessage.removeListener(handleMessage);
+  }, []);
+
   const handleActionClick = async (actionId: string) => {
     // Find the selected action
     const action = MENU_ACTIONS.find(a => a.id === actionId);
     if (!action || !selectedText) return;
 
-    // Open side panel
-    await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
+    // Open side panel for other actions
+    if (actionId !== 'take-note') {
+      await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
+    }
 
     // Send the action to the side panel
     setTimeout(async () => {
       try {
-        await chrome.runtime.sendMessage({
-          type: 'CONTEXT_MENU_ACTION',
-          actionId,
-          text: selectedText,
-          url: window.location.href,
-        });
+        await chrome.runtime.sendMessage(
+          {
+            type: 'CONTEXT_MENU_ACTION',
+            actionId,
+            text: selectedText,
+            url: window.location.href,
+          },
+          response => {
+            // Handle direct response (for browsers that support it)
+            if (actionId === 'take-note' && response) {
+              if (response.success) {
+                showToast('Note saved successfully', 'success');
+              } else {
+                showToast(`Failed to save note: ${response.error || 'Unknown error'}`, 'error');
+              }
+            }
+          },
+        );
       } catch (error) {
         console.error('Error sending message:', error);
+        if (actionId === 'take-note') {
+          showToast('Failed to send note', 'error');
+        }
       }
     }, 500);
 
     setVisible(false);
   };
 
-  if (!visible) return null;
-
   return (
-    <div
-      id="selection-popup"
-      ref={popupRef}
-      className="fixed z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-lg p-2 transform -translate-x-1/2 flex flex-col"
-      style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
-        pointerEvents: 'auto', // Ensure the popup can receive events
-      }}>
-      <div className="flex flex-row space-x-1">
-        {MENU_ACTIONS.map(action => (
-          <button
-            key={action.id}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md flex items-center justify-center"
-            onClick={() => handleActionClick(action.id)}
-            title={action.title}>
-            {action.icon}
-          </button>
-        ))}
-      </div>
-    </div>
+    <>
+      {visible && (
+        <div
+          id="selection-popup"
+          ref={popupRef}
+          className="fixed z-[9999] bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-border transform -translate-x-1/2 flex flex-col"
+          style={{
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+            pointerEvents: 'auto', // Ensure the popup can receive events
+          }}>
+          <div className="flex flex-row">
+            {MENU_ACTIONS.map(action => (
+              <button
+                key={action.id}
+                className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 ${action.className || ''}`}
+                onClick={() => handleActionClick(action.id)}
+                title={action.title}
+                aria-label={action.title}>
+                <span className="sr-only">{action.title}</span>
+                {action.icon}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {toast?.visible && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
+    </>
   );
 }
