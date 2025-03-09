@@ -2,7 +2,7 @@
 
 [![Watch the video](https://cdn.loom.com/sessions/thumbnails/f7b5958bb7f14e4db3566eb4c23d6e70-bd26582bfc32b03b-full-play.gif)](https://www.loom.com/share/f7b5958bb7f14e4db3566eb4c23d6e70)
 
-A Chrome extension that enhances your browsing experience with AI-powered assistance, supporting multiple models including OpenAI, Anthropic, Google Gemini, and local Ollama models.
+Overlay is a powerful Chrome extension that transforms your browsing experience through advanced AI capabilities. It leverages large language models (LLMs) to provide context-aware assistance, content analysis, and task automation as you browse the web. The extension supports multiple models including OpenAI, Anthropic Claude, Google Gemini, and local Ollama models, giving users flexibility in their AI interactions.
 
 ## Features
 
@@ -13,7 +13,7 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 - ✅ Sidepanel integration for easy access
 - ✅ Responsive and modern UI design with Tailwind CSS
 
-### AI Integration
+### AI Integration & LLM-Enhanced Browsing
 - ✅ Multi-model support
   - OpenAI integration
   - Anthropic Claude integration
@@ -27,13 +27,24 @@ A Chrome extension that enhances your browsing experience with AI-powered assist
 - ✅ Context-aware browsing assistance
   - Interactive and conversational modes
   - Context menu integration for quick actions
+  - Webpage content analysis and summarization
+  - Task extraction and planning from web content
+- ✅ Advanced LLM capabilities
+  - Intelligent response generation based on web context
+  - Custom prompting system for targeted assistance
+  - Structured data extraction from webpages
+  - Semantic understanding of page content
 - 📝 Chat history and conversation management
 
 ### Content Features
 - ✅ Inspirational quotes on new tab
 - ✅ Quote categorization and attribution
 - 🚧 Customizable new tab layout
-- 📝 Task management
+- ✅ Task identification and planning
+  - Automatic task detection from page content
+  - Step-by-step task breakdown for complex topics
+  - Progress tracking for identified tasks
+- 🚧 Personalized content recommendations
 
 ### Privacy & Security
 - ✅ Local model execution via Ollama
@@ -126,6 +137,21 @@ overlay/
 - Node.js >= 22.12.0
 - pnpm 9.15.1+
 - Chrome browser or Firefox
+
+## Project Vision & Roadmap
+
+Overlay aims to fundamentally transform how users interact with web content by leveraging the power of large language models. Our vision is to create an intelligent companion that understands user intent, provides contextual assistance, and automates repetitive tasks across the browsing experience.
+
+### Future Development Plans
+
+- 🔮 Advanced webpage analysis with semantic understanding
+- 🔮 Personalized assistance based on browsing patterns and preferences
+- 🔮 Proactive information discovery and curation
+- 🔮 Cross-page content correlation and knowledge synthesis
+- 🔮 Fine-tuned domain-specific assistance for specialized workflows
+- 🔮 Enhanced privacy-preserving local model integration
+
+We believe LLMs have the potential to create a more intuitive, efficient, and personalized web browsing experience that adapts to each user's unique needs and interests.
 
 ## Based on
 - [Chrome Extension Boilerplate](https://github.com/lsgrep/chrome-extension-boilerplate)
