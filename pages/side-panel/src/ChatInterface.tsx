@@ -23,6 +23,7 @@ interface Message {
     originalQuestion?: string;
     extractedData?: unknown;
     timestamp?: number;
+    sourceUrl?: string;
   };
 }
 
@@ -90,16 +91,34 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
     const submitMessageProgrammatically = async (messageText: string, includePageContext = true) => {
       if (!messageText.trim() || isLoading) return;
 
+      // Extract page context first so we can get the URL and avoid calling the method twice
+      let extractedPageContext: PageContext | null = null;
+      try {
+        // Always extract page context to get the URL, even if we don't use it for the API call
+        extractedPageContext = await ChatService.extractPageContent();
+      } catch (err) {
+        console.error('Error extracting page context:', err);
+      }
+
+      // Get the active tab URL from the extracted context
+      const activeTabUrl = extractedPageContext?.url || ''; // Fallback to empty string if undefined
+
       // Create the display message
-      const displayMessage: Message = { role: 'user', content: messageText };
+      const displayMessage: Message = {
+        role: 'user',
+        content: messageText,
+        metadata: {
+          timestamp: Date.now(),
+          // Always use active page URL for all user messages
+          sourceUrl: activeTabUrl,
+        },
+      };
       setMessages(prev => [...prev, displayMessage]);
       setIsLoading(true);
       setError(null);
 
       try {
-        // Extract page context only if requested (not for selection popup actions except notes)
-        const extractedPageContext = includePageContext ? await ChatService.extractPageContent() : null;
-
+        // Use the previously extracted page context if includePageContext is true
         if (includePageContext && extractedPageContext) {
           setPageContext(extractedPageContext);
         }
@@ -130,6 +149,7 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
               questionId,
               originalQuestion: displayMessage.content,
               timestamp: Date.now(),
+              // Don't add sourceUrl to LLM responses as requested
             },
           },
         ]);

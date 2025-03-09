@@ -1,11 +1,33 @@
 import type React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Terminal } from 'lucide-react';
+import { Terminal, Link } from 'lucide-react';
 import { TaskPlanView } from '../components/TaskPlanView';
 import { AnthropicService } from '../services/llm/anthropic';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import type { PageContext } from '../services/llm/prompts/types';
 import type { TaskPlan } from '../services/task/types';
+
+// Source URL component to ensure consistent formatting
+const SourceUrl: React.FC<{ url: string }> = ({ url }) => {
+  try {
+    const hostname = new URL(url).hostname;
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs text-blue-500 hover:underline max-w-[200px] truncate inline-block"
+        title={url}>
+        <span className="flex items-center gap-1">
+          <Link size={10} />
+          {hostname}
+        </span>
+      </a>
+    );
+  } catch {
+    return null;
+  }
+};
 
 interface MessageItemProps {
   message: {
@@ -21,6 +43,7 @@ interface MessageItemProps {
       originalQuestion?: string;
       extractedData?: unknown;
       timestamp?: number;
+      sourceUrl?: string;
     };
   };
   index: number;
@@ -46,6 +69,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
   const timestamp = message.metadata?.timestamp
     ? new Date(message.metadata.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : '';
+  // Get source URL from message metadata
+  const sourceUrl = message.metadata?.sourceUrl || '';
 
   // Determine message style based on role
   const messageContainerClasses = isUser
@@ -108,11 +133,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               {isUser ? 'You' : message.model?.displayName || message.model?.name || 'Assistant'}
             </span>
           </div>
-          {timestamp && (
-            <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-              {timestamp}
-            </span>
-          )}
+          <div className="flex flex-col items-end gap-1">
+            {timestamp && <span className="text-xs text-muted-foreground">{timestamp}</span>}
+            {sourceUrl && <SourceUrl url={sourceUrl} />}
+          </div>
         </div>
 
         {/* Message content */}
