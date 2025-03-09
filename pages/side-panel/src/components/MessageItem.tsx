@@ -4,8 +4,8 @@ import { Terminal } from 'lucide-react';
 import { TaskPlanView } from '../components/TaskPlanView';
 import { AnthropicService } from '../services/llm/anthropic';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
-import { PageContext } from '../services/llm/prompts';
-import { TaskPlan } from '../services/task/TaskExecutor';
+import type { PageContext } from '../services/llm/prompts/types';
+import type { TaskPlan } from '../services/task/types';
 
 interface MessageItemProps {
   message: {
@@ -122,8 +122,63 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               {(() => {
                 try {
                   console.log('Attempting to parse as TaskPlan:', message.content);
-                  const plan: TaskPlan = JSON.parse(message.content);
-                  console.log('Successfully parsed TaskPlan:', plan);
+                  const parsedJson = JSON.parse(message.content);
+                  console.log('Successfully parsed JSON:', parsedJson);
+
+                  // Handle Gemini model structure that wraps task plan in "answer" field
+                  let plan: TaskPlan;
+
+                  // Check if this is a nested structure (Gemini format)
+                  if (parsedJson.answer && typeof parsedJson.answer === 'object' && parsedJson.confidence) {
+                    console.log('Detected Gemini nested format, extracting task plan from answer field');
+
+                    // For Gemini models that return steps instead of actions
+                    if (parsedJson.answer.goal && Array.isArray(parsedJson.answer.steps)) {
+                      // Convert to proper TaskPlan format
+                      plan = {
+                        task_type: 'web_navigation',
+                        actions: parsedJson.answer.steps.map((step: Record<string, unknown>, index: number) => ({
+                          id: `step-${index}`,
+                          type: step.action,
+                          description: step.description,
+                          parameters: {
+                            ...Object.keys(step)
+                              .filter(key => key !== 'action' && key !== 'description')
+                              .reduce((obj: Record<string, unknown>, key) => {
+                                obj[key] = step[key];
+                                return obj;
+                              }, {}),
+                          },
+                        })),
+                        error_handling: {
+                          retry_strategy: 'linear',
+                          max_retries: 3,
+                        },
+                      };
+                    } else if (typeof parsedJson.answer === 'string') {
+                      // If answer is a string, it might be a JSON string containing the plan
+                      try {
+                        const nestedPlan = JSON.parse(parsedJson.answer);
+                        plan = nestedPlan.task_type
+                          ? nestedPlan
+                          : {
+                              task_type: 'response',
+                              actions: [],
+                              error_handling: { retry_strategy: 'none', max_retries: 0 },
+                            };
+                      } catch {
+                        throw new Error('Cannot parse nested JSON in answer field');
+                      }
+                    } else {
+                      // Just use the answer object directly if it has required fields
+                      plan = parsedJson.answer;
+                    }
+                  } else {
+                    // Standard format, use as-is
+                    plan = parsedJson;
+                  }
+
+                  console.log('Final parsed TaskPlan:', plan);
 
                   // Validate required properties before rendering
                   if (!plan.task_type || !Array.isArray(plan.actions) || !plan.error_handling) {
@@ -135,7 +190,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                     <TaskPlanView
                       plan={plan}
                       isLight={isLight}
-                      pageContext={pageContext}
+                      pageContext={pageContext || undefined}
                       llmService={new AnthropicService(selectedModel)}
                       goal={message.metadata?.originalQuestion}
                     />

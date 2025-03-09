@@ -148,7 +148,7 @@ export class GeminiService implements LLMService {
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
     // If structured output was requested but the response isn't valid JSON,
     // try to ensure we return valid JSON
-    if (structuredOutput && responseText !== 'No response generated') {
+    if ((structuredOutput || mode === 'interactive') && responseText !== 'No response generated') {
       try {
         // Test if the response is already valid JSON
         JSON.parse(responseText);
@@ -177,13 +177,41 @@ export class GeminiService implements LLMService {
 
           try {
             // Validate the extracted JSON
-            JSON.parse(extractedJson);
+            const parsed = JSON.parse(extractedJson);
+
+            // If in interactive mode and we need to adapt the format for LLMExtractionHandler
+            if (mode === 'interactive' && !parsed.answer && !structuredOutput) {
+              // If we have a task plan or other structured data but not in the expected format
+              // for LLMExtractionHandler, transform it to the expected format
+              console.log('Adapting interactive response format:', parsed);
+              const adaptedResponse = {
+                answer: typeof parsed === 'object' ? JSON.stringify(parsed) : parsed,
+                confidence: 0.9,
+              };
+              return JSON.stringify(adaptedResponse);
+            }
+
             return extractedJson;
-          } catch {
+          } catch (parseError) {
             // Invalid JSON in extraction
-            // If extraction failed, return the original response
-            console.warn('Could not extract valid JSON from response');
+            console.warn('Could not extract valid JSON from response:', parseError);
+
+            // For interactive mode, wrap the response in the expected format as fallback
+            if (mode === 'interactive') {
+              const fallbackResponse = {
+                answer: responseText,
+                confidence: 0.7,
+              };
+              return JSON.stringify(fallbackResponse);
+            }
           }
+        } else if (mode === 'interactive') {
+          // If no JSON found and in interactive mode, wrap the plain text in the expected format
+          const fallbackResponse = {
+            answer: responseText,
+            confidence: 0.6,
+          };
+          return JSON.stringify(fallbackResponse);
         }
       }
     }
