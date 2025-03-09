@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Terminal } from 'lucide-react';
 import { TaskPlanView } from '../components/TaskPlanView';
@@ -19,7 +19,7 @@ interface MessageItemProps {
     metadata?: {
       questionId?: string;
       originalQuestion?: string;
-      extractedData?: any;
+      extractedData?: unknown;
       timestamp?: number;
     };
   };
@@ -210,7 +210,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                           <div className="mb-2 p-2 bg-amber-100 text-amber-800 rounded-md text-sm">
                             This appears to be a task plan but is missing required properties. Displaying as raw JSON.
                           </div>
-                          <pre className="whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm bg-muted">
+                          <pre
+                            className={`whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'}`}>
                             {JSON.stringify(json, null, 2)}
                           </pre>
                         </div>
@@ -218,7 +219,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                     }
 
                     return (
-                      <pre className="whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm bg-muted">
+                      <pre
+                        className={`whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'}`}>
                         {JSON.stringify(json, null, 2)}
                       </pre>
                     );
@@ -249,14 +251,14 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                     return !inline ? (
                       <div className="relative group">
                         <pre
-                          className={`p-3 rounded-md bg-gray-900 dark:bg-gray-800 overflow-x-auto text-xs ${match ? `language-${match[1]}` : ''}`}>
+                          className={`p-3 rounded-md overflow-x-auto text-xs ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'} ${match ? `language-${match[1]}` : ''}`}>
                           <code className={className} {...otherProps}>
                             {children}
                           </code>
                         </pre>
                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
-                            className="p-1 rounded-md bg-gray-700 text-gray-100 hover:bg-gray-600 text-xs"
+                            className={`p-1 rounded-md text-xs ${isLight ? 'bg-slate-300 text-slate-800 hover:bg-slate-400' : 'bg-slate-700 text-slate-100 hover:bg-slate-600'}`}
                             onClick={() => {
                               navigator.clipboard.writeText(String(children));
                             }}>
@@ -265,7 +267,9 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                         </div>
                       </div>
                     ) : (
-                      <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs" {...props}>
+                      <code
+                        className={`px-1 py-0.5 rounded text-xs ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'}`}
+                        {...props}>
                         {children}
                       </code>
                     );
@@ -281,30 +285,30 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                     </a>
                   ),
                   // Enhanced lists
-                  ul: ({ className, children, ...props }) => (
+                  ul: ({ children, ...props }) => (
                     <ul className="pl-5 list-disc space-y-1 my-2" {...props}>
                       {children}
                     </ul>
                   ),
-                  ol: ({ node, className, children, ...props }) => (
+                  ol: ({ children, ...props }) => (
                     <ol className="pl-5 list-decimal space-y-1 my-2" {...props}>
                       {children}
                     </ol>
                   ),
                   // Enhanced headings
-                  h1: ({ node, className, children, ...props }) => (
+                  h1: ({ children, ...props }) => (
                     <h1
                       className="text-xl font-bold mt-6 mb-2 pb-1 border-b border-gray-200 dark:border-gray-700"
                       {...props}>
                       {children}
                     </h1>
                   ),
-                  h2: ({ node, className, children, ...props }) => (
+                  h2: ({ children, ...props }) => (
                     <h2 className="text-lg font-bold mt-5 mb-2" {...props}>
                       {children}
                     </h2>
                   ),
-                  h3: ({ node, className, children, ...props }) => (
+                  h3: ({ children, ...props }) => (
                     <h3 className="text-md font-bold mt-4 mb-1" {...props}>
                       {children}
                     </h3>
