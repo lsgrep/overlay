@@ -156,13 +156,24 @@ export class GeminiService implements LLMService {
       } catch {
         // Non-JSON response - attempt to extract
         // Not valid JSON, try to extract JSON from the text if there's any
+        // Try various regex patterns to extract JSON from the response
         const jsonMatch =
-          responseText.match(/```json\n([\s\S]*?)\n```/) ||
+          // Match JSON in code blocks with flexible whitespace
+          responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
+          // Match JSON with flexible whitespace around brackets
+          responseText.match(/\s*({[\s\S]*})\s*/) ||
+          responseText.match(/\s*(\[[\s\S]*\])\s*/) ||
+          // Traditional JSON matching as fallback
           responseText.match(/{[\s\S]*}/) ||
           responseText.match(/\[[\s\S]*\]/);
 
         if (jsonMatch) {
-          const extractedJson = jsonMatch[1] || jsonMatch[0];
+          // Use the captured group if available (from code blocks), otherwise use the full match
+          let extractedJson = jsonMatch[1] || jsonMatch[0];
+          // Clean up the extracted JSON - remove any trailing commas which are invalid in JSON
+          extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1');
+          // Remove any leading/trailing whitespace
+          extractedJson = extractedJson.trim();
 
           try {
             // Validate the extracted JSON
