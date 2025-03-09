@@ -26,7 +26,9 @@ const SidePanel = () => {
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
   const [input, setInput] = useState('');
   // Reference to ChatInterface methods
-  const chatInterfaceRef = useRef<{ submitMessage: (text: string) => Promise<void> } | null>(null);
+  const chatInterfaceRef = useRef<{
+    submitMessage: (text: string, includePageContext?: boolean) => Promise<void>;
+  } | null>(null);
 
   // We'll use Chrome's native notifications instead of custom UI notifications
 
@@ -142,7 +144,10 @@ const SidePanel = () => {
                   console.log('Debug: Processing chat input:', chatInput);
                   // Add to message history and trigger LLM call if chatInterfaceRef is available
                   if (chatInterfaceRef.current) {
-                    chatInterfaceRef.current.submitMessage(chatInput);
+                    // For selection popup actions, don't include page context (false parameter)
+                    // Only note creation should include page context, which is handled separately above
+                    console.log('Debug: Submitting selection popup message without page context');
+                    chatInterfaceRef.current.submitMessage(chatInput, false);
                   } else {
                     // Fallback to old behavior if ref isn't available
                     console.log('Debug: ChatInterface ref not available, setting input text only');

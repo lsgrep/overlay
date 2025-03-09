@@ -86,7 +86,8 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
     }, [initialInput, isLoading]);
 
     // Function to submit a message programmatically (without a form event)
-    const submitMessageProgrammatically = async (messageText: string) => {
+    // includePageContext defaults to true for normal chat inputs, but can be set to false for selection popup actions
+    const submitMessageProgrammatically = async (messageText: string, includePageContext = true) => {
       if (!messageText.trim() || isLoading) return;
 
       // Create the display message
@@ -96,16 +97,20 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
       setError(null);
 
       try {
-        // Extract page context
-        const extractedPageContext = await ChatService.extractPageContent();
-        setPageContext(extractedPageContext);
+        // Extract page context only if requested (not for selection popup actions except notes)
+        const extractedPageContext = includePageContext ? await ChatService.extractPageContent() : null;
+
+        if (includePageContext && extractedPageContext) {
+          setPageContext(extractedPageContext);
+        }
 
         // Submit message to ChatService
         const { response, model, questionId } = await ChatService.submitMessage({
           input: displayMessage.content,
           selectedModel,
           mode,
-          pageContext: extractedPageContext,
+          // @ts-expect-error - ChatService should handle null pageContext
+          pageContext: includePageContext ? extractedPageContext : null,
           messages,
           openaiModels,
           geminiModels,
@@ -138,7 +143,8 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
 
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
-      submitMessage: submitMessageProgrammatically,
+      submitMessage: (text: string, includePageContext = false) =>
+        submitMessageProgrammatically(text, includePageContext),
     }));
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -146,7 +152,8 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
       if (!input.trim() || isLoading) return;
 
       // Reuse the submitMessage functionality
-      await submitMessageProgrammatically(input);
+      // Standard form submission should include page context
+      await submitMessageProgrammatically(input, true);
       setInput('');
     };
 
