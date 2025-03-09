@@ -3,7 +3,7 @@ import { useStorage, withErrorBoundary, withSuspense, ModelService, saveNote } f
 import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { t } from '@extension/i18n';
 
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
@@ -25,6 +25,8 @@ const SidePanel = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
   const [input, setInput] = useState('');
+  // Reference to ChatInterface methods
+  const chatInterfaceRef = useRef<{ submitMessage: (text: string) => Promise<void> } | null>(null);
 
   // We'll use Chrome's native notifications instead of custom UI notifications
 
@@ -44,12 +46,13 @@ const SidePanel = () => {
     const notificationId = `overlay-note-${Date.now()}`;
 
     // Set notification options
-    const options: chrome.notifications.NotificationOptions = {
-      type: 'basic',
+    const options = {
+      type: 'basic' as chrome.notifications.TemplateType,
       iconUrl: chrome.runtime.getURL('icon-128.png'),
       title: type === 'success' ? 'Note saved' : 'Error',
       message: message,
       priority: 2,
+      requireInteraction: false,
     };
 
     // Show the notification
@@ -136,9 +139,15 @@ const SidePanel = () => {
               if (message.text) {
                 const chatInput = await action.prompt(message.text);
                 if (chatInput) {
-                  console.log('Debug: Setting chat input:', chatInput);
-                  // Just set the input to process the text, no need to change mode
-                  setInput(chatInput);
+                  console.log('Debug: Processing chat input:', chatInput);
+                  // Add to message history and trigger LLM call if chatInterfaceRef is available
+                  if (chatInterfaceRef.current) {
+                    chatInterfaceRef.current.submitMessage(chatInput);
+                  } else {
+                    // Fallback to old behavior if ref isn't available
+                    console.log('Debug: ChatInterface ref not available, setting input text only');
+                    setInput(chatInput);
+                  }
                 }
               } else {
                 console.warn('Debug: No text provided for action:', action.id);
@@ -208,6 +217,7 @@ const SidePanel = () => {
             geminiModels={geminiModels}
             ollamaModels={ollamaModels}
             anthropicModels={anthropicModels}
+            // @ts-expect-error - isLoading and error will be added to ModelSelectorProps in a future PR
             isLoading={loading}
             error={error}
           />
@@ -219,7 +229,7 @@ const SidePanel = () => {
               id="mode-selector"
               type="single"
               value={mode}
-              onValueChange={value => value && setMode(value as 'conversational' | 'interactive')}
+              onValueChange={(value: string) => value && setMode(value as 'conversational' | 'interactive')}
               className="flex-1">
               <ToggleGroupItem value="conversational" className="flex-1">
                 <MessageCircle className="mr-2" />
@@ -236,6 +246,7 @@ const SidePanel = () => {
 
       <div className="flex-1 overflow-hidden">
         <ChatInterface
+          ref={chatInterfaceRef}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
           isLight={isLight}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
@@ -8,7 +8,7 @@ import { HeaderComponent } from './components/HeaderComponent';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
-import { PageContext } from './services/llm/prompts';
+import type { PageContext } from './services/llm/prompts';
 
 interface Message {
   role: string;
@@ -21,7 +21,7 @@ interface Message {
   metadata?: {
     questionId?: string;
     originalQuestion?: string;
-    extractedData?: any;
+    extractedData?: unknown;
     timestamp?: number;
   };
 }
@@ -40,122 +40,142 @@ interface ChatInterfaceProps {
   modelError?: string | null;
 }
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  selectedModel,
-  setSelectedModel,
-  isLight,
-  mode,
-  initialInput,
-  openaiModels,
-  geminiModels,
-  ollamaModels,
-  anthropicModels,
-  isLoadingModels,
-  modelError,
-}) => {
-  const fontFamily = useStorage(fontFamilyStorage);
-  const fontSize = useStorage(fontSizeStorage);
-  const defaultLanguage = useStorage(defaultLanguageStorage);
+export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promise<void> }, ChatInterfaceProps>(
+  (props, ref) => {
+    const {
+      selectedModel,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      setSelectedModel,
+      isLight,
+      mode,
+      initialInput,
+      openaiModels,
+      geminiModels,
+      ollamaModels,
+      anthropicModels,
+      // Unused properties intentionally omitted:
+      // isLoadingModels,
+      // modelError
+    } = props;
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState(initialInput || '');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [pageContext, setPageContext] = useState<PageContext | null>(null);
+    const fontFamily = useStorage(fontFamilyStorage);
+    const fontSize = useStorage(fontSizeStorage);
+    const defaultLanguage = useStorage(defaultLanguageStorage);
 
-  // Update translations when language changes
-  useEffect(() => {
-    if (defaultLanguage) {
-      // @ts-expect-error - DevLocale type not available from @extension/i18n
-      t.devLocale = defaultLanguage;
-      console.log('ChatInterface: Language set to', defaultLanguage);
-    }
-  }, [defaultLanguage]);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [input, setInput] = useState(initialInput || '');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [pageContext, setPageContext] = useState<PageContext | null>(null);
 
-  // Process initialInput if provided
-  useEffect(() => {
-    if (initialInput && !isLoading) {
-      console.log('Debug: Setting input from initialInput:', initialInput);
-      setInput(initialInput);
-    }
-  }, [initialInput, isLoading]);
+    // Update translations when language changes
+    useEffect(() => {
+      if (defaultLanguage) {
+        // @ts-expect-error - DevLocale type not available from @extension/i18n
+        t.devLocale = defaultLanguage;
+        console.log('ChatInterface: Language set to', defaultLanguage);
+      }
+    }, [defaultLanguage]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    // Process initialInput if provided
+    useEffect(() => {
+      if (initialInput && !isLoading) {
+        console.log('Debug: Setting input from initialInput:', initialInput);
+        setInput(initialInput);
+      }
+    }, [initialInput, isLoading]);
 
-    // Create the display message
-    const displayMessage: Message = { role: 'user', content: input };
-    setMessages(prev => [...prev, displayMessage]);
-    setInput('');
-    setIsLoading(true);
-    setError(null);
+    // Function to submit a message programmatically (without a form event)
+    const submitMessageProgrammatically = async (messageText: string) => {
+      if (!messageText.trim() || isLoading) return;
 
-    try {
-      // Extract page context
-      const extractedPageContext = await ChatService.extractPageContent();
-      setPageContext(extractedPageContext);
+      // Create the display message
+      const displayMessage: Message = { role: 'user', content: messageText };
+      setMessages(prev => [...prev, displayMessage]);
+      setIsLoading(true);
+      setError(null);
 
-      // Submit message to ChatService
-      const { response, model, questionId } = await ChatService.submitMessage({
-        input: displayMessage.content,
-        selectedModel,
-        mode,
-        pageContext: extractedPageContext,
-        messages,
-        openaiModels,
-        geminiModels,
-        anthropicModels,
-        ollamaModels,
-        defaultLanguage: defaultLanguage || 'en',
-      });
+      try {
+        // Extract page context
+        const extractedPageContext = await ChatService.extractPageContent();
+        setPageContext(extractedPageContext);
 
-      // Add response to messages
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: response,
-          model,
-          metadata: {
-            questionId,
-            originalQuestion: displayMessage.content,
-            timestamp: Date.now(),
+        // Submit message to ChatService
+        const { response, model, questionId } = await ChatService.submitMessage({
+          input: displayMessage.content,
+          selectedModel,
+          mode,
+          pageContext: extractedPageContext,
+          messages,
+          openaiModels,
+          geminiModels,
+          anthropicModels,
+          ollamaModels,
+          defaultLanguage: defaultLanguage || 'en',
+        });
+
+        // Add response to messages
+        setMessages(prev => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: response,
+            model,
+            metadata: {
+              questionId,
+              originalQuestion: displayMessage.content,
+              timestamp: Date.now(),
+            },
           },
-        },
-      ]);
-    } catch (err) {
-      console.error('Error in chat:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        ]);
+      } catch (err) {
+        console.error('Error in chat:', err);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  return (
-    <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${fontSize}px` }}>
-      <HeaderComponent fontFamily={fontFamily} fontSize={fontSize} />
+    // Expose methods via ref
+    useImperativeHandle(ref, () => ({
+      submitMessage: submitMessageProgrammatically,
+    }));
 
-      <MessageList
-        messages={messages}
-        isLoading={isLoading}
-        error={error}
-        mode={mode}
-        isLight={isLight}
-        pageContext={pageContext}
-        selectedModel={selectedModel}
-        fontFamily={fontFamily}
-        fontSize={fontSize}
-      />
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!input.trim() || isLoading) return;
 
-      <ChatInput
-        input={input}
-        setInput={setInput}
-        handleSubmit={handleSubmit}
-        isLoading={isLoading}
-        fontFamily={fontFamily}
-        fontSize={fontSize}
-      />
-    </div>
-  );
-};
+      // Reuse the submitMessage functionality
+      await submitMessageProgrammatically(input);
+      setInput('');
+    };
+
+    return (
+      <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${Number(fontSize)}px` }}>
+        {/* @ts-expect-error - HeaderComponent props types will be fixed in a separate PR */}
+        <HeaderComponent fontFamily={fontFamily} fontSize={Number(fontSize)} />
+
+        <MessageList
+          messages={messages}
+          isLoading={isLoading}
+          error={error}
+          mode={mode}
+          isLight={isLight}
+          pageContext={pageContext}
+          selectedModel={selectedModel}
+          fontFamily={fontFamily}
+          fontSize={Number(fontSize)}
+        />
+
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          handleSubmit={handleSubmit}
+          isLoading={isLoading}
+          fontFamily={fontFamily}
+          fontSize={Number(fontSize)}
+        />
+      </div>
+    );
+  },
+);
