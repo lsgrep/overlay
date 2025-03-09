@@ -214,6 +214,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Process initialInput when in context-menu mode
+  useEffect(() => {
+    const processInitialInput = async () => {
+      if (initialInput && mode === 'context-menu' && !isLoading) {
+        console.log('Debug: Processing initial input in context-menu mode:', initialInput);
+        setInput(initialInput);
+        // Trigger a form submission after a short delay to ensure state updates
+        setTimeout(() => {
+          const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
+          handleSubmit(fakeEvent);
+        }, 500);
+      }
+    };
+
+    processInitialInput();
+  }, [initialInput, mode, isLoading]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;

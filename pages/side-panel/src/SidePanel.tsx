@@ -134,7 +134,7 @@ const SidePanel = () => {
                 const chatInput = await action.prompt(message.text);
                 if (chatInput) {
                   console.log('Debug: Setting chat input:', chatInput);
-                  setMode('context-menu');
+                  setMode('context-menu'); // Set mode to context-menu for selection actions
                   setInput(chatInput);
                 }
               } else {
@@ -216,7 +216,11 @@ const SidePanel = () => {
               id="mode-selector"
               type="single"
               value={mode}
-              onValueChange={value => value && setMode(value as 'conversational' | 'interactive')}
+              onValueChange={value => {
+                if (value && (value === 'conversational' || value === 'interactive')) {
+                  setMode(value);
+                }
+              }}
               className="flex-1">
               <ToggleGroupItem value="conversational" className="flex-1">
                 <MessageCircle className="mr-2" />
