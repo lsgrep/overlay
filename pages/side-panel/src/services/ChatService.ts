@@ -166,14 +166,47 @@ export class ChatService {
       llmService = new AnthropicService(selectedModel);
       response = await llmService.generateCompletion(anthropicMessages, prompt);
     } else if (selectedModel.includes('gemini')) {
-      llmService = new GeminiService(selectedModel);
-      response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
+      const geminiService = new GeminiService(selectedModel);
       const modelName = selectedModel.replace('models/', '');
       const model = {
         name: selectedModel,
         provider: 'gemini',
         displayName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
       };
+
+      // Check if this is a task planning request
+      const isTaskPlanningRequest =
+        input.toLowerCase().includes('task plan') ||
+        input.toLowerCase().includes('automate') ||
+        input.toLowerCase().includes('extract data');
+
+      // If this appears to be a task planning request, use the specialized method
+      if (isTaskPlanningRequest && mode === 'interactive' && pageContext) {
+        try {
+          // Use the task planning functionality
+          const taskPlan = await geminiService.generateTaskPlan(
+            input,
+            {
+              title: pageContext.title,
+              url: pageContext.url,
+              content: pageContext.content?.substring(0, 2000), // Limit content length
+            },
+            [], // Available tools - could be extended in the future
+            [], // Previous actions - could be tracked in the future
+          );
+
+          // Format the response for the chat interface
+          response = JSON.stringify(taskPlan, null, 2);
+          console.log('Generated task plan:', taskPlan);
+        } catch (error) {
+          console.error('Task planning failed, falling back to standard completion:', error);
+          // Fall back to standard completion if task planning fails
+          response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+        }
+      } else {
+        // Use standard completion for regular queries
+        response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+      }
 
       return {
         response,
