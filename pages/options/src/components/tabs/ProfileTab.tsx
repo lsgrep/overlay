@@ -8,7 +8,8 @@ import {
   resumeFileStorage,
   defaultLanguageStorage,
 } from '@extension/storage';
-import { DevLocale, t } from '@extension/i18n';
+import type { DevLocale } from '@extension/i18n';
+import { t } from '@extension/i18n';
 import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import { Label, Textarea, Button } from '@extension/ui';

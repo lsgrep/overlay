@@ -1,4 +1,4 @@
-import { PromptGenerator } from './types';
+import type { PromptGenerator } from './types';
 
 export class OllamaPromptGenerator implements PromptGenerator {
   generateSystemPrompt(): string {

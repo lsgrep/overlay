@@ -1,12 +1,14 @@
 import { geminiKeyStorage } from '@extension/storage';
-import type { JSONSchema, LLMConfig, LLMService, Message, StructuredOutputConfig } from './types';
+import type { LLMConfig, LLMService, Message, StructuredOutputConfig } from './types';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { generateText, type CoreMessage } from 'ai';
 
 export class GeminiService implements LLMService {
   private modelName: string;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
 
   constructor(modelName: string) {
-    this.modelName = modelName.includes('/') ? modelName : `models/${modelName}`.replace('//', '/');
+    // Remove any model/ prefix if present, the SDK will handle the format
+    this.modelName = modelName.replace(/^models\//, '');
   }
 
   async generateCompletion(
@@ -17,204 +19,165 @@ export class GeminiService implements LLMService {
     structuredOutput?: StructuredOutputConfig,
   ): Promise<string> {
     // Adjust temperature based on the mode
-    // Interactive mode uses lower temperature for more focused responses
-    // Conversational mode uses higher temperature for more creative responses
     const temperatureAdjustment = mode === 'interactive' ? 0.2 : 0.0;
-    const adjustedConfig = {
-      ...config,
-      temperature: (config?.temperature ?? 0.7) - temperatureAdjustment,
-    };
+    const adjustedTemperature = (config?.temperature ?? 0.7) - temperatureAdjustment;
+
+    // Get API key from storage
     const geminiKey = await geminiKeyStorage.get();
     if (!geminiKey) {
       throw new Error('Gemini API key not found');
     }
 
-    const apiUrl = `${this.baseUrl}/${this.modelName}:generateContent?key=${geminiKey}`;
-    // Define type for request body with generationConfig
-    interface RequestBody {
-      contents: Array<{
-        role: string;
-        parts: Array<{ text: string }>;
-      }>;
-      generationConfig: {
-        temperature: number;
-        topK: number;
-        topP: number;
-        maxOutputTokens: number;
-        response_mime_type?: string;
-        response_schema?: JSONSchema;
-      };
-      safetySettings: Array<{
-        category: string;
-        threshold: string;
-      }>;
-    }
-    // Prepare request body with base configuration
-    const requestBody: RequestBody = {
-      contents: messages.concat({ role: 'user', content: context }).map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }],
-      })),
-      generationConfig: {
-        temperature: adjustedConfig.temperature,
-        topK: config?.topK ?? 40,
+    try {
+      // Create Google Generative AI provider with API key
+      const google = createGoogleGenerativeAI({
+        apiKey: geminiKey,
+      });
+
+      // Create the model instance
+      const model = google(this.modelName);
+
+      // Prepare messages format - convert from our format to AI SDK format
+      const aiMessages: CoreMessage[] = [];
+
+      // Add context as a system message first
+      aiMessages.push({
+        role: 'system',
+        content: context,
+      } as CoreMessage);
+
+      // Add the conversation messages
+      for (const msg of messages) {
+        // Map our role format to the AI SDK format
+        // The SDK expects 'user', 'assistant', 'system', or 'tool'
+        let sdkRole: 'user' | 'assistant' | 'system' | 'tool';
+
+        switch (msg.role) {
+          case 'user':
+            sdkRole = 'user';
+            break;
+          case 'assistant':
+            sdkRole = 'assistant';
+            break;
+          case 'system':
+            sdkRole = 'system';
+            break;
+          default:
+            sdkRole = 'user'; // Default fallback
+        }
+
+        aiMessages.push({
+          role: sdkRole,
+          content: msg.content,
+        } as CoreMessage);
+      }
+
+      // Generate completion using AI SDK
+      const completion = await generateText({
+        model,
+        messages: aiMessages,
+        temperature: adjustedTemperature,
+        maxTokens: config?.maxOutputTokens ?? 2048,
         topP: config?.topP ?? 0.95,
-        maxOutputTokens: config?.maxOutputTokens ?? 2048,
-      },
-      safetySettings: [
-        {
-          category: 'HARM_CATEGORY_HARASSMENT',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-        },
-        {
-          category: 'HARM_CATEGORY_HATE_SPEECH',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-        },
-        {
-          category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-        },
-        {
-          category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-          threshold: 'BLOCK_MEDIUM_AND_ABOVE',
-        },
-      ],
-    };
-    // Add structured output configuration if provided
-    if (structuredOutput) {
-      requestBody.generationConfig.response_mime_type = 'application/json';
-      // If a schema is provided, add it to the configuration
-      if (structuredOutput.schema) {
-        requestBody.generationConfig.response_schema = structuredOutput.schema;
-      }
-    }
+        topK: config?.topK ?? 40,
+      });
 
-    let response;
-    let retryCount = 0;
-    const maxRetries = 3;
-    const baseDelay = 1000;
+      // Process the text response - convert completion result to string
+      // The SDK returns a special result object that needs to be converted to string
+      const responseText = String(completion);
 
-    while (retryCount < maxRetries) {
-      try {
-        response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
+      // Handle structured output if specified
+      if (structuredOutput && responseText) {
+        try {
+          // If schema is provided, force the response into valid JSON
+          // The SDK should already return valid JSON with schema, but we check just in case
+          JSON.parse(responseText); // Will throw if not valid JSON
+          return responseText;
+        } catch {
+          // Try to extract JSON from the response if it's not already valid JSON
+          const jsonMatch =
+            responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
+            responseText.match(/\s*({[\s\S]*})\s*/) ||
+            responseText.match(/\s*(\[[\s\S]*\])\s*/) ||
+            responseText.match(/{[\s\S]*}/) ||
+            responseText.match(/\[[\s\S]*\]/);
 
-        if (response.ok) {
-          break;
-        }
+          if (jsonMatch) {
+            let extractedJson = jsonMatch[1] || jsonMatch[0];
+            extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1').trim();
 
-        const errorText = await response.text();
-        const error = new Error(`Gemini API error: ${response.status} - ${errorText}`);
-
-        if (response.status !== 429 && !errorText.includes('RESOURCE_EXHAUSTED')) {
-          throw error;
-        }
-
-        retryCount++;
-        if (retryCount === maxRetries) {
-          throw error;
-        }
-
-        const delay = baseDelay * Math.pow(2, retryCount - 1);
-        console.log(`Attempt ${retryCount} failed, retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } catch (error: unknown) {
-        const errorObj = error as { message?: string };
-        if (
-          retryCount === maxRetries ||
-          (!errorObj.message?.includes('429') && !errorObj.message?.includes('RESOURCE_EXHAUSTED'))
-        ) {
-          throw error;
-        }
-      }
-    }
-
-    if (!response) {
-      throw new Error('Failed to get response from Gemini API');
-    }
-
-    const data = (await response.json()) as {
-      candidates?: Array<{
-        content?: {
-          parts?: Array<{ text?: string }>;
-        };
-      }>;
-    };
-    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated';
-    // If structured output was requested but the response isn't valid JSON,
-    // try to ensure we return valid JSON
-    if ((structuredOutput || mode === 'interactive') && responseText !== 'No response generated') {
-      try {
-        // Test if the response is already valid JSON
-        JSON.parse(responseText);
-        return responseText;
-      } catch {
-        // Non-JSON response - attempt to extract
-        // Not valid JSON, try to extract JSON from the text if there's any
-        // Try various regex patterns to extract JSON from the response
-        const jsonMatch =
-          // Match JSON in code blocks with flexible whitespace
-          responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
-          // Match JSON with flexible whitespace around brackets
-          responseText.match(/\s*({[\s\S]*})\s*/) ||
-          responseText.match(/\s*(\[[\s\S]*\])\s*/) ||
-          // Traditional JSON matching as fallback
-          responseText.match(/{[\s\S]*}/) ||
-          responseText.match(/\[[\s\S]*\]/);
-
-        if (jsonMatch) {
-          // Use the captured group if available (from code blocks), otherwise use the full match
-          let extractedJson = jsonMatch[1] || jsonMatch[0];
-          // Clean up the extracted JSON - remove any trailing commas which are invalid in JSON
-          extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1');
-          // Remove any leading/trailing whitespace
-          extractedJson = extractedJson.trim();
-
-          try {
-            // Validate the extracted JSON
-            const parsed = JSON.parse(extractedJson);
-
-            // If in interactive mode and we need to adapt the format for LLMExtractionHandler
-            if (mode === 'interactive' && !parsed.answer && !structuredOutput) {
-              // If we have a task plan or other structured data but not in the expected format
-              // for LLMExtractionHandler, transform it to the expected format
-              console.log('Adapting interactive response format:', parsed);
-              const adaptedResponse = {
-                answer: typeof parsed === 'object' ? JSON.stringify(parsed) : parsed,
-                confidence: 0.9,
-              };
-              return JSON.stringify(adaptedResponse);
-            }
-
-            return extractedJson;
-          } catch (parseError) {
-            // Invalid JSON in extraction
-            console.warn('Could not extract valid JSON from response:', parseError);
-
-            // For interactive mode, wrap the response in the expected format as fallback
-            if (mode === 'interactive') {
-              const fallbackResponse = {
-                answer: responseText,
-                confidence: 0.7,
-              };
-              return JSON.stringify(fallbackResponse);
+            try {
+              JSON.parse(extractedJson); // Validate the extracted JSON
+              return extractedJson;
+            } catch {
+              console.warn('Could not extract valid JSON from response');
             }
           }
-        } else if (mode === 'interactive') {
-          // If no JSON found and in interactive mode, wrap the plain text in the expected format
-          const fallbackResponse = {
-            answer: responseText,
-            confidence: 0.6,
-          };
-          return JSON.stringify(fallbackResponse);
         }
       }
+
+      // Handle interactive mode responses
+      if (mode === 'interactive' && responseText) {
+        try {
+          // Try to parse the response as JSON first
+          const parsed = JSON.parse(responseText);
+
+          // If it already has an answer field, return as is
+          if (parsed.answer) {
+            return responseText;
+          }
+
+          // Otherwise wrap the response in the expected format
+          const adaptedResponse = {
+            answer: typeof parsed === 'object' ? JSON.stringify(parsed) : parsed,
+            confidence: 0.9,
+          };
+          return JSON.stringify(adaptedResponse);
+        } catch {
+          // Not valid JSON, try to extract JSON from the text
+          const jsonMatch =
+            responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
+            responseText.match(/\s*({[\s\S]*})\s*/) ||
+            responseText.match(/\s*(\[[\s\S]*\])\s*/) ||
+            responseText.match(/{[\s\S]*}/) ||
+            responseText.match(/\[[\s\S]*\]/);
+
+          if (jsonMatch) {
+            let extractedJson = jsonMatch[1] || jsonMatch[0];
+            extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1').trim();
+
+            try {
+              const parsed = JSON.parse(extractedJson);
+
+              if (!parsed.answer) {
+                return JSON.stringify({
+                  answer: JSON.stringify(parsed),
+                  confidence: 0.8,
+                });
+              }
+
+              return extractedJson;
+            } catch {
+              // For interactive mode with no valid JSON, wrap the plain text
+              return JSON.stringify({
+                answer: responseText,
+                confidence: 0.6,
+              });
+            }
+          } else {
+            // For interactive mode with no JSON, wrap the plain text
+            return JSON.stringify({
+              answer: responseText,
+              confidence: 0.6,
+            });
+          }
+        }
+      }
+
+      return responseText || 'No response generated';
+    } catch (error) {
+      console.error('Error in Gemini chat:', error);
+      throw error;
     }
-    return responseText;
   }
 }

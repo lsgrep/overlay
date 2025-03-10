@@ -1,5 +1,5 @@
 import { anthropicKeyStorage } from '@extension/storage';
-import { Message, LLMConfig, LLMService } from './types';
+import type { Message, LLMConfig, LLMService } from './types';
 
 interface AnthropicMessage {
   role: 'user' | 'assistant';

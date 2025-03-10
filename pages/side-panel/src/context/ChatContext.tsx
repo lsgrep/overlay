@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import type React from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { useStorage } from '@extension/shared';
 import { defaultLanguageStorage } from '@extension/storage';
-import { PageContext } from '../services/llm/prompts';
+import type { PageContext } from '../services/llm/prompts';
 import { t } from '@extension/i18n';
 
 interface Message {

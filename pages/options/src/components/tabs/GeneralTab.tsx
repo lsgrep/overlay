@@ -1,6 +1,7 @@
 import { useStorage } from '@extension/shared';
 import { defaultLanguageStorage, defaultModelStorage, proxyModeStorage } from '@extension/storage';
-import { availableLanguages as i18nAvailableLanguages, DevLocale, t } from '@extension/i18n';
+import type { DevLocale } from '@extension/i18n';
+import { availableLanguages as i18nAvailableLanguages, t } from '@extension/i18n';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';

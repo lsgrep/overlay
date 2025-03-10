@@ -4,7 +4,7 @@ import { AnthropicService } from './llm/anthropic';
 import { GeminiService } from './llm/gemini';
 import { OpenAIService } from './llm/openai';
 import { OllamaService } from './llm/ollama';
-import { LLMService } from './llm/types';
+import type { LLMService } from './llm/types';
 
 interface Message {
   role: string;

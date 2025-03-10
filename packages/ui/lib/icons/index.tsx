@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export const OpenAIIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" {...props}>

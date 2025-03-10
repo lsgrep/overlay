@@ -1,4 +1,4 @@
-import { ActionContext, PromptGenerator } from './types';
+import type { ActionContext, PromptGenerator } from './types';
 import type { TaskPlan } from '../../task/TaskExecutor';
 
 /**

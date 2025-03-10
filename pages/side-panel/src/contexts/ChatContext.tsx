@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import { ChatConfig, ChatState, ChatContextValue, Message, ContextMenuAction, ChatMode } from '../types/chat';
+import type { ChatConfig, ChatState, ChatContextValue, Message, ContextMenuAction, ChatMode } from '../types/chat';
 
 // Initial states
 const initialChatState: ChatState = {

@@ -1,8 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import type React from 'react';
+import { useRef, useEffect } from 'react';
 import { MessageItem } from './MessageItem';
 import { LoadingMessage } from './LoadingMessage';
 import { ErrorMessage } from './ErrorMessage';
-import { PageContext } from '../services/llm/prompts';
+import type { PageContext } from '../services/llm/prompts';
 
 interface Message {
   role: string;

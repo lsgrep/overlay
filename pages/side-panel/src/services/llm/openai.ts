@@ -1,4 +1,4 @@
-import { Message, LLMService, LLMConfig } from './types';
+import type { Message, LLMService, LLMConfig } from './types';
 import { openAIKeyStorage } from '@extension/storage';
 export class OpenAIService implements LLMService {
   private apiKey: string = '';

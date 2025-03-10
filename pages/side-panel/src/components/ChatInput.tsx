@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { t } from '@extension/i18n';
 import { Button, Textarea } from '@extension/ui';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';

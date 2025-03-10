@@ -1,8 +1,9 @@
+import type { Model } from '@extension/shared';
 import { useStorage } from '@extension/shared';
 import { geminiKeyStorage, defaultLanguageStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
-import { Model } from '@extension/shared';
-import { t, DevLocale } from '@extension/i18n';
+import type { DevLocale } from '@extension/i18n';
+import { t } from '@extension/i18n';
 import { useEffect, useState } from 'react';
 
 interface GoogleTabProps {

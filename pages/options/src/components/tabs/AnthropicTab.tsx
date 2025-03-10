@@ -1,8 +1,9 @@
+import type { Model } from '@extension/shared';
 import { useStorage } from '@extension/shared';
 import { anthropicKeyStorage, defaultLanguageStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
-import { Model } from '@extension/shared';
-import { DevLocale, t } from '@extension/i18n';
+import type { DevLocale } from '@extension/i18n';
+import { t } from '@extension/i18n';
 import { useEffect, useState } from 'react';
 
 interface AnthropicTabProps {

@@ -1,4 +1,4 @@
-import { LLMConfig, LLMService, Message } from './types';
+import type { LLMConfig, LLMService, Message } from './types';
 
 export class OllamaService implements LLMService {
   private modelName: string;
@@ -89,7 +89,7 @@ export class OllamaService implements LLMService {
         try {
           const data = JSON.parse(line);
           if (data.message?.content) {
-            let content = data.message.content;
+            const content = data.message.content;
             if (mode === 'interactive') {
               // For interactive mode, accumulate JSON chunks
               accumulatedJson += content;
