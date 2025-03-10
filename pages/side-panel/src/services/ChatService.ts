@@ -17,7 +17,7 @@ interface Message {
   metadata?: {
     questionId?: string;
     originalQuestion?: string;
-    extractedData?: any;
+    extractedData?: Record<string, unknown>;
     timestamp?: number;
   };
 }
@@ -119,7 +119,8 @@ export class ChatService {
           try {
             const json = JSON.parse(msg.content);
             return json.task_type || 'unknown';
-          } catch (e) {
+          } catch {
+            // If parsing fails, assume it's a conversational message
             return 'conversational';
           }
         }),
@@ -155,85 +156,160 @@ export class ChatService {
       },
     });
 
-    let response: string;
+    let response: string = '';
     let llmService: LLMService;
 
-    if (selectedModel.startsWith('claude')) {
-      const anthropicMessages = chatMessages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'assistant',
-        content: msg.content,
-      }));
-      llmService = new AnthropicService(selectedModel);
-      response = await llmService.generateCompletion(anthropicMessages, prompt);
-    } else if (selectedModel.includes('gemini')) {
-      const geminiService = new GeminiService(selectedModel);
-      const modelName = selectedModel.replace('models/', '');
-      const model = {
-        name: selectedModel,
-        provider: 'gemini',
-        displayName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
-      };
-
-      // Check if this is a task planning request
-      const isTaskPlanningRequest =
-        input.toLowerCase().includes('task plan') ||
-        input.toLowerCase().includes('automate') ||
-        input.toLowerCase().includes('extract data');
-
-      // If this appears to be a task planning request, use the specialized method
-      if (isTaskPlanningRequest && mode === 'interactive' && pageContext) {
-        try {
-          // Use the task planning functionality
-          const taskPlan = await geminiService.generateTaskPlan(
-            input,
-            {
-              title: pageContext.title,
-              url: pageContext.url,
-              content: pageContext.content?.substring(0, 2000), // Limit content length
-            },
-            [], // Available tools - could be extended in the future
-            [], // Previous actions - could be tracked in the future
-          );
-
-          // Format the response for the chat interface
-          response = JSON.stringify(taskPlan, null, 2);
-          console.log('Generated task plan:', taskPlan);
-        } catch (error) {
-          console.error('Task planning failed, falling back to standard completion:', error);
-          // Fall back to standard completion if task planning fails
-          response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
-        }
-      } else {
-        // Use standard completion for regular queries
-        response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+    try {
+      // Check for extension context validity at the beginning
+      if (typeof chrome !== 'undefined' && chrome?.runtime?.lastError) {
+        console.error('Chrome runtime error detected at start:', chrome.runtime.lastError);
+        throw new Error(`Extension context error: ${chrome.runtime.lastError.message}`);
       }
 
-      return {
-        response,
-        model,
-        questionId,
-      };
-    } else if (selectedModel.startsWith('gpt')) {
-      llmService = new OpenAIService(selectedModel);
-      response = await llmService.generateCompletion(chatMessages, prompt);
-    } else {
-      llmService = new OllamaService(selectedModel, API_URL);
-      response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
+      if (selectedModel.startsWith('claude')) {
+        const anthropicMessages = chatMessages.map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.content,
+        }));
+        llmService = new AnthropicService(selectedModel);
+        response = await llmService.generateCompletion(anthropicMessages, prompt);
+      } else if (selectedModel.includes('gemini')) {
+        const geminiService = new GeminiService(selectedModel);
+        const modelName = selectedModel.replace('models/', '');
+        const model = {
+          name: selectedModel,
+          provider: 'gemini',
+          displayName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
+        };
+
+        try {
+          // Check if this is a task planning request
+          const isTaskPlanningRequest =
+            input.toLowerCase().includes('task plan') ||
+            input.toLowerCase().includes('automate') ||
+            input.toLowerCase().includes('extract data');
+
+          // If this appears to be a task planning request, use the specialized method
+          if (isTaskPlanningRequest && mode === 'interactive' && pageContext) {
+            try {
+              // Safely access page context properties with defaults
+              const safePageContext = {
+                title: pageContext?.title || 'Unknown Page',
+                url: pageContext?.url || window.location?.href || 'Unknown URL',
+                content: pageContext?.content?.substring(0, 2000) || '', // Limit content length
+              };
+
+              // Use the task planning functionality
+              const taskPlan = await geminiService.generateTaskPlan(
+                input,
+                safePageContext,
+                [], // Available tools - could be extended in the future
+                [], // Previous actions - could be tracked in the future
+              );
+
+              // Format the response for the chat interface
+              response = JSON.stringify(taskPlan, null, 2);
+              console.log('Generated task plan:', taskPlan);
+            } catch (planError) {
+              console.error('Task planning failed, falling back to standard completion:', planError);
+              // Fall back to standard completion if task planning fails
+              response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+            }
+          } else {
+            // Use standard completion for regular queries
+            response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+          }
+
+          return {
+            response,
+            model,
+            questionId,
+          };
+        } catch (geminiError) {
+          console.error('Error in Gemini processing:', geminiError);
+          // Check if this is an extension context error
+          // Properly type the error
+          const error = geminiError as Error;
+          if (error.message?.includes('Extension context')) {
+            throw geminiError; // Re-throw to be caught by outer handler
+          }
+          // Otherwise return a friendly error message
+          return {
+            response: 'An error occurred while processing your request with Gemini. Please try again.',
+            model,
+            questionId,
+          };
+        }
+      } else if (selectedModel.startsWith('gpt')) {
+        try {
+          llmService = new OpenAIService(selectedModel);
+          response = await llmService.generateCompletion(chatMessages, prompt);
+        } catch (openaiError) {
+          console.error('OpenAI service error:', openaiError);
+          response = 'Error communicating with OpenAI. Please try again later.';
+        }
+      } else {
+        try {
+          llmService = new OllamaService(selectedModel, API_URL);
+          response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
+        } catch (ollamaError) {
+          console.error('Ollama service error:', ollamaError);
+          response = 'Error communicating with Ollama. Please ensure the Ollama service is running and try again.';
+        }
+      }
+    } catch (globalError) {
+      // Global error handler for any unexpected errors
+      console.error('Global error in submitMessage:', globalError);
+      // Handle error object gracefully
+      const error = globalError as Error;
+      if (error.message?.includes('Extension context invalidated')) {
+        response =
+          'The extension context was invalidated. Please reload the extension or refresh the page and try again.';
+      } else {
+        response = 'I encountered an unexpected error. Please try again or reload the extension.';
+      }
     }
 
     console.log('Debug: Response:', response);
-    const model = [...openaiModels, ...geminiModels, ...anthropicModels, ...ollamaModels].find(
-      model => model.name === selectedModel,
-    ) || {
-      name: selectedModel,
-      provider: selectedModel.startsWith('gpt') ? 'openai' : 'ollama',
-      displayName: selectedModel,
-    };
 
-    return {
-      response,
-      model,
-      questionId,
-    };
+    // If we've already returned from the Gemini branch, we don't need to continue
+    if (response) {
+      const model = [...openaiModels, ...geminiModels, ...anthropicModels, ...ollamaModels].find(
+        model => model.name === selectedModel,
+      ) || {
+        name: selectedModel,
+        provider: selectedModel.startsWith('gpt')
+          ? 'openai'
+          : selectedModel.startsWith('claude')
+            ? 'anthropic'
+            : selectedModel.includes('gemini')
+              ? 'gemini'
+              : 'ollama',
+        displayName: selectedModel,
+      };
+
+      try {
+        // Final check for extension context validity before returning
+        if (typeof chrome !== 'undefined' && chrome?.runtime?.lastError) {
+          console.error('Chrome runtime error before return:', chrome.runtime.lastError);
+          throw new Error(`Extension context error: ${chrome.runtime.lastError.message}`);
+        }
+
+        return {
+          response,
+          model,
+          questionId,
+        };
+      } catch (finalError) {
+        console.error('Error in final response preparation:', finalError);
+        // If we encounter an extension context error at the end, still return something useful
+        return {
+          response:
+            'The extension context was invalidated. Please reload the extension or refresh the page and try again.',
+          model,
+          questionId,
+        };
+      }
+    }
   }
 }
