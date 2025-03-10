@@ -31,6 +31,12 @@ export interface JSONSchema {
 
 export interface StructuredOutputConfig {
   schema?: JSONSchema;
+  /**
+   * If true, disables native structured output capabilities of the model
+   * and instead relies on post-processing the text output.
+   * This is useful for models like Gemini that have limited schema support.
+   */
+  disableNativeStructuredOutput?: boolean;
 }
 
 export interface LLMService {

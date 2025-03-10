@@ -34,20 +34,30 @@ export class GeminiService implements LLMService {
         apiKey: geminiKey,
       });
 
-      // Create the model instance
-      const model = google(this.modelName);
+      // Create the model instance with appropriate configuration
+      const model = google(this.modelName, {
+        // Disable structured outputs when using complex schema that might have unions
+        // or other unsupported features
+        structuredOutputs: structuredOutput?.disableNativeStructuredOutput ? false : true,
+      });
 
       // Prepare messages format - convert from our format to AI SDK format
       const aiMessages: CoreMessage[] = [];
 
-      // Add context as a system message first
-      aiMessages.push({
-        role: 'system',
-        content: context,
-      } as CoreMessage);
+      // For Gemini, prepend the system context to the first user message
+      // or add as a user message if there are no user messages
+      const hasUserMessage = messages.some(msg => msg.role === 'user');
+      if (!hasUserMessage) {
+        // If no user messages, add context as a user message
+        aiMessages.push({
+          role: 'user',
+          content: `${context}\n\nPlease acknowledge that you understand these instructions.`,
+        } as CoreMessage);
+      }
 
       // Add the conversation messages
-      for (const msg of messages) {
+      for (const idx in messages) {
+        const msg = messages[idx];
         // Map our role format to the AI SDK format
         // The SDK expects 'user', 'assistant', 'system', or 'tool'
         let sdkRole: 'user' | 'assistant' | 'system' | 'tool';
@@ -66,10 +76,18 @@ export class GeminiService implements LLMService {
             sdkRole = 'user'; // Default fallback
         }
 
-        aiMessages.push({
-          role: sdkRole,
-          content: msg.content,
-        } as CoreMessage);
+        // For the first user message, prepend the system context
+        if (sdkRole === 'user' && idx === '0' && context) {
+          aiMessages.push({
+            role: sdkRole,
+            content: `${context}\n\n${msg.content}`,
+          } as CoreMessage);
+        } else {
+          aiMessages.push({
+            role: sdkRole,
+            content: msg.content,
+          } as CoreMessage);
+        }
       }
 
       // Generate completion using AI SDK
@@ -84,99 +102,97 @@ export class GeminiService implements LLMService {
 
       // Process the text response - convert completion result to string
       // The SDK returns a special result object that needs to be converted to string
-      const responseText = String(completion);
+      console.log('Gemini response:', completion);
 
-      // Handle structured output if specified
-      if (structuredOutput && responseText) {
+      // Handle structured output
+      if (structuredOutput?.schema) {
         try {
-          // If schema is provided, force the response into valid JSON
-          // The SDK should already return valid JSON with schema, but we check just in case
-          JSON.parse(responseText); // Will throw if not valid JSON
-          return responseText;
-        } catch {
-          // Try to extract JSON from the response if it's not already valid JSON
-          const jsonMatch =
-            responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
-            responseText.match(/\s*({[\s\S]*})\s*/) ||
-            responseText.match(/\s*(\[[\s\S]*\])\s*/) ||
-            responseText.match(/{[\s\S]*}/) ||
-            responseText.match(/\[[\s\S]*\]/);
-
-          if (jsonMatch) {
-            let extractedJson = jsonMatch[1] || jsonMatch[0];
-            extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1').trim();
-
-            try {
-              JSON.parse(extractedJson); // Validate the extracted JSON
-              return extractedJson;
-            } catch {
-              console.warn('Could not extract valid JSON from response');
-            }
-          }
-        }
-      }
-
-      // Handle interactive mode responses
-      if (mode === 'interactive' && responseText) {
-        try {
-          // Try to parse the response as JSON first
-          const parsed = JSON.parse(responseText);
-
-          // If it already has an answer field, return as is
-          if (parsed.answer) {
-            return responseText;
+          // If we're returning structured output directly from Gemini API
+          if (!structuredOutput.disableNativeStructuredOutput) {
+            return completion.text;
           }
 
-          // Otherwise wrap the response in the expected format
-          const adaptedResponse = {
-            answer: typeof parsed === 'object' ? JSON.stringify(parsed) : parsed,
-            confidence: 0.9,
-          };
-          return JSON.stringify(adaptedResponse);
-        } catch {
-          // Not valid JSON, try to extract JSON from the text
-          const jsonMatch =
-            responseText.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
-            responseText.match(/\s*({[\s\S]*})\s*/) ||
-            responseText.match(/\s*(\[[\s\S]*\])\s*/) ||
-            responseText.match(/{[\s\S]*}/) ||
-            responseText.match(/\[[\s\S]*\]/);
+          // If we need to post-process the text to extract JSON
+          const text = completion.text;
+          // Try to parse directly first
+          try {
+            const parsed = JSON.parse(text);
+            return JSON.stringify(parsed);
+          } catch (parseError) {
+            console.warn('Failed to parse direct JSON response, attempting extraction:', parseError);
 
-          if (jsonMatch) {
-            let extractedJson = jsonMatch[1] || jsonMatch[0];
-            extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1').trim();
+            // Try to extract JSON from markdown code blocks or plain text
+            const jsonMatch =
+              text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
+              text.match(/\s*({[\s\S]*})\s*/) ||
+              text.match(/\s*(\[[\s\S]*\])\s*/) ||
+              text.match(/{[\s\S]*}/) ||
+              text.match(/\[[\s\S]*\]/);
 
-            try {
-              const parsed = JSON.parse(extractedJson);
+            if (jsonMatch) {
+              let extractedJson = jsonMatch[1] || jsonMatch[0];
+              extractedJson = extractedJson.replace(/,\s*(\}|\])(?=\s*$)/g, '$1').trim();
 
-              if (!parsed.answer) {
+              try {
+                const parsed = JSON.parse(extractedJson);
+                return JSON.stringify(parsed);
+              } catch (extractionError) {
+                console.error('Failed to extract JSON from response:', extractionError);
                 return JSON.stringify({
-                  answer: JSON.stringify(parsed),
-                  confidence: 0.8,
+                  error: 'Failed to parse structured output',
+                  original_response: text,
                 });
               }
-
-              return extractedJson;
-            } catch {
-              // For interactive mode with no valid JSON, wrap the plain text
+            } else {
+              console.warn('No JSON pattern found in response');
               return JSON.stringify({
-                answer: responseText,
-                confidence: 0.6,
+                error: 'No JSON pattern found in model response',
+                original_response: text,
               });
             }
-          } else {
-            // For interactive mode with no JSON, wrap the plain text
-            return JSON.stringify({
-              answer: responseText,
-              confidence: 0.6,
-            });
           }
+        } catch (error) {
+          console.error('Error handling structured output:', error);
+          return JSON.stringify({
+            error: 'Error processing structured output',
+            message: error instanceof Error ? error.message : String(error),
+          });
         }
       }
 
-      return responseText || 'No response generated';
+      // For interactive mode, format response appropriately
+      if (mode === 'interactive') {
+        try {
+          // Try to parse as JSON first
+          const parsed = JSON.parse(completion.text);
+
+          // If already has answer field, return as is
+          if (parsed.answer) {
+            return JSON.stringify(parsed);
+          }
+
+          // Otherwise wrap in expected format
+          return JSON.stringify({
+            answer: typeof parsed === 'object' ? JSON.stringify(parsed) : parsed,
+            confidence: 0.9,
+          });
+        } catch {
+          // Not JSON, wrap the plain text
+          return JSON.stringify({
+            answer: completion.text,
+            confidence: 0.7,
+          });
+        }
+      }
+
+      // Default case, return raw text
+      return completion.text;
     } catch (error) {
       console.error('Error in Gemini chat:', error);
+      // Provide more detailed error information
+      if (error instanceof Error) {
+        throw new Error(`Gemini API error: ${error.message}`);
+      }
       throw error;
     }
   }
