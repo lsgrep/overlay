@@ -311,5 +311,22 @@ export class ChatService {
         };
       }
     }
+
+    // Add final return statement to ensure all code paths return a value
+    return {
+      response: 'Could not generate a response. Please try again.',
+      model: {
+        name: selectedModel,
+        provider: selectedModel.startsWith('gpt')
+          ? 'openai'
+          : selectedModel.startsWith('claude')
+            ? 'anthropic'
+            : selectedModel.includes('gemini')
+              ? 'gemini'
+              : 'ollama',
+        displayName: selectedModel,
+      },
+      questionId,
+    };
   }
 }

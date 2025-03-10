@@ -21,7 +21,7 @@ interface Message {
   metadata?: {
     questionId?: string;
     originalQuestion?: string;
-    extractedData?: unknown;
+    extractedData?: Record<string, unknown>;
     timestamp?: number;
     sourceUrl?: string;
   };
