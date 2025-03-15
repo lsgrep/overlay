@@ -32,6 +32,22 @@ export interface GeminiInvocationOptions {
 /**
  * Implementation of LLMService for Google's Gemini models using the official Google Generative AI SDK
  */
+/**
+ * Helper function to convert ArrayBuffer to base64 string in browser environment
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  // Create a Uint8Array from the ArrayBuffer
+  const bytes = new Uint8Array(buffer);
+  // Convert to a binary string
+  let binary = '';
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  // Convert to base64
+  return btoa(binary);
+}
+
 export class GeminiService implements LLMService {
   private modelName: string;
   private genAI: GoogleGenerativeAI | null = null;
@@ -167,10 +183,45 @@ export class GeminiService implements LLMService {
         generationConfig,
       });
 
-      // Format the messages for Gemini API
+      // Check if this is a PDF and we should use direct PDF processing
+      if (context?.isPdf && context.url) {
+        try {
+          console.log('Processing PDF directly with Gemini API:', context.url);
+
+          // Fetch the PDF file
+          const pdfResponse = await fetch(context.url).then(response => {
+            if (!response.ok) {
+              throw new Error(`Failed to fetch PDF: ${response.status}`);
+            }
+            return response.arrayBuffer();
+          });
+
+          // Convert ArrayBuffer to base64 (browser-compatible)
+          const base64Data = arrayBufferToBase64(pdfResponse);
+
+          // Generate content using direct PDF processing with the provided prompt
+          const pdfContentResult = await model.generateContent([
+            {
+              inlineData: {
+                data: base64Data,
+                mimeType: 'application/pdf',
+              },
+            },
+            prompt,
+          ]);
+
+          return pdfContentResult.response.text();
+        } catch (pdfError) {
+          console.error('Error processing PDF with Gemini:', pdfError);
+          console.log('Falling back to standard text processing');
+          // Continue with standard processing as fallback
+        }
+      }
+
+      // Format the messages for Gemini API (standard approach)
       const formattedMessages = this.formatMessages(messages, prompt);
 
-      // Generate content
+      // Generate content with standard approach
       const contentResult = await model.generateContent({
         contents: formattedMessages,
       });
