@@ -4,10 +4,6 @@ export interface PageContext {
   content?: string;
   originalHtml?: string;
   isPdf?: boolean;
-  pdfData?: {
-    bytes?: Uint8Array;
-    filename?: string;
-  };
   metadata?: {
     // Additional page metadata that might be useful
     lastModified?: string;

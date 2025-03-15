@@ -3,6 +3,7 @@ import type { LLMConfig, LLMService, Message, StructuredOutputConfig } from './t
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import type { Schema } from '@google/generative-ai';
 import { TaskPlanSchema } from '../task/types';
+import { PageContext } from './prompts';
 
 /**
  * Constants for Gemini models
@@ -136,12 +137,18 @@ export class GeminiService implements LLMService {
   /**
    * Generate text completion using Gemini
    */
-  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
+  async generateCompletion(
+    messages: Message[],
+    prompt: string,
+    config?: LLMConfig,
+    context: PageContext,
+  ): Promise<string> {
     try {
       // Adjust temperature based on the mode
       const temperatureAdjustment = 0.0;
       const adjustedTemperature = (config?.temperature ?? 0.7) - temperatureAdjustment;
-
+      console.log('[gemini]');
+      console.log(context);
       // Get the Gemini API client
       const genAI = await this.getClient();
 
@@ -161,7 +168,7 @@ export class GeminiService implements LLMService {
       });
 
       // Format the messages for Gemini API
-      const formattedMessages = this.formatMessages(messages, context);
+      const formattedMessages = this.formatMessages(messages, prompt);
 
       // Generate content
       const contentResult = await model.generateContent({
@@ -184,14 +191,7 @@ export class GeminiService implements LLMService {
   /**
    * Generate a task plan for web automation using Gemini's structured output capability
    */
-  async generateTaskPlan(
-    userRequest: string,
-    pageContext: {
-      title?: string;
-      url?: string;
-      content?: string;
-    },
-  ): Promise<string> {
+  async generateTaskPlan(userRequest: string, pageContext: PageContext): Promise<string> {
     try {
       // Get the Gemini API client
       const genAI = await this.getClient();
