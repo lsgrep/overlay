@@ -1,9 +1,10 @@
 import type { ActionContext, ChatMode, ModelInfo, PageContext, PromptGenerator } from './prompts/types';
-import { AnthropicPromptGenerator } from './prompts/anthropic';
 import { GeminiPromptGenerator } from './prompts/gemini';
+import { AnthropicPromptGenerator } from './prompts/anthropic';
 import { OpenAIPromptGenerator } from './prompts/openai';
 import { OllamaPromptGenerator } from './prompts/ollama';
-import { EnhancedAnthropicPromptGenerator } from './prompts/enhanced-anthropic';
+// Enhanced implementations will need to be updated
+const EnhancedAnthropicPromptGenerator = AnthropicPromptGenerator;
 
 export interface PromptOptions {
   goal?: string;
@@ -108,15 +109,9 @@ export class PromptManager {
       if (options.enhancedMode && options.goal && promptGenerator.generateTaskDecompositionPrompt) {
         context += '\n\n' + promptGenerator.generateTaskDecompositionPrompt(options.goal);
       }
-    } else if (mode === 'context-menu' && pageContext && pageContext.metadata?.selectedText) {
-      // Special handling for context-menu mode with selected text
-      context += `\n\nYou are in context-menu mode. The user has selected text and wants you to help with it.`;
-      context += `\n\nSelected text: ${pageContext.metadata.selectedText}`;
-      context += '\n\n' + promptGenerator.generateConversationalPrompt();
     } else {
       context += '\n\n' + promptGenerator.generateConversationalPrompt();
     }
-
     return context;
   }
 

@@ -31,7 +31,7 @@ export interface ModelInfo {
   capabilities?: string[];
 }
 
-export type ChatMode = 'interactive' | 'conversational' | 'context-menu';
+export type ChatMode = 'interactive' | 'conversational';
 
 export interface ActionContext {
   sessionId: string;

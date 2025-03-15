@@ -183,41 +183,32 @@ export class ChatService {
         };
 
         try {
-          // Check if this is a task planning request
-          const isTaskPlanningRequest =
-            input.toLowerCase().includes('task plan') ||
-            input.toLowerCase().includes('automate') ||
-            input.toLowerCase().includes('extract data');
-
           // If this appears to be a task planning request, use the specialized method
-          if (isTaskPlanningRequest && mode === 'interactive' && pageContext) {
+          if (mode === 'interactive' && pageContext) {
             try {
               // Safely access page context properties with defaults
               const safePageContext = {
                 title: pageContext?.title || 'Unknown Page',
                 url: pageContext?.url || window.location?.href || 'Unknown URL',
-                content: pageContext?.content?.substring(0, 2000) || '', // Limit content length
+                content: pageContext?.content?.substring(0) || '', // Limit content length
               };
 
+              console.log('about to generate task plan:', input, safePageContext);
+
               // Use the task planning functionality
-              const taskPlan = await geminiService.generateTaskPlan(
-                input,
-                safePageContext,
-                [], // Available tools - could be extended in the future
-                [], // Previous actions - could be tracked in the future
-              );
+              const taskPlan = await geminiService.generateTaskPlan(input, safePageContext);
 
               // Format the response for the chat interface
-              response = JSON.stringify(taskPlan, null, 2);
+              response = taskPlan;
               console.log('Generated task plan:', taskPlan);
             } catch (planError) {
               console.error('Task planning failed, falling back to standard completion:', planError);
               // Fall back to standard completion if task planning fails
-              response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+              response = await geminiService.generateCompletion(chatMessages, prompt, undefined);
             }
           } else {
             // Use standard completion for regular queries
-            response = await geminiService.generateCompletion(chatMessages, prompt, undefined, mode);
+            response = await geminiService.generateCompletion(chatMessages, prompt, undefined);
           }
 
           return {
@@ -251,7 +242,7 @@ export class ChatService {
       } else {
         try {
           llmService = new OllamaService(selectedModel, API_URL);
-          response = await llmService.generateCompletion(chatMessages, prompt, undefined, mode);
+          response = await llmService.generateCompletion(chatMessages, prompt, undefined);
         } catch (ollamaError) {
           console.error('Ollama service error:', ollamaError);
           response = 'Error communicating with Ollama. Please ensure the Ollama service is running and try again.';

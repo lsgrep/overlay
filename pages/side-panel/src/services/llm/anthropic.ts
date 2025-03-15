@@ -1,74 +1,77 @@
 import { anthropicKeyStorage } from '@extension/storage';
 import type { Message, LLMConfig, LLMService } from './types';
-
-interface AnthropicMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
-interface AnthropicResponse {
-  id: string;
-  type: string;
-  role: string;
-  content: Array<{
-    type: string;
-    text: string;
-  }>;
-}
+import Anthropic from '@anthropic-ai/sdk';
+import type { Messages } from '@anthropic-ai/sdk/resources';
 
 export class AnthropicService implements LLMService {
-  private API_URL = 'https://api.anthropic.com/v1/messages';
   private model: string;
+  private client: Anthropic | null = null;
 
   constructor(model: string) {
     this.model = model;
   }
 
-  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
-    const key = await anthropicKeyStorage.get();
-    if (!key) {
+  /**
+   * Get or initialize the Anthropic client
+   */
+  private async getClient(): Promise<Anthropic> {
+    if (this.client) return this.client;
+
+    // Get API key from storage
+    const apiKey = await anthropicKeyStorage.get();
+    if (!apiKey) {
       throw new Error('Anthropic API key not found');
     }
 
-    // Convert messages to Anthropic format
-    const anthropicMessages: AnthropicMessage[] = messages.map(msg => ({
-      role: msg.role.toLowerCase() === 'user' ? 'user' : 'assistant',
-      content: msg.content,
-    }));
+    // Initialize the client
+    this.client = new Anthropic({
+      apiKey,
+      dangerouslyAllowBrowser: true, // Required for browser usage
+    });
 
-    // Add context as system prompt
-    const systemPrompt = context;
+    return this.client;
+  }
 
+  /**
+   * Generate text completion using Anthropic Claude
+   */
+  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
     try {
-      const response = await fetch(this.API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: this.model,
-          messages: anthropicMessages,
-          max_tokens: config?.maxOutputTokens || 4096,
-          temperature: config?.temperature,
-          top_k: config?.topK,
-          top_p: config?.topP,
-          system: systemPrompt,
-        }),
-      });
-      console.log('Anthropic response:', response);
+      // Get the Anthropic client
+      const client = await this.getClient();
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Anthropic API error: ${error.error?.message || response.statusText}`);
+      // Convert messages to Anthropic format
+      const anthropicMessages = messages.map(msg => ({
+        role: msg.role.toLowerCase() === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+      })) as Messages.MessageParam[];
+
+      // Create the message with the SDK
+      const response = await client.messages.create({
+        model: this.model,
+        messages: anthropicMessages,
+        system: context,
+        max_tokens: config?.maxOutputTokens || 4096,
+        temperature: config?.temperature,
+        top_k: config?.topK,
+        top_p: config?.topP,
+      });
+
+      // Extract the response text from the content
+      if (response.content && response.content.length > 0) {
+        // Check if the content is a text block
+        const block = response.content[0];
+        if (block.type === 'text') {
+          return block.text;
+        }
       }
 
-      const data: AnthropicResponse = await response.json();
-      return data.content[0].text;
+      return '';
     } catch (error) {
       console.error('Error in Anthropic chat:', error);
+      if (error instanceof Error) {
+        throw new Error(`Anthropic API error: ${error.message}`);
+      }
       throw error;
     }
   }

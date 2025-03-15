@@ -40,11 +40,5 @@ export interface StructuredOutputConfig {
 }
 
 export interface LLMService {
-  generateCompletion(
-    messages: Message[],
-    context: string,
-    config?: LLMConfig,
-    mode?: 'interactive' | 'conversational',
-    structuredOutput?: StructuredOutputConfig,
-  ): Promise<string>;
+  generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string>;
 }

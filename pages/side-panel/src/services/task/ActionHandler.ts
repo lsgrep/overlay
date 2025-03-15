@@ -110,6 +110,9 @@ export class ActionHandler {
     if (action.parameters.query) {
       await performSearch(action.parameters.query);
       return true;
+    } else if (action.parameters.text) {
+      await performSearch(action.parameters.text);
+      return true;
     }
     throw new Error('Search query is required for search action');
   }

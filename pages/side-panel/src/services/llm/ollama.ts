@@ -9,7 +9,7 @@ export class OllamaService implements LLMService {
     this.apiUrl = apiUrl;
   }
 
-  private getRequestFormat(mode: 'interactive' | 'conversational' | 'context-menu') {
+  private getRequestFormat(mode: 'interactive' | 'conversational') {
     if (mode === 'interactive') {
       return {
         type: 'object',
@@ -46,12 +46,8 @@ export class OllamaService implements LLMService {
     return undefined;
   }
 
-  async generateCompletion(
-    messages: Message[],
-    context: string,
-    config?: LLMConfig,
-    mode: 'interactive' | 'conversational' | 'context-menu' = 'conversational',
-  ): Promise<string> {
+  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
+    const mode = 'conversational';
     const requestBody: any = {
       model: this.modelName,
       messages: [...messages, { role: 'user', content: context }],
