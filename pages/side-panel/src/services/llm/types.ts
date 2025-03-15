@@ -1,3 +1,5 @@
+import type { PageContext } from './prompts';
+
 export interface Message {
   role: string;
   content: string;
@@ -40,5 +42,10 @@ export interface StructuredOutputConfig {
 }
 
 export interface LLMService {
-  generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string>;
+  generateCompletion(
+    messages: Message[],
+    context: string,
+    config?: LLMConfig,
+    pageContent?: PageContext,
+  ): Promise<string>;
 }

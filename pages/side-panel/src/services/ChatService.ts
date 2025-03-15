@@ -191,7 +191,7 @@ export class ChatService {
           content: msg.content,
         }));
         llmService = new AnthropicService(selectedModel);
-        response = await llmService.generateCompletion(anthropicMessages, prompt);
+        response = await llmService.generateCompletion(anthropicMessages, prompt, undefined, pageContext);
       } else if (selectedModel.includes('gemini')) {
         const geminiService = new GeminiService(selectedModel);
         const modelName = selectedModel.replace('models/', '');
