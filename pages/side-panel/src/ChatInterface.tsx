@@ -101,8 +101,9 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
         console.error('Error extracting page context:', err);
       }
 
-      // Get the active tab URL from the extracted context
+      // Get the active tab URL and title from the extracted context
       const activeTabUrl = extractedPageContext?.url || ''; // Fallback to empty string if undefined
+      const activeTabTitle = extractedPageContext?.title || ''; // Fallback to empty string if undefined
 
       // Create the display message
       const displayMessage: Message = {
@@ -173,6 +174,7 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
               promptTimestamp: displayMessage.metadata?.timestamp,
               responseTimestamp,
               pageContextIncluded: !!includePageContext,
+              pageTitle: activeTabTitle, // Add page title to metadata
             },
           });
           console.log('Completion saved to database');
