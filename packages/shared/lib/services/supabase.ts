@@ -274,3 +274,167 @@ export async function deleteNote(noteId: string) {
     return { success: false, error: (error as Error).message };
   }
 }
+
+/**
+ * Type alias for Completion objects from the database
+ */
+export type Completion = Database['public']['Tables']['completions']['Row'];
+
+/**
+ * Save a completion to Supabase
+ * @param promptContent The prompt/question content
+ * @param responseContent The response content from the LLM
+ * @param sourceUrl Optional source URL where the completion occurred
+ * @param modelInfo Optional information about the model used
+ * @param metadata Optional additional metadata
+ * @returns The saved completion data or null if there was an error
+ */
+export async function saveCompletion({
+  promptContent,
+  responseContent,
+  sourceUrl = null,
+  questionId = null,
+  modelInfo = {},
+  metadata = null,
+}: {
+  promptContent: string;
+  responseContent: string;
+  sourceUrl?: string | null;
+  questionId?: string | null;
+  modelInfo?: {
+    modelName?: string;
+    modelProvider?: string;
+    modelDisplayName?: string;
+  };
+  metadata?: Record<string, unknown> | null;
+}) {
+  try {
+    const user = await getCurrentUserFromStorage();
+    if (!user) {
+      console.error('[SUPABASE] Cannot save completion: User not authenticated');
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    // Generate a UUID for the completion
+    const completionId = crypto.randomUUID();
+
+    // Current timestamp in milliseconds
+    const now = Date.now();
+
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('completions')
+      .insert({
+        completion_id: completionId,
+        uid: user.id,
+        prompt_content: promptContent,
+        response_content: responseContent,
+        prompt_timestamp: now,
+        response_timestamp: now,
+        source_url: sourceUrl,
+        question_id: questionId,
+        model_name: modelInfo.modelName || null,
+        model_provider: modelInfo.modelProvider || null,
+        model_display_name: modelInfo.modelDisplayName || null,
+        metadata,
+      } as Database['public']['Tables']['completions']['Insert'])
+      .select();
+
+    if (error) {
+      console.error('[SUPABASE] Error saving completion:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('[SUPABASE] Completion saved successfully:', data);
+    return { success: true, data };
+  } catch (error) {
+    console.error('[SUPABASE] Error in saveCompletion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
+ * Get completions for the current user
+ * @param options Optional parameters for filtering and pagination
+ * @returns An array of completions or an error
+ */
+export async function getCompletions({
+  limit = 50,
+  offset = 0,
+  sourceUrl = null,
+  questionId = null,
+  orderBy = { column: 'created_at', ascending: false },
+}: {
+  limit?: number;
+  offset?: number;
+  sourceUrl?: string | null;
+  questionId?: string | null;
+  orderBy?: { column: string; ascending: boolean };
+} = {}) {
+  try {
+    const user = await getCurrentUserFromStorage();
+    if (!user) {
+      console.error('[SUPABASE] Cannot get completions: User not authenticated');
+      return { success: false, error: 'User not authenticated', data: [] };
+    }
+
+    const supabase = createClient();
+    let query = supabase
+      .from('completions')
+      .select('*')
+      .eq('uid', user.id)
+      .order(orderBy.column, { ascending: orderBy.ascending })
+      .range(offset, offset + limit - 1);
+
+    // Apply additional filters if provided
+    if (sourceUrl) {
+      query = query.eq('source_url', sourceUrl);
+    }
+
+    if (questionId) {
+      query = query.eq('question_id', questionId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('[SUPABASE] Error getting completions:', error);
+      return { success: false, error: error.message, data: [] };
+    }
+
+    console.log(`[SUPABASE] Retrieved ${data.length} completions`);
+    return { success: true, data: data as Completion[] };
+  } catch (error) {
+    console.error('[SUPABASE] Error in getCompletions:', error);
+    return { success: false, error: (error as Error).message, data: [] };
+  }
+}
+
+/**
+ * Delete a completion by ID
+ * @param completionId The ID of the completion to delete
+ * @returns Success status and any error message
+ */
+export async function deleteCompletion(completionId: string) {
+  try {
+    const user = await getCurrentUserFromStorage();
+    if (!user) {
+      console.error('[SUPABASE] Cannot delete completion: User not authenticated');
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const supabase = createClient();
+    const { error } = await supabase.from('completions').delete().eq('completion_id', completionId).eq('uid', user.id);
+
+    if (error) {
+      console.error('[SUPABASE] Error deleting completion:', error);
+      return { success: false, error: error.message };
+    }
+
+    console.log('[SUPABASE] Completion deleted successfully');
+    return { success: true };
+  } catch (error) {
+    console.error('[SUPABASE] Error in deleteCompletion:', error);
+    return { success: false, error: (error as Error).message };
+  }
+}
