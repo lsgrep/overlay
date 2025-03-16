@@ -2,6 +2,7 @@ import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
+import { saveCompletion } from '@extension/shared/lib/services/supabase';
 
 // Import our refactored components
 import { HeaderComponent } from './components/HeaderComponent';
@@ -139,6 +140,7 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
         });
 
         // Add response to messages
+        const responseTimestamp = Date.now();
         setMessages(prev => [
           ...prev,
           {
@@ -148,11 +150,36 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
             metadata: {
               questionId,
               originalQuestion: displayMessage.content,
-              timestamp: Date.now(),
+              timestamp: responseTimestamp,
               // Don't add sourceUrl to LLM responses as requested
             },
           },
         ]);
+
+        // Save completion to Supabase
+        try {
+          await saveCompletion({
+            promptContent: displayMessage.content,
+            responseContent: response,
+            sourceUrl: activeTabUrl,
+            questionId,
+            modelInfo: {
+              modelName: model.name,
+              modelProvider: model.provider,
+              modelDisplayName: model.displayName,
+            },
+            metadata: {
+              mode,
+              promptTimestamp: displayMessage.metadata?.timestamp,
+              responseTimestamp,
+              pageContextIncluded: !!includePageContext,
+            },
+          });
+          console.log('Completion saved to database');
+        } catch (saveError) {
+          // Don't break the chat flow if saving fails
+          console.error('Error saving completion to database:', saveError);
+        }
       } catch (err) {
         console.error('Error in chat:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
