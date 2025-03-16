@@ -3,6 +3,60 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      completions: {
+        Row: {
+          completion_id: string;
+          created_at: string;
+          id: number;
+          metadata: Json | null;
+          mode: string | null;
+          model_display_name: string | null;
+          model_name: string | null;
+          model_provider: string | null;
+          prompt_content: string;
+          prompt_timestamp: number | null;
+          question_id: string | null;
+          response_content: string;
+          response_timestamp: number | null;
+          source_url: string | null;
+          uid: string;
+        };
+        Insert: {
+          completion_id?: string;
+          created_at?: string;
+          id?: number;
+          metadata?: Json | null;
+          mode?: string | null;
+          model_display_name?: string | null;
+          model_name?: string | null;
+          model_provider?: string | null;
+          prompt_content: string;
+          prompt_timestamp?: number | null;
+          question_id?: string | null;
+          response_content: string;
+          response_timestamp?: number | null;
+          source_url?: string | null;
+          uid: string;
+        };
+        Update: {
+          completion_id?: string;
+          created_at?: string;
+          id?: number;
+          metadata?: Json | null;
+          mode?: string | null;
+          model_display_name?: string | null;
+          model_name?: string | null;
+          model_provider?: string | null;
+          prompt_content?: string;
+          prompt_timestamp?: number | null;
+          question_id?: string | null;
+          response_content?: string;
+          response_timestamp?: number | null;
+          source_url?: string | null;
+          uid?: string;
+        };
+        Relationships: [];
+      };
       note_attachments: {
         Row: {
           created_at: string;
