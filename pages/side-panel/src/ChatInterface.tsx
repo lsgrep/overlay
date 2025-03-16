@@ -12,6 +12,13 @@ import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
 import type { PageContext } from './services/llm/prompts';
 
+// Define task interface matching what's in MessageItem.tsx
+interface TaskItem {
+  text: string;
+  completed: boolean;
+  dueDate?: string; // Optional due date
+}
+
 interface Message {
   role: string;
   content: string;
@@ -26,6 +33,8 @@ interface Message {
     extractedData?: Record<string, unknown>;
     timestamp?: number;
     sourceUrl?: string;
+    isTaskList?: boolean; // Indicate if this message contains tasks
+    tasks?: TaskItem[]; // Array of task items if this is a task message
   };
 }
 
@@ -207,15 +216,24 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
         setIsLoading(true);
         try {
           const tasks = await overlayApi.getTasks();
-          // Create a formatted tasks message
+          // Convert API tasks to our TaskItem format
+          const taskItems: TaskItem[] = tasks.map(task => ({
+            text: task.title,
+            completed: task.status === 'completed',
+            dueDate: task.due ? overlayApi.formatDate(task.due) : undefined,
+          }));
+
+          // Create a formatted tasks message using checkbox markdown syntax
+          // This serves as fallback content for clients that don't support our enhanced UI
           let tasksContent = '### Your Tasks\n\n';
           if (tasks.length === 0) {
             tasksContent += 'You have no tasks in your list.';
           } else {
             tasks.forEach(task => {
-              const status = task.status === 'completed' ? '✅' : '⬜';
+              // Use checkbox markdown syntax: - [ ] or - [x]
+              const checkboxStatus = task.status === 'completed' ? '[x]' : '[ ]';
               const dueDate = task.due ? ` (Due: ${overlayApi.formatDate(task.due)})` : '';
-              tasksContent += `${status} ${task.title}${dueDate}\n`;
+              tasksContent += `- ${checkboxStatus} ${task.title}${dueDate}\n`;
             });
           }
           // Add a system message with the tasks
@@ -237,6 +255,8 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
               },
               metadata: {
                 timestamp: Date.now(),
+                isTaskList: tasks.length > 0,
+                tasks: taskItems,
               },
             },
           ]);
@@ -260,6 +280,7 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
               },
               metadata: {
                 timestamp: Date.now(),
+                isTaskList: false, // No tasks to display
               },
             },
           ]);

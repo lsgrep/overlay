@@ -1,6 +1,6 @@
 import type React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Terminal, Link } from 'lucide-react';
+import { Terminal, Link, CheckSquare, Square, ListChecks } from 'lucide-react';
 import { TaskPlanView } from '../components/TaskPlanView';
 import { AnthropicService } from '../services/llm/anthropic';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
@@ -29,6 +29,12 @@ const SourceUrl: React.FC<{ url: string }> = ({ url }) => {
   }
 };
 
+interface TaskItem {
+  text: string;
+  completed: boolean;
+  dueDate?: string; // Optional due date
+}
+
 interface MessageItemProps {
   message: {
     role: string;
@@ -44,6 +50,8 @@ interface MessageItemProps {
       extractedData?: unknown;
       timestamp?: number;
       sourceUrl?: string;
+      isTaskList?: boolean; // Indicate if this message contains tasks
+      tasks?: TaskItem[]; // Array of task items if this is a task message
     };
   };
   index: number;
@@ -54,6 +62,63 @@ interface MessageItemProps {
   fontFamily: string;
   fontSize: number;
 }
+
+// Helper function to detect if content could be a task list
+const detectTaskContent = (content: string): { isTaskList: boolean; tasks: TaskItem[] } => {
+  // Simple detection for task-like content with checkbox markdown syntax
+  const lines = content.split('\n');
+  const checkboxPattern = /^\s*[-*]\s*\[([ xX])\]\s*(.+)$/;
+
+  const possibleTasks = lines
+    .map(line => {
+      const match = line.match(checkboxPattern);
+      if (match) {
+        return {
+          text: match[2].trim(),
+          completed: match[1].toLowerCase() === 'x',
+        };
+      }
+      return null;
+    })
+    .filter(task => task !== null) as TaskItem[];
+
+  // If we have at least one task, consider it a task list
+  return {
+    isTaskList: possibleTasks.length > 0,
+    tasks: possibleTasks,
+  };
+};
+
+// Component to render a task list
+const TaskListView: React.FC<{ tasks: TaskItem[]; isLight: boolean }> = ({ tasks, isLight }) => {
+  return (
+    <div className="my-2">
+      <div className="flex items-center gap-2 mb-2 text-sm font-medium">
+        <ListChecks size={16} />
+        <span>Tasks</span>
+      </div>
+      <div className="space-y-2">
+        {tasks.map((task, idx) => (
+          <div
+            key={idx}
+            className={`flex items-start gap-2 p-2 rounded ${isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-800'} transition-colors`}>
+            <div className="flex-shrink-0 mt-0.5">
+              {task.completed ? (
+                <CheckSquare size={18} className="text-green-500" />
+              ) : (
+                <Square size={18} className="text-gray-400" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className={`text-sm ${task.completed ? 'line-through text-gray-500' : ''}`}>{task.text}</p>
+              {task.dueDate && <p className="text-xs text-gray-500 mt-1">Due: {task.dueDate}</p>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const MessageItem: React.FC<MessageItemProps> = ({
   message,
@@ -71,6 +136,12 @@ export const MessageItem: React.FC<MessageItemProps> = ({
     : '';
   // Get source URL from message metadata
   const sourceUrl = message.metadata?.sourceUrl || '';
+
+  // Process task content if not explicitly defined in metadata
+  const { isTaskList, tasks } =
+    message.metadata?.isTaskList !== undefined
+      ? { isTaskList: message.metadata.isTaskList, tasks: message.metadata.tasks || [] }
+      : detectTaskContent(message.content);
 
   // Determine message style based on role
   const messageContainerClasses = isUser
@@ -141,7 +212,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
         {/* Message content */}
         <div className="text-foreground overflow-x-auto max-w-full">
-          {mode === 'interactive' && message.role === 'assistant' ? (
+          {/* Special handling for task list messages */}
+          {isTaskList && tasks.length > 0 ? (
+            <TaskListView tasks={tasks} isLight={isLight} />
+          ) : mode === 'interactive' && message.role === 'assistant' ? (
             <div className="space-y-2 max-w-full">
               {(() => {
                 try {
@@ -308,17 +382,61 @@ export const MessageItem: React.FC<MessageItemProps> = ({
                       {children}
                     </a>
                   ),
-                  // Enhanced lists
-                  ul: ({ children, ...props }) => (
-                    <ul className="pl-5 list-disc space-y-1 my-2" {...props}>
-                      {children}
-                    </ul>
-                  ),
+                  // Enhanced lists with special handling for checkbox markdown
+                  ul: ({ children, ...props }) => {
+                    // Don't apply task styling here - we detect and render tasks separately
+                    return (
+                      <ul className="pl-5 list-disc space-y-1 my-2" {...props}>
+                        {children}
+                      </ul>
+                    );
+                  },
                   ol: ({ children, ...props }) => (
                     <ol className="pl-5 list-decimal space-y-1 my-2" {...props}>
                       {children}
                     </ol>
                   ),
+                  // Special handling for list items to convert checkbox markdown to interactive elements
+                  li: ({ children, ...props }) => {
+                    // Safe access to node content with proper type handling
+                    // We need to use a type assertion here to safely access the AST node structure
+                    const node = props.node as {
+                      children?: Array<{
+                        type?: string;
+                        children?: Array<{ value?: string }>;
+                      }>;
+                    };
+                    let textContent = '';
+
+                    // Safely extract text content from the node structure
+                    if (node?.children?.[0]?.children?.[0]?.value) {
+                      textContent = node.children[0].children[0].value;
+                    }
+
+                    // Match checkbox pattern if text content exists
+                    if (textContent) {
+                      const match = textContent.match(/^\[([ xX])\]\s*(.+)$/);
+
+                      if (match) {
+                        const checked = match[1].toLowerCase() === 'x';
+                        return (
+                          <li className="!list-none -ml-5" {...props}>
+                            <div className="flex items-start gap-2">
+                              <div className="flex-shrink-0 mt-0.5">
+                                {checked ? (
+                                  <CheckSquare size={18} className="text-green-500" />
+                                ) : (
+                                  <Square size={18} className="text-gray-400" />
+                                )}
+                              </div>
+                              <span className={`${checked ? 'line-through text-gray-500' : ''}`}>{match[2]}</span>
+                            </div>
+                          </li>
+                        );
+                      }
+                    }
+                    return <li {...props}>{children}</li>;
+                  },
                   // Enhanced headings
                   h1: ({ children, ...props }) => (
                     <h1
