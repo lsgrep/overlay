@@ -3,7 +3,7 @@ import type { LLMConfig, LLMService, Message, StructuredOutputConfig } from './t
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import type { Schema } from '@google/generative-ai';
 import { TaskPlanSchema } from '../task/types';
-import { PageContext } from './prompts';
+import type { PageContext } from './prompts';
 
 /**
  * Constants for Gemini models

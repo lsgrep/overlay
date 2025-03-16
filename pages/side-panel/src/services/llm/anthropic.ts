@@ -2,7 +2,7 @@ import { anthropicKeyStorage } from '@extension/storage';
 import type { Message, LLMConfig, LLMService } from './types';
 import Anthropic from '@anthropic-ai/sdk';
 import type { Messages } from '@anthropic-ai/sdk/resources';
-import { PageContext } from './prompts';
+import type { PageContext } from './prompts';
 
 /**
  * Helper function to convert ArrayBuffer to base64 string in browser environment

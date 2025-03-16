@@ -46,7 +46,7 @@ export class ChatService {
   static async extractPageContent(): Promise<PageContext & { isPdf?: boolean }> {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      let currentContent = '';
+      const currentContent = '';
       let isPdf = false;
 
       if (tab?.id) {
