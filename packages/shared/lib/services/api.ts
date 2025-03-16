@@ -1,7 +1,8 @@
 import { chromeStorageKeys } from './supabase';
 
 // Base URL for Overlay API
-const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
+// const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
+const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
 
 // Default task list ID
 const DEFAULT_TASK_LIST_ID = 'MDU1MjgyMTk4ODAzMTg5NDI3MjA6MDow';

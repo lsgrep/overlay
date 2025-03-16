@@ -3,6 +3,7 @@ import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
 import { saveCompletion } from '@extension/shared/lib/services/supabase';
+import { overlayApi } from '@extension/shared/lib/services/api';
 
 // Import our refactored components
 import { HeaderComponent } from './components/HeaderComponent';
@@ -200,10 +201,77 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
       e.preventDefault();
       if (!input.trim() || isLoading) return;
 
-      // Reuse the submitMessage functionality
-      // Standard form submission should include page context
-      await submitMessageProgrammatically(input, true);
-      setInput('');
+      const inputTrimmed = input.trim();
+      // Check for /tasks command
+      if (inputTrimmed === '/tasks') {
+        setIsLoading(true);
+        try {
+          const tasks = await overlayApi.getTasks();
+          // Create a formatted tasks message
+          let tasksContent = '### Your Tasks\n\n';
+          if (tasks.length === 0) {
+            tasksContent += 'You have no tasks in your list.';
+          } else {
+            tasks.forEach(task => {
+              const status = task.status === 'completed' ? '✅' : '⬜';
+              const dueDate = task.due ? ` (Due: ${overlayApi.formatDate(task.due)})` : '';
+              tasksContent += `${status} ${task.title}${dueDate}\n`;
+            });
+          }
+          // Add a system message with the tasks
+          setMessages(prev => [
+            ...prev,
+            {
+              role: 'user',
+              content: input,
+              metadata: {
+                timestamp: Date.now(),
+              },
+            },
+            {
+              role: 'assistant',
+              content: tasksContent,
+              model: {
+                name: 'system',
+                provider: 'overlay',
+              },
+              metadata: {
+                timestamp: Date.now(),
+              },
+            },
+          ]);
+        } catch (error) {
+          console.error('Error fetching tasks:', error);
+          setMessages(prev => [
+            ...prev,
+            {
+              role: 'user',
+              content: input,
+              metadata: {
+                timestamp: Date.now(),
+              },
+            },
+            {
+              role: 'assistant',
+              content: 'Error fetching tasks. Please make sure you are authenticated.',
+              model: {
+                name: 'system',
+                provider: 'overlay',
+              },
+              metadata: {
+                timestamp: Date.now(),
+              },
+            },
+          ]);
+        } finally {
+          setIsLoading(false);
+          setInput('');
+        }
+      } else {
+        // Normal message handling
+        await submitMessageProgrammatically(input, true);
+        setInput('');
+      }
     };
 
     return (
