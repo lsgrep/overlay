@@ -106,15 +106,6 @@ export const overlayApi = {
   },
 
   /**
-   * Get a specific task by ID
-   * @param taskId The ID of the task to retrieve
-   * @param listId The ID of the list containing the task (optional, uses default if not provided)
-   */
-  async getTaskById(taskId: string, listId: string = DEFAULT_TASK_LIST_ID) {
-    return makeAuthenticatedRequest<Task>(`/tasks/${taskId}?listId=${listId}`);
-  },
-
-  /**
    * Create a new task
    * @param taskData Data for the new task
    */
