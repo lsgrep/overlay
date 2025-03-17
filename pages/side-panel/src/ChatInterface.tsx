@@ -3,7 +3,7 @@ import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
 import { saveCompletion } from '@extension/shared/lib/services/supabase';
-import { overlayApi } from '@extension/shared/lib/services/api';
+import { overlayApi, type Task } from '@extension/shared/lib/services/api';
 
 // Import our refactored components
 import { HeaderComponent } from './components/HeaderComponent';
@@ -12,12 +12,7 @@ import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
 import type { PageContext } from './services/llm/prompts';
 
-// Define task interface matching what's in MessageItem.tsx
-interface TaskItem {
-  text: string;
-  completed: boolean;
-  dueDate?: string; // Optional due date
-}
+// We're using the Task interface directly from the API module
 
 interface Message {
   role: string;
@@ -34,7 +29,7 @@ interface Message {
     timestamp?: number;
     sourceUrl?: string;
     isTaskList?: boolean; // Indicate if this message contains tasks
-    tasks?: TaskItem[]; // Array of task items if this is a task message
+    tasks?: Task[]; // Array of task items if this is a task message
   };
 }
 
@@ -215,13 +210,8 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
       if (inputTrimmed === '/tasks') {
         setIsLoading(true);
         try {
-          const tasks = await overlayApi.getTasks();
-          // Convert API tasks to our TaskItem format
-          const taskItems: TaskItem[] = tasks.map(task => ({
-            text: task.title,
-            completed: task.status === 'completed',
-            dueDate: task.due ? overlayApi.formatDate(task.due) : undefined,
-          }));
+          // Get tasks from API
+          const tasks: Task[] = await overlayApi.getTasks();
 
           // Create a formatted tasks message using checkbox markdown syntax
           // This serves as fallback content for clients that don't support our enhanced UI
@@ -256,7 +246,7 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
               metadata: {
                 timestamp: Date.now(),
                 isTaskList: tasks.length > 0,
-                tasks: taskItems,
+                tasks: tasks,
               },
             },
           ]);

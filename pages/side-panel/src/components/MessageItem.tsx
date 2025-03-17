@@ -2,11 +2,11 @@ import type React from 'react';
 import { Terminal, Link } from 'lucide-react';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import type { PageContext } from '../services/llm/prompts/types';
+import { type Task } from '@extension/shared/lib/services/api';
 
 // Import the extracted components
 import { MarkdownMessageContent } from './MarkdownMessageContent';
 import { TaskMessageContent } from './TaskView';
-import type { TaskItem } from './TaskView';
 
 // ========================
 // Shared Types & Interfaces
@@ -27,7 +27,7 @@ interface Message {
     timestamp?: number;
     sourceUrl?: string;
     isTaskList?: boolean; // Indicate if this message contains tasks
-    tasks?: TaskItem[]; // Array of task items if this is a task message
+    tasks?: Task[]; // Array of task items if this is a task message
   };
 }
 
