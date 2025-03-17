@@ -1,5 +1,6 @@
 // import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService, saveNote } from '@extension/shared';
+import { overlayApi } from '@extension/shared/lib/services/api';
 import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
@@ -136,6 +137,66 @@ const SidePanel = () => {
                   `Failed to save note: ${result.error || 'An error occurred while saving your note.'}`,
                   'error',
                 );
+              }
+            }
+            // Handle the 'create-todo' action to create a task
+            else if (action.id === 'create-todo' && message.text) {
+              try {
+                // Check if user is authenticated
+                const isAuthenticated = await overlayApi.isAuthenticated();
+                if (!isAuthenticated) {
+                  showNotification('You need to be signed in to create tasks.', 'error');
+
+                  // Send result back to content script for toast notification
+                  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                  const activeTab = tabs[0];
+                  if (activeTab && activeTab.id) {
+                    await chrome.tabs.sendMessage(activeTab.id, {
+                      type: 'NOTE_SAVE_RESULT',
+                      success: false,
+                      error: 'Authentication required. Please sign in first.',
+                    });
+                  }
+                  return;
+                }
+
+                // Create a task using the selected text as title
+                const sourceUrl = message.url || 'Unknown source';
+                await overlayApi.createTask({
+                  title: message.text,
+                  notes: `Created from: ${sourceUrl}`,
+                });
+
+                console.log('[SidePanel] Todo created successfully');
+                // Show success notification in side panel
+                showNotification('Todo created successfully.', 'success');
+
+                // Send success notification to content script
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                const activeTab = tabs[0];
+                if (activeTab && activeTab.id) {
+                  await chrome.tabs.sendMessage(activeTab.id, {
+                    type: 'NOTE_SAVE_RESULT',
+                    success: true,
+                  });
+                  console.log('[SidePanel] Sent todo creation result to content script');
+                }
+              } catch (error) {
+                console.error('[SidePanel] Failed to create todo:', error);
+                // Show error notification
+                const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                showNotification(`Failed to create todo: ${errorMessage}`, 'error');
+
+                // Send error notification to content script
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                const activeTab = tabs[0];
+                if (activeTab && activeTab.id) {
+                  await chrome.tabs.sendMessage(activeTab.id, {
+                    type: 'NOTE_SAVE_RESULT',
+                    success: false,
+                    error: errorMessage,
+                  });
+                }
               }
             } else {
               // Handle other actions as before

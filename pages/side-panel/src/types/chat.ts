@@ -71,6 +71,12 @@ export const CONTEXT_MENU_ACTIONS: ContextMenuAction[] = [
     prompt: text => `Selected text: "${text}"`,
     icon: 'Bookmark',
   },
+  {
+    id: 'create-todo',
+    title: 'Create Todo',
+    prompt: text => `Create a todo task with title: "${text}"`,
+    icon: 'ListTodo',
+  },
 ];
 
 export interface ChatConfig {

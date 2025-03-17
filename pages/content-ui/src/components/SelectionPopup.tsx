@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Languages, HelpCircle, Sparkles, FileText, Pencil, Check, X } from 'lucide-react';
+import { Languages, HelpCircle, Sparkles, FileText, Pencil, Check, X, ListTodo } from 'lucide-react';
 
 type PopupPosition = {
   top: number;
@@ -82,6 +82,12 @@ const MENU_ACTIONS: MenuAction[] = [
     title: 'Take Note',
     icon: <Pencil size={16} />,
     className: 'text-red-500',
+  },
+  {
+    id: 'create-todo',
+    title: 'Create Todo',
+    icon: <ListTodo size={16} />,
+    className: 'text-teal-500',
   },
 ];
 
@@ -275,7 +281,7 @@ export default function SelectionPopup() {
     const action = MENU_ACTIONS.find(a => a.id === actionId);
     if (!action || !selectedText) return;
 
-    // Open side panel for other actions
+    // Open side panel for all actions except take-note
     if (actionId !== 'take-note') {
       await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
     }
@@ -297,6 +303,13 @@ export default function SelectionPopup() {
                 showToast('Note saved successfully', 'success');
               } else {
                 showToast(`Failed to save note: ${response.error || 'Unknown error'}`, 'error');
+              }
+            }
+            if (actionId === 'create-todo' && response) {
+              if (response.success) {
+                showToast('Todo created successfully', 'success');
+              } else {
+                showToast(`Failed to create todo: ${response.error || 'Unknown error'}`, 'error');
               }
             }
           },
