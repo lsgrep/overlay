@@ -125,21 +125,6 @@ export const overlayApi = {
   },
 
   /**
-   * Update a task's status (mark as complete/incomplete)
-   * @param data The task update data
-   */
-  async updateTaskStatus(data: UpdateTaskData) {
-    return makeAuthenticatedRequest<Task>('/tasks', {
-      method: 'PATCH',
-      body: JSON.stringify({
-        listId: data.listId || DEFAULT_TASK_LIST_ID,
-        taskId: data.taskId,
-        status: data.status,
-      }),
-    });
-  },
-
-  /**
    * Update a task's details
    * @param taskId The ID of the task to update
    * @param taskData The new task data

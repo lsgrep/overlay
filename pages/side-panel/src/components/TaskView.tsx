@@ -68,13 +68,8 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
     setLoading(prev => ({ ...prev, [taskId]: true }));
 
     try {
-      const updateData: UpdateTaskData = {
-        taskId,
-        status: newStatus as 'completed' | 'needsAction',
-      };
-
       // Call API to update task status
-      await overlayApi.updateTaskStatus(updateData);
+      await overlayApi.updateTask(taskId, { status: newStatus });
 
       // Update local state
       setTasks(prevTasks => prevTasks.map(task => (task.id === taskId ? { ...task, status: newStatus } : task)));
