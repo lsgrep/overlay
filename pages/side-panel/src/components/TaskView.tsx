@@ -1,8 +1,51 @@
 import { useState } from 'react';
 import { CheckSquare, Square, Trash2, Edit, X, FileText, Clock, Save, CalendarIcon } from 'lucide-react';
 import { type Task, overlayApi, type UpdateTaskData } from '@extension/shared/lib/services/api';
-import { Button, Skeleton, Calendar, Popover, PopoverTrigger, PopoverContent } from '@extension/ui/lib/ui';
+import { Button, Skeleton, Calendar, Popover, PopoverTrigger, PopoverContent, Badge } from '@extension/ui/lib/ui';
 import { cn } from '@extension/ui/lib/utils';
+
+// Helper functions for date comparisons
+const isSameDay = (date1: Date, date2: Date): boolean => {
+  return (
+    date1.getDate() === date2.getDate() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear()
+  );
+};
+
+const isToday = (date: Date): boolean => {
+  const today = new Date();
+  return isSameDay(today, date);
+};
+
+const isTomorrow = (date: Date): boolean => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return isSameDay(tomorrow, date);
+};
+
+const isThisWeek = (date: Date): boolean => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilEndOfWeek = 7 - dayOfWeek - 1;
+  const endOfWeek = new Date();
+  endOfWeek.setDate(today.getDate() + daysUntilEndOfWeek);
+  endOfWeek.setHours(23, 59, 59, 999);
+  return date >= today && date <= endOfWeek;
+};
+
+const isNextWeek = (date: Date): boolean => {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const daysUntilEndOfWeek = 7 - dayOfWeek - 1;
+  const endOfThisWeek = new Date();
+  endOfThisWeek.setDate(today.getDate() + daysUntilEndOfWeek);
+  endOfThisWeek.setHours(23, 59, 59, 999);
+  const endOfNextWeek = new Date();
+  endOfNextWeek.setDate(today.getDate() + daysUntilEndOfWeek + 7);
+  endOfNextWeek.setHours(23, 59, 59, 999);
+  return date > endOfThisWeek && date <= endOfNextWeek;
+};
 
 // ========================
 // Task-specific Components
@@ -280,15 +323,87 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
                               />
                             </PopoverContent>
                           </Popover>
-                          {editedTask?.due && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="mt-1 h-6 text-xs text-muted-foreground hover:text-destructive"
-                              onClick={() => handleInputChange('due', null)}>
-                              Clear date
-                            </Button>
-                          )}
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            <Badge
+                              variant={editedTask?.due && isToday(new Date(editedTask.due)) ? 'default' : 'secondary'}
+                              className={`cursor-pointer ${
+                                editedTask?.due && isToday(new Date(editedTask.due))
+                                  ? 'bg-blue-600 hover:bg-blue-700'
+                                  : 'hover:bg-blue-100 dark:hover:bg-blue-900'
+                              }`}
+                              onClick={() => {
+                                const today = new Date();
+                                today.setHours(23, 59, 59, 999);
+                                handleInputChange('due', today);
+                              }}>
+                              Today
+                            </Badge>
+                            <Badge
+                              variant={
+                                editedTask?.due && isTomorrow(new Date(editedTask.due)) ? 'default' : 'secondary'
+                              }
+                              className={`cursor-pointer ${
+                                editedTask?.due && isTomorrow(new Date(editedTask.due))
+                                  ? 'bg-blue-600 hover:bg-blue-700'
+                                  : 'hover:bg-blue-100 dark:hover:bg-blue-900'
+                              }`}
+                              onClick={() => {
+                                const tomorrow = new Date();
+                                tomorrow.setDate(tomorrow.getDate() + 1);
+                                tomorrow.setHours(23, 59, 59, 999);
+                                handleInputChange('due', tomorrow);
+                              }}>
+                              Tomorrow
+                            </Badge>
+                            <Badge
+                              variant={
+                                editedTask?.due && isThisWeek(new Date(editedTask.due)) ? 'default' : 'secondary'
+                              }
+                              className={`cursor-pointer ${
+                                editedTask?.due && isThisWeek(new Date(editedTask.due))
+                                  ? 'bg-blue-600 hover:bg-blue-700'
+                                  : 'hover:bg-blue-100 dark:hover:bg-blue-900'
+                              }`}
+                              onClick={() => {
+                                const today = new Date();
+                                const dayOfWeek = today.getDay();
+                                const daysUntilEndOfWeek = 7 - dayOfWeek - 1;
+                                const endOfWeek = new Date();
+                                endOfWeek.setDate(today.getDate() + daysUntilEndOfWeek);
+                                endOfWeek.setHours(23, 59, 59, 999);
+                                handleInputChange('due', endOfWeek);
+                              }}>
+                              This week
+                            </Badge>
+                            <Badge
+                              variant={
+                                editedTask?.due && isNextWeek(new Date(editedTask.due)) ? 'default' : 'secondary'
+                              }
+                              className={`cursor-pointer ${
+                                editedTask?.due && isNextWeek(new Date(editedTask.due))
+                                  ? 'bg-blue-600 hover:bg-blue-700'
+                                  : 'hover:bg-blue-100 dark:hover:bg-blue-900'
+                              }`}
+                              onClick={() => {
+                                const today = new Date();
+                                const dayOfWeek = today.getDay();
+                                const daysUntilEndOfWeek = 7 - dayOfWeek - 1;
+                                const endOfNextWeek = new Date();
+                                endOfNextWeek.setDate(today.getDate() + daysUntilEndOfWeek + 7);
+                                endOfNextWeek.setHours(23, 59, 59, 999);
+                                handleInputChange('due', endOfNextWeek);
+                              }}>
+                              Next week
+                            </Badge>
+                            {editedTask?.due && (
+                              <Badge
+                                variant="outline"
+                                className="cursor-pointer text-destructive hover:bg-destructive/10"
+                                onClick={() => handleInputChange('due', null)}>
+                                Clear date
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="mt-4">
