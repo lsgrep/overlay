@@ -59,13 +59,13 @@ export const MarkdownMessageContent: React.FC<{
           ul: ({ children, ...props }) => {
             // Don't apply task styling here - we detect and render tasks separately
             return (
-              <ul className="pl-5 list-disc space-y-1 my-2" {...props}>
+              <ul className="pl-6 list-disc space-y-1 my-2" {...props}>
                 {children}
               </ul>
             );
           },
           ol: ({ children, ...props }) => (
-            <ol className="pl-5 list-decimal space-y-1 my-2" {...props}>
+            <ol className="pl-7 list-decimal space-y-1 my-2" {...props}>
               {children}
             </ol>
           ),
@@ -108,7 +108,11 @@ export const MarkdownMessageContent: React.FC<{
                 );
               }
             }
-            return <li {...props}>{children}</li>;
+            return (
+              <li className="ml-1 pl-1" {...props}>
+                {children}
+              </li>
+            );
           },
           // Enhanced headings
           h1: ({ children, ...props }) => (
