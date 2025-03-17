@@ -1,8 +1,8 @@
 import { chromeStorageKeys } from './supabase';
 
 // Base URL for Overlay API
-// const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
-const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
+const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
+// const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
 
 // Default task list ID
 const DEFAULT_TASK_LIST_ID = 'MDU1MjgyMTk4ODAzMTg5NDI3MjA6MDow';
@@ -158,7 +158,7 @@ export const overlayApi = {
    * @param listId The ID of the list containing the task (optional, uses default if not provided)
    */
   async deleteTask(taskId: string, listId: string = DEFAULT_TASK_LIST_ID) {
-    return makeAuthenticatedRequest<void>(`/tasks/${taskId}?listId=${listId}`, {
+    return makeAuthenticatedRequest<void>(`/tasks?listId=${listId}&taskId=${taskId}`, {
       method: 'DELETE',
     });
   },
