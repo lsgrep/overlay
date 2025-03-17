@@ -152,7 +152,7 @@ const SidePanel = () => {
                   const activeTab = tabs[0];
                   if (activeTab && activeTab.id) {
                     await chrome.tabs.sendMessage(activeTab.id, {
-                      type: 'NOTE_SAVE_RESULT',
+                      type: 'TODO_CREATE_RESULT',
                       success: false,
                       error: 'Authentication required. Please sign in first.',
                     });
@@ -176,7 +176,7 @@ const SidePanel = () => {
                 const activeTab = tabs[0];
                 if (activeTab && activeTab.id) {
                   await chrome.tabs.sendMessage(activeTab.id, {
-                    type: 'NOTE_SAVE_RESULT',
+                    type: 'TODO_CREATE_RESULT',
                     success: true,
                   });
                   console.log('[SidePanel] Sent todo creation result to content script');
@@ -192,7 +192,7 @@ const SidePanel = () => {
                 const activeTab = tabs[0];
                 if (activeTab && activeTab.id) {
                   await chrome.tabs.sendMessage(activeTab.id, {
-                    type: 'NOTE_SAVE_RESULT',
+                    type: 'TODO_CREATE_RESULT',
                     success: false,
                     error: errorMessage,
                   });

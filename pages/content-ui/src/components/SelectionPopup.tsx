@@ -254,20 +254,26 @@ export default function SelectionPopup() {
     setToast(null);
   };
 
-  // Set up listener for note save confirmation
+  // Set up listener for note/todo action confirmations
   useEffect(() => {
-    interface NoteSaveResult {
+    interface ActionResult {
       type: string;
       success: boolean;
       error?: string;
     }
 
-    const handleMessage = (message: NoteSaveResult) => {
+    const handleMessage = (message: ActionResult) => {
       if (message.type === 'NOTE_SAVE_RESULT') {
         if (message.success) {
           showToast('Note saved successfully', 'success');
         } else {
           showToast(`Failed to save note: ${message.error || 'Unknown error'}`, 'error');
+        }
+      } else if (message.type === 'TODO_CREATE_RESULT') {
+        if (message.success) {
+          showToast('Todo created successfully', 'success');
+        } else {
+          showToast(`Failed to create todo: ${message.error || 'Unknown error'}`, 'error');
         }
       }
     };
@@ -303,13 +309,6 @@ export default function SelectionPopup() {
                 showToast('Note saved successfully', 'success');
               } else {
                 showToast(`Failed to save note: ${response.error || 'Unknown error'}`, 'error');
-              }
-            }
-            if (actionId === 'create-todo' && response) {
-              if (response.success) {
-                showToast('Todo created successfully', 'success');
-              } else {
-                showToast(`Failed to create todo: ${response.error || 'Unknown error'}`, 'error');
               }
             }
           },
