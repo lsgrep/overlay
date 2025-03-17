@@ -9,6 +9,7 @@ import { t } from '@extension/i18n';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
 import { ModelSelector } from './components/ModelSelector';
+import { Toaster } from '@extension/ui/lib/ui/sonner';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -265,6 +266,7 @@ const SidePanel = () => {
           modelError={error}
         />
       </div>
+      <Toaster />
     </div>
   );
 };

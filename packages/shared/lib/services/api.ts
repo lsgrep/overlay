@@ -27,7 +27,10 @@ export interface CreateTaskData {
 export interface UpdateTaskData {
   listId?: string;
   taskId: string;
-  status: 'completed' | 'needsAction';
+  status?: 'completed' | 'needsAction';
+  title?: string;
+  notes?: string;
+  due?: string;
 }
 
 /**
@@ -143,8 +146,11 @@ export const overlayApi = {
    * @param listId The ID of the list containing the task (optional, uses default if not provided)
    */
   async updateTask(taskId: string, taskData: Partial<Task>, listId: string = DEFAULT_TASK_LIST_ID) {
+    // add taskId and listId to the request body
+    taskData.id = taskId;
+    taskData.listId = listId;
     return makeAuthenticatedRequest<Task>(`/tasks?listId=${listId}&taskId=${taskId}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify({
         ...taskData,
       }),
