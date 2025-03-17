@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { CheckSquare, Square, Trash2, Edit, X, Calendar, FileText, Clock, Save } from 'lucide-react';
+import { CheckSquare, Square, Trash2, Edit, X, FileText, Clock, Save, CalendarIcon } from 'lucide-react';
 import { type Task, overlayApi, type UpdateTaskData } from '@extension/shared/lib/services/api';
+import { Button, Skeleton, Calendar, Popover, PopoverTrigger, PopoverContent } from '@extension/ui/lib/ui';
+import { cn } from '@extension/ui/lib/utils';
 
 // ========================
 // Task-specific Components
@@ -77,9 +79,14 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
   };
 
   // Handle input changes for editable fields
-  const handleInputChange = (field: keyof Task, value: string) => {
+  const handleInputChange = (field: keyof Task, value: string | Date | null) => {
     if (editedTask) {
-      setEditedTask(prev => ({ ...prev, [field]: value }));
+      // If it's a Date object (from Calendar), convert to ISO string
+      if (field === 'due' && value instanceof Date) {
+        setEditedTask(prev => ({ ...prev, [field]: value.toISOString() }));
+      } else {
+        setEditedTask(prev => ({ ...prev, [field]: value }));
+      }
     }
   };
 
@@ -110,26 +117,35 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
   return (
     <div className="my-2">
       {tasks.length === 0 ? (
-        <div className="p-4 text-center text-gray-500 border border-dashed rounded-md bg-white dark:bg-gray-800">
+        <div className="p-4 text-center text-gray-500 border border-dashed rounded-md bg-gradient-to-b from-background to-muted/30 dark:from-gray-900 dark:to-gray-800">
           No tasks available
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {tasks.map(task => (
             <div
               key={task.id}
-              className={`border rounded-md overflow-hidden shadow-sm ${isLight ? 'border-blue-100 bg-white' : 'border-blue-800 bg-gray-800'}`}>
-              <div className="flex items-start gap-2 p-3 transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/10">
-                <button
+              className={cn(
+                'border rounded-md overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md',
+                isLight
+                  ? 'border-blue-100 bg-gradient-to-b from-white to-blue-50/30'
+                  : 'border-blue-800/40 bg-gradient-to-b from-gray-800 to-gray-900/70',
+              )}>
+              <div className="flex items-start gap-2 p-3 transition-colors hover:bg-blue-50/50 dark:hover:bg-blue-900/20">
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => toggleTaskStatus(task.id, task.status)}
                   disabled={loading[task.id]}
-                  className={`flex-shrink-0 mt-0.5 ${loading[task.id] ? 'opacity-50' : 'hover:scale-110'} transition-transform cursor-pointer`}>
-                  {task.status === 'completed' ? (
-                    <CheckSquare size={18} className="text-green-500" />
+                  className={`flex-shrink-0 h-6 w-6 mt-0.5 p-0 ${loading[task.id] ? 'opacity-50' : 'hover:scale-110'} transition-transform`}>
+                  {loading[task.id] ? (
+                    <Skeleton className="h-4 w-4 rounded-sm" />
+                  ) : task.status === 'completed' ? (
+                    <CheckSquare size={16} className="text-green-500" />
                   ) : (
-                    <Square size={18} className="text-gray-400" />
+                    <Square size={16} className="text-gray-400" />
                   )}
-                </button>
+                </Button>
 
                 <button
                   className="flex-1 cursor-pointer text-left"
@@ -141,7 +157,7 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
 
                   {task.due && (
                     <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                      <Calendar size={12} />
+                      <CalendarIcon size={12} />
                       <span>Due: {overlayApi.formatDate(task.due)}</span>
                     </div>
                   )}
@@ -149,65 +165,67 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
 
                 <div className="flex gap-1">
                   {expandedTaskId === task.id && editMode === task.id ? (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => saveTask(task.id)}
                       disabled={loading[task.id]}
-                      className="p-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800">
-                      <Save size={16} className="text-green-500" />
-                    </button>
+                      className="h-7 w-7 rounded-full">
+                      {loading[task.id] ? (
+                        <Skeleton className="h-4 w-4" />
+                      ) : (
+                        <Save size={14} className="text-green-500" />
+                      )}
+                    </Button>
                   ) : (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => {
-                        console.log(
-                          'Button clicked for task:',
-                          task.id,
-                          'expanded:',
-                          expandedTaskId === task.id,
-                          'editMode:',
-                          editMode === task.id,
-                        );
-
                         // If already in edit mode, exit edit mode
                         if (editMode === task.id) {
-                          console.log('Exiting edit mode');
                           setEditMode(null);
                           return;
                         }
 
                         // If not expanded, expand first
                         if (expandedTaskId !== task.id) {
-                          console.log('Expanding task first');
                           setExpandedTaskId(task.id);
                         }
 
                         // Enter edit mode (this will also expand if not already expanded)
-                        console.log('Entering edit mode');
                         enterEditMode(task);
                       }}
-                      className="p-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800">
+                      className="h-7 w-7 rounded-full">
                       {editMode === task.id ? (
                         // In edit mode, show X icon
-                        <X size={16} className="text-gray-500" />
+                        <X size={14} className="text-gray-500" />
                       ) : expandedTaskId === task.id ? (
                         // Expanded but not in edit mode, show blue edit icon
-                        <Edit size={16} className="text-blue-500" />
+                        <Edit size={14} className="text-blue-500" />
                       ) : (
                         // Not expanded, show normal edit icon
-                        <Edit size={16} className="text-gray-500" />
+                        <Edit size={14} className="text-gray-500" />
                       )}
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => deleteTask(task.id)}
                     disabled={loading[task.id]}
-                    className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900">
-                    <Trash2 size={16} className="text-red-500" />
-                  </button>
+                    className="h-7 w-7 rounded-full hover:bg-red-100 dark:hover:bg-red-900/20">
+                    {loading[task.id] ? (
+                      <Skeleton className="h-4 w-4" />
+                    ) : (
+                      <Trash2 size={14} className="text-red-500" />
+                    )}
+                  </Button>
                 </div>
               </div>
 
               {expandedTaskId === task.id && (
-                <div className="p-3 border-t border-blue-100 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
+                <div className="p-3 border-t border-blue-100 dark:border-blue-800/40 bg-gradient-to-b from-blue-50/70 to-blue-50/30 dark:from-blue-900/20 dark:to-blue-900/5">
                   {editMode === task.id ? (
                     // Edit mode - Show editable fields
                     <div className="space-y-3">
@@ -231,20 +249,55 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
                           id="taskNotes"
                           value={editedTask?.notes || ''}
                           onChange={e => handleInputChange('notes', e.target.value)}
-                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white min-h-[60px] focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-800 min-h-[60px] focus:border-primary focus:ring-1 focus:ring-primary"
                         />
                       </div>
                       <div>
                         <label htmlFor="taskDueDate" className="block text-xs font-medium text-gray-500 mb-1">
                           Due Date
                         </label>
-                        <input
-                          id="taskDueDate"
-                          type="date"
-                          value={editedTask?.due ? new Date(editedTask.due).toISOString().split('T')[0] : ''}
-                          onChange={e => handleInputChange('due', e.target.value)}
-                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        />
+                        <div className="flex flex-col">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal bg-white dark:bg-gray-800"
+                                id="taskDueDate">
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {editedTask?.due ? (
+                                  new Date(editedTask.due).toLocaleDateString()
+                                ) : (
+                                  <span className="text-muted-foreground">Select a date</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={editedTask?.due ? new Date(editedTask.due) : undefined}
+                                onSelect={date => handleInputChange('due', date || null)}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          {editedTask?.due && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="mt-1 h-6 text-xs text-muted-foreground hover:text-destructive"
+                              onClick={() => handleInputChange('due', null)}>
+                              Clear date
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          className="w-full py-2 text-sm font-medium bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm"
+                          onClick={() => saveTask(editMode as string)}>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save Changes
+                        </Button>
                       </div>
                     </div>
                   ) : (
@@ -260,7 +313,7 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
                         </div>
                       </div>
 
-                      <div className="text-xs text-gray-500 flex flex-col gap-1 mt-3 pt-2 border-t border-gray-200">
+                      <div className="text-xs text-gray-500 flex flex-col gap-1 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                         <div className="flex justify-between">
                           <span>Task ID:</span>
                           <span className="font-mono">{task.id.substring(0, 12)}...</span>

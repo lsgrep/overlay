@@ -14,3 +14,4 @@ export * from './dropdown-menu';
 export * from './calendar';
 export * from './sonner';
 export * from './skeleton';
+export * from './badge';
