@@ -3,6 +3,7 @@ import { Terminal, Link } from 'lucide-react';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import type { PageContext } from '../services/llm/prompts/types';
 import { type Task } from '@extension/shared/lib/services/api';
+import icon from '../../../../chrome-extension/public/icon-128.png';
 
 // Import the extracted components
 import { MarkdownMessageContent } from './MarkdownMessageContent';
@@ -109,7 +110,7 @@ const MessageAvatar: React.FC<{ isUser: boolean; provider?: string }> = ({ isUse
       ) : ProviderIcon ? (
         <ProviderIcon className={`w-4 h-4 ${accentColorClass}`} />
       ) : (
-        <div className="w-4 h-4 rounded-full bg-gradient-to-br from-purple-400 to-blue-500" />
+        <img src={icon} alt="Overlay" className="w-5 h-5" />
       )}
     </div>
   );

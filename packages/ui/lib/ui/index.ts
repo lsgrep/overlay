@@ -11,3 +11,4 @@ export * from './textarea';
 export * from './avatar';
 export * from './tooltip';
 export * from './dropdown-menu';
+export * from './calendar';

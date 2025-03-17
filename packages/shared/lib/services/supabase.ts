@@ -15,11 +15,30 @@ export const chromeStorageKeys = {
 // Create a singleton Supabase client
 let supabaseInstance: ReturnType<typeof createSupabaseClient> | null = null;
 
+const storageAdapterBG = {
+  getItem: async (key: string) => {
+    const cookie = await chrome.cookies.get({ url: 'https://overlay.one', name: key });
+    return decodeURIComponent(cookie?.value || '');
+  },
+
+  setItem: async (key: string, value: string) => {
+    await chrome.cookies.set({
+      url: 'https://overlay.one',
+      name: key,
+      value: encodeURIComponent(value),
+    });
+  },
+
+  removeItem: async (key: string) => {
+    await chrome.cookies.remove({ url: 'https://overlay.one', name: key });
+  },
+};
 export function createClient() {
   if (supabaseInstance) return supabaseInstance;
 
   supabaseInstance = createSupabaseClient(supabaseUrl, supabaseAnonKey, {
     auth: {
+      storage: storageAdapterBG,
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
