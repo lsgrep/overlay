@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { CheckSquare, Square, Trash2, Edit, X, Calendar, FileText, Clock } from 'lucide-react';
+import { CheckSquare, Square, Trash2, Edit, X, Calendar, FileText, Clock, Save } from 'lucide-react';
 import { type Task, overlayApi, type UpdateTaskData } from '@extension/shared/lib/services/api';
-import icon from '../../../../chrome-extension/public/icon-128.png';
 
 // ========================
 // Task-specific Components
@@ -12,6 +11,8 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [editMode, setEditMode] = useState<string | null>(null);
+  const [editedTask, setEditedTask] = useState<Partial<Task> | null>(null);
 
   // Toggle task completion status
   const toggleTaskStatus = async (taskId: string, currentStatus: string | undefined) => {
@@ -59,6 +60,51 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
   // Toggle expanded view for a task
   const toggleExpandTask = (taskId: string) => {
     setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
+    setEditMode(null); // Exit edit mode when collapsing
+    console.log('Task expanded state:', taskId, expandedTaskId === taskId ? 'collapsed' : 'expanded');
+  };
+
+  // Enter edit mode for a task
+  const enterEditMode = (task: Task) => {
+    setExpandedTaskId(task.id); // Ensure task is expanded
+    setEditMode(task.id);
+    setEditedTask({
+      title: task.title,
+      notes: task.notes || '',
+      due: task.due || '',
+    });
+    console.log('Edit mode entered for task:', task.id);
+  };
+
+  // Handle input changes for editable fields
+  const handleInputChange = (field: keyof Task, value: string) => {
+    if (editedTask) {
+      setEditedTask(prev => ({ ...prev, [field]: value }));
+    }
+  };
+
+  // Save edited task
+  const saveTask = async (taskId: string) => {
+    if (!editedTask) return;
+    setLoading(prev => ({ ...prev, [taskId]: true }));
+
+    try {
+      // Format the date properly if it exists
+      const formattedTask = {
+        ...editedTask,
+        due: editedTask.due ? new Date(editedTask.due).toISOString() : undefined,
+      };
+
+      await overlayApi.updateTask(taskId, formattedTask);
+      // Update local state
+      setTasks(prevTasks => prevTasks.map(task => (task.id === taskId ? { ...task, ...editedTask } : task)));
+      // Exit edit mode
+      setEditMode(null);
+    } catch (error) {
+      console.error('Error updating task:', error);
+    } finally {
+      setLoading(prev => ({ ...prev, [taskId]: false }));
+    }
   };
 
   return (
@@ -102,14 +148,59 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
                 </button>
 
                 <div className="flex gap-1">
-                  <button onClick={() => toggleExpandTask(task.id)} className="p-1 rounded-full">
-                    {expandedTaskId === task.id ? (
-                      <X size={16} className="text-gray-500" />
-                    ) : (
-                      <Edit size={16} className="text-gray-500" />
-                    )}
-                  </button>
-                  <button onClick={() => deleteTask(task.id)} disabled={loading[task.id]} className="p-1 rounded-full">
+                  {expandedTaskId === task.id && editMode === task.id ? (
+                    <button
+                      onClick={() => saveTask(task.id)}
+                      disabled={loading[task.id]}
+                      className="p-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800">
+                      <Save size={16} className="text-green-500" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        console.log(
+                          'Button clicked for task:',
+                          task.id,
+                          'expanded:',
+                          expandedTaskId === task.id,
+                          'editMode:',
+                          editMode === task.id,
+                        );
+
+                        // If already in edit mode, exit edit mode
+                        if (editMode === task.id) {
+                          console.log('Exiting edit mode');
+                          setEditMode(null);
+                          return;
+                        }
+
+                        // If not expanded, expand first
+                        if (expandedTaskId !== task.id) {
+                          console.log('Expanding task first');
+                          setExpandedTaskId(task.id);
+                        }
+
+                        // Enter edit mode (this will also expand if not already expanded)
+                        console.log('Entering edit mode');
+                        enterEditMode(task);
+                      }}
+                      className="p-1 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800">
+                      {editMode === task.id ? (
+                        // In edit mode, show X icon
+                        <X size={16} className="text-gray-500" />
+                      ) : expandedTaskId === task.id ? (
+                        // Expanded but not in edit mode, show blue edit icon
+                        <Edit size={16} className="text-blue-500" />
+                      ) : (
+                        // Not expanded, show normal edit icon
+                        <Edit size={16} className="text-gray-500" />
+                      )}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => deleteTask(task.id)}
+                    disabled={loading[task.id]}
+                    className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900">
                     <Trash2 size={16} className="text-red-500" />
                   </button>
                 </div>
@@ -117,28 +208,72 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
 
               {expandedTaskId === task.id && (
                 <div className="p-3 border-t border-blue-100 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
-                  <div className="mb-2">
-                    <div className="flex items-center gap-1 text-xs font-medium text-gray-500 mb-1">
-                      <FileText size={12} />
-                      <span>Notes</span>
-                    </div>
-                    <div className="p-2 rounded text-sm min-h-[40px]">
-                      {task.notes ? task.notes : <span className="text-gray-400 italic">No notes</span>}
-                    </div>
-                  </div>
-
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 mt-3 pt-2 border-t border-gray-200">
-                    <div className="flex justify-between">
-                      <span>Task ID:</span>
-                      <span className="font-mono">{task.id.substring(0, 12)}...</span>
-                    </div>
-                    {task.listId && (
-                      <div className="flex justify-between">
-                        <span>List:</span>
-                        <span className="font-mono">{task.listId.substring(0, 12)}...</span>
+                  {editMode === task.id ? (
+                    // Edit mode - Show editable fields
+                    <div className="space-y-3">
+                      <div>
+                        <label htmlFor="taskTitle" className="block text-xs font-medium text-gray-500 mb-1">
+                          Title
+                        </label>
+                        <input
+                          id="taskTitle"
+                          type="text"
+                          value={editedTask?.title || ''}
+                          onChange={e => handleInputChange('title', e.target.value)}
+                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
                       </div>
-                    )}
-                  </div>
+                      <div>
+                        <label htmlFor="taskNotes" className="block text-xs font-medium text-gray-500 mb-1">
+                          Notes
+                        </label>
+                        <textarea
+                          id="taskNotes"
+                          value={editedTask?.notes || ''}
+                          onChange={e => handleInputChange('notes', e.target.value)}
+                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white min-h-[60px] focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="taskDueDate" className="block text-xs font-medium text-gray-500 mb-1">
+                          Due Date
+                        </label>
+                        <input
+                          id="taskDueDate"
+                          type="date"
+                          value={editedTask?.due ? new Date(editedTask.due).toISOString().split('T')[0] : ''}
+                          onChange={e => handleInputChange('due', e.target.value)}
+                          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    // View mode - Show task details
+                    <>
+                      <div className="mb-2">
+                        <div className="flex items-center gap-1 text-xs font-medium text-gray-500 mb-1">
+                          <FileText size={12} />
+                          <span>Notes</span>
+                        </div>
+                        <div className="p-2 rounded text-sm min-h-[40px]">
+                          {task.notes ? task.notes : <span className="text-gray-400 italic">No notes</span>}
+                        </div>
+                      </div>
+
+                      <div className="text-xs text-gray-500 flex flex-col gap-1 mt-3 pt-2 border-t border-gray-200">
+                        <div className="flex justify-between">
+                          <span>Task ID:</span>
+                          <span className="font-mono">{task.id.substring(0, 12)}...</span>
+                        </div>
+                        {task.listId && (
+                          <div className="flex justify-between">
+                            <span>List:</span>
+                            <span className="font-mono">{task.listId.substring(0, 12)}...</span>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

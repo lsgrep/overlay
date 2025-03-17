@@ -240,7 +240,7 @@ export const ChatInterface = forwardRef<{ submitMessage: (text: string) => Promi
               role: 'assistant',
               content: tasksContent,
               model: {
-                name: 'system',
+                name: 'Tasks',
                 provider: 'overlay',
               },
               metadata: {
