@@ -8,6 +8,7 @@ import icon from '../../../../chrome-extension/public/icon-128.png';
 // Import the extracted components
 import { MarkdownMessageContent } from './MarkdownMessageContent';
 import { TaskMessageContent } from './TaskView';
+import { SystemMessageView } from './SystemMessageView';
 
 // ========================
 // Shared Types & Interfaces
@@ -206,6 +207,21 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
 
   // Get provider icon for assistant messages
   const providerType = !isUser ? message.model?.provider : undefined;
+
+  // Check if this is a system message that should use SystemMessageView
+  if (message.role === 'system' && message.metadata?.systemMessageType) {
+    return (
+      <SystemMessageView
+        data={{
+          type: message.metadata.systemMessageType,
+          content: message.content,
+          timestamp: timestamp || Date.now(),
+          sourceUrl,
+          metadata: message.metadata,
+        }}
+      />
+    );
+  }
 
   return (
     <div key={index} className="relative flex items-start gap-2 group">

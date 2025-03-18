@@ -9,8 +9,10 @@ import { t } from '@extension/i18n';
 
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
+import type { Message as ChatMessage } from './ChatInterface';
 import { ModelSelector } from './components/ModelSelector';
 import { Toaster } from '@extension/ui/lib/ui/sonner';
+import type { SystemMessageType } from './components/SystemMessageView';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -30,6 +32,8 @@ const SidePanel = () => {
   // Reference to ChatInterface methods
   const chatInterfaceRef = useRef<{
     submitMessage: (text: string, includePageContext?: boolean) => Promise<void>;
+    addSystemMessage: (message: ChatMessage) => number | undefined;
+    updateSystemMessage: (messageId: number, updatedMessage: Partial<ChatMessage>) => void;
   } | null>(null);
 
   // We'll use Chrome's native notifications instead of custom UI notifications
@@ -106,6 +110,25 @@ const SidePanel = () => {
             // Handle the 'take-note' action differently
             if (action.id === 'take-note' && message.text) {
               const sourceUrl = message.url || 'Unknown source';
+              // Add loading system message to the chat first
+              let messageId: number | undefined;
+              if (chatInterfaceRef.current) {
+                const loadingMessage = {
+                  role: 'system',
+                  content: `🔄 Saving note: "${message.text}"...`,
+                  model: {
+                    name: 'Overlay',
+                    provider: 'overlay',
+                  },
+                  metadata: {
+                    timestamp: Date.now(),
+                    sourceUrl: sourceUrl,
+                  },
+                };
+                // Add the loading system message and store its ID
+                messageId = chatInterfaceRef.current.addSystemMessage(loadingMessage);
+              }
+              // Save the note
               const result = await saveNote(message.text, sourceUrl);
 
               // Send result back to content script for toast notification
@@ -130,6 +153,16 @@ const SidePanel = () => {
                 console.log('[SidePanel] Note saved successfully');
                 // Show success notification
                 showNotification('Note saved: Your note has been saved successfully.', 'success');
+                // Update the system message to show success
+                if (chatInterfaceRef.current && messageId) {
+                  const updatedMessage = {
+                    content: message.text,
+                    metadata: {
+                      systemMessageType: 'note' as SystemMessageType,
+                    },
+                  };
+                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                }
               } else {
                 console.error('[SidePanel] Failed to save note:', result.error);
                 // Show error notification
@@ -137,10 +170,39 @@ const SidePanel = () => {
                   `Failed to save note: ${result.error || 'An error occurred while saving your note.'}`,
                   'error',
                 );
+                // Update the system message to show error
+                if (chatInterfaceRef.current && messageId) {
+                  const updatedMessage = {
+                    content: `Failed to save note: "${message.text}"`,
+                    metadata: {
+                      systemMessageType: 'error' as SystemMessageType,
+                    },
+                  };
+                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                }
               }
             }
             // Handle the 'create-todo' action to create a task
             else if (action.id === 'create-todo' && message.text) {
+              const sourceUrl = message.url || 'Unknown source';
+              // Add loading system message to the chat first
+              let messageId: number | undefined;
+              if (chatInterfaceRef.current) {
+                const loadingMessage = {
+                  role: 'system',
+                  content: `🔄 Creating task: "${message.text}"...`,
+                  model: {
+                    name: 'Overlay',
+                    provider: 'overlay',
+                  },
+                  metadata: {
+                    timestamp: Date.now(),
+                    sourceUrl: sourceUrl,
+                  },
+                };
+                // Add the loading system message and store its ID
+                messageId = chatInterfaceRef.current.addSystemMessage(loadingMessage);
+              }
               try {
                 // Check if user is authenticated
                 const isAuthenticated = await overlayApi.isAuthenticated();
@@ -157,11 +219,20 @@ const SidePanel = () => {
                       error: 'Authentication required. Please sign in first.',
                     });
                   }
+                  // Update the system message to show authentication error
+                  if (chatInterfaceRef.current && messageId) {
+                    const updatedMessage = {
+                      content: `Authentication required. Please sign in first.`,
+                      metadata: {
+                        systemMessageType: 'error' as SystemMessageType,
+                      },
+                    };
+                    chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                  }
                   return;
                 }
 
                 // Create a task using the selected text as title
-                const sourceUrl = message.url || 'Unknown source';
                 await overlayApi.createTask({
                   title: message.text,
                   notes: `Created from: ${sourceUrl}`,
@@ -181,6 +252,16 @@ const SidePanel = () => {
                   });
                   console.log('[SidePanel] Sent todo creation result to content script');
                 }
+                // Update the system message to show success
+                if (chatInterfaceRef.current && messageId) {
+                  const updatedMessage = {
+                    content: message.text,
+                    metadata: {
+                      systemMessageType: 'task' as SystemMessageType,
+                    },
+                  };
+                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                }
               } catch (error) {
                 console.error('[SidePanel] Failed to create todo:', error);
                 // Show error notification
@@ -196,6 +277,16 @@ const SidePanel = () => {
                     success: false,
                     error: errorMessage,
                   });
+                }
+                // Update the system message to show error
+                if (chatInterfaceRef.current && messageId) {
+                  const updatedMessage = {
+                    content: `Failed to create task: "${message.text}"`,
+                    metadata: {
+                      systemMessageType: 'error' as SystemMessageType,
+                    },
+                  };
+                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
                 }
               }
             } else {
