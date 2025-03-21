@@ -1,13 +1,7 @@
 import type React from 'react';
 import { NoteView } from './NoteView';
 import { TaskItemView } from './TaskItemView';
-// Import the Spinner component from UI library
-import { Loader2 } from 'lucide-react';
-
-// Spinner component for loading states
-const SpinnerCircle = ({ className }: { className?: string }) => (
-  <Loader2 className={`animate-spin ${className || ''}`} />
-);
+import { ArrowPathIcon } from '@heroicons/react/24/solid';
 
 // Define types for the system message
 export type SystemMessageType = 'note' | 'task' | 'loading' | 'error' | 'info';
@@ -41,8 +35,21 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
   if (type === 'loading') {
     return (
       <div className="flex items-center p-3 my-2 bg-slate-100 dark:bg-slate-800 rounded-md">
-        <SpinnerCircle className="w-4 h-4 mr-2 text-blue-500" />
+        <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin text-blue-500" />
         <span className="text-sm text-gray-700 dark:text-gray-300">{content}</span>
+
+        {/* Typing animation dots */}
+        <div className="flex ml-2 space-x-1">
+          <div
+            className="w-1.5 h-1.5 bg-blue-500/70 rounded-full animate-bounce"
+            style={{ animationDelay: '0ms' }}></div>
+          <div
+            className="w-1.5 h-1.5 bg-blue-500/70 rounded-full animate-bounce"
+            style={{ animationDelay: '200ms' }}></div>
+          <div
+            className="w-1.5 h-1.5 bg-blue-500/70 rounded-full animate-bounce"
+            style={{ animationDelay: '400ms' }}></div>
+        </div>
       </div>
     );
   }
