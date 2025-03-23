@@ -2,13 +2,14 @@ import type React from 'react';
 import { Terminal, Link } from 'lucide-react';
 import { OpenAIIcon, GeminiIcon, OllamaIcon, AnthropicIcon } from '@extension/ui/lib/icons';
 import type { PageContext } from '../services/llm/prompts/types';
-import { type Task } from '@extension/shared/lib/services/api';
+import { type Task, overlayApi } from '@extension/shared/lib/services/api';
 import icon from '../../../../chrome-extension/public/icon-128.png';
 
 // Import the extracted components
 import { MarkdownMessageContent } from './MarkdownMessageContent';
-import { TaskMessageContent } from './TaskView';
-import { SystemMessageView } from './SystemMessageView';
+import { SystemMessageView, type SystemMessageType } from './SystemMessageView';
+import { UnifiedTaskListView } from './UnifiedTaskView';
+import { deleteNote } from '@extension/shared/lib/services/supabase';
 
 // ========================
 // Shared Types & Interfaces
@@ -209,15 +210,75 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
   const providerType = !isUser ? message.model?.provider : undefined;
 
   // Check if this is a system message that should use SystemMessageView
-  if (message.role === 'system' && message.metadata?.systemMessageType) {
+  if (message.role === 'system' && (message.metadata?.systemMessageType as SystemMessageType)) {
+    const messageType = message.metadata.systemMessageType as SystemMessageType;
+
+    // Handle system messages with SystemMessageView
     return (
       <SystemMessageView
         data={{
-          type: message.metadata.systemMessageType,
+          type: messageType,
           content: message.content,
           timestamp: timestamp || Date.now(),
           sourceUrl,
           metadata: message.metadata,
+        }}
+        onCopy={() => {
+          navigator.clipboard.writeText(message.content);
+          console.log('Copied to clipboard');
+        }}
+        onDelete={async data => {
+          try {
+            // Handle different delete operations based on message type
+            if (data.type === 'task' && data.metadata?.id) {
+              const taskId = data.metadata.id as string;
+              await overlayApi.deleteTask(taskId);
+              console.log(`Task ${taskId} deleted successfully`);
+            } else if (data.type === 'note' && data.metadata?.id) {
+              const noteId = data.metadata.id as string;
+              const result = await deleteNote(noteId);
+              if (result.success) {
+                console.log(`Note ${noteId} deleted successfully`);
+              } else {
+                console.error(`Failed to delete note: ${result.error}`);
+              }
+            }
+          } catch (error) {
+            console.error('Error deleting item:', error);
+          }
+        }}
+        onToggleComplete={async (completed, data) => {
+          try {
+            if (data.metadata?.id) {
+              const taskId = data.metadata.id as string;
+              // Call the API to update the task status
+              await overlayApi.updateTask(taskId, {
+                status: completed ? 'completed' : 'needsAction',
+              });
+              console.log(`Task ${taskId} status updated to ${completed ? 'completed' : 'needsAction'}`);
+            }
+          } catch (error) {
+            console.error('Error toggling task completion:', error);
+          }
+        }}
+        onUpdate={async (data, updatedTask) => {
+          try {
+            if (data.type === 'task' && data.metadata?.id) {
+              const taskId = data.metadata.id as string;
+              // Call the API to update the task with all new details
+              await overlayApi.updateTask(taskId, updatedTask);
+              console.log(`Task ${taskId} updated successfully`, updatedTask);
+            }
+            return Promise.resolve();
+          } catch (error) {
+            console.error('Error updating task:', error);
+            return Promise.reject(error);
+          }
+        }}
+        onEdit={data => {
+          // For notes, we update the data in the UI
+          // The actual update to the database would happen elsewhere
+          console.log('Editing data:', data);
         }}
       />
     );
@@ -245,7 +306,42 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
         <div className="text-foreground overflow-x-auto max-w-full">
           {/* Special handling for task list messages */}
           {isTaskList && tasks.length > 0 ? (
-            <TaskMessageContent tasks={tasks} isLight={isLight} />
+            <UnifiedTaskListView
+              tasks={tasks}
+              isLight={isLight}
+              onUpdate={async task => {
+                try {
+                  await overlayApi.updateTask(task.id, task);
+                  console.log(`Task ${task.id} updated successfully`, task);
+                  return Promise.resolve();
+                } catch (error) {
+                  console.error('Error updating task:', error);
+                  return Promise.reject(error);
+                }
+              }}
+              onDelete={async taskId => {
+                try {
+                  await overlayApi.deleteTask(taskId);
+                  console.log(`Task ${taskId} deleted successfully`);
+                  return Promise.resolve();
+                } catch (error) {
+                  console.error('Error deleting task:', error);
+                  return Promise.reject(error);
+                }
+              }}
+              onToggleComplete={async (taskId, completed) => {
+                try {
+                  await overlayApi.updateTask(taskId, {
+                    status: completed ? 'completed' : 'needsAction',
+                  });
+                  console.log(`Task ${taskId} status updated to ${completed ? 'completed' : 'needsAction'}`);
+                  return Promise.resolve();
+                } catch (error) {
+                  console.error('Error toggling task completion:', error);
+                  return Promise.reject(error);
+                }
+              }}
+            />
           ) : mode === 'interactive' && message.role === 'assistant' ? (
             <InteractiveMessageContent message={message} isLight={isLight} />
           ) : (

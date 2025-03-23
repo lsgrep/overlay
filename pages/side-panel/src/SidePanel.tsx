@@ -1,6 +1,7 @@
 // import '@src/SidePanel.css';
-import { useStorage, withErrorBoundary, withSuspense, ModelService, saveNote } from '@extension/shared';
+import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { overlayApi } from '@extension/shared/lib/services/api';
+import { saveNote, deleteNote } from '@extension/shared/lib/services/supabase';
 import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
@@ -155,10 +156,14 @@ const SidePanel = () => {
                 showNotification('Note saved: Your note has been saved successfully.', 'success');
                 // Update the system message to show success
                 if (chatInterfaceRef.current && messageId) {
+                  // Check if we have a note ID from the save result
+                  const noteId = result.data?.[0]?.id;
+
                   const updatedMessage = {
                     content: message.text,
                     metadata: {
                       systemMessageType: 'note' as SystemMessageType,
+                      id: noteId, // Save the note ID for later updates/deletion
                     },
                   };
                   chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
@@ -258,6 +263,9 @@ const SidePanel = () => {
                     content: message.text,
                     metadata: {
                       systemMessageType: 'task' as SystemMessageType,
+                      id: `task-${Date.now()}`,
+                      notes: `Created from: ${sourceUrl}`,
+                      completed: false,
                     },
                   };
                   chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
