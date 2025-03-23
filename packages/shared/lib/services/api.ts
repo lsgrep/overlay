@@ -10,6 +10,7 @@ const DEFAULT_TASK_LIST_ID = 'MDU1MjgyMTk4ODAzMTg5NDI3MjA6MDow';
 // Task interfaces
 export interface Task {
   id: string;
+  taskId: string;
   title: string;
   notes?: string;
   status?: string;
@@ -132,7 +133,7 @@ export const overlayApi = {
    */
   async updateTask(taskId: string, taskData: Partial<Task>, listId: string = DEFAULT_TASK_LIST_ID) {
     // add taskId and listId to the request body
-    taskData.id = taskId;
+    taskData.taskId = taskId;
     taskData.listId = listId;
     return makeAuthenticatedRequest<Task>(`/tasks?listId=${listId}&taskId=${taskId}`, {
       method: 'PATCH',
