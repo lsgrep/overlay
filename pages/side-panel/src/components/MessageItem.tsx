@@ -31,7 +31,12 @@ interface Message {
     sourceUrl?: string;
     isTaskList?: boolean; // Indicate if this message contains tasks
     tasks?: Task[]; // Array of task items if this is a task message
+    systemMessageType?: string; // Type for system messages
   };
+  images?: Array<{
+    url: string;
+    mimeType?: string;
+  }>; // Array of images attached to the message
 }
 
 interface MessageItemProps {
@@ -210,7 +215,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
   const providerType = !isUser ? message.model?.provider : undefined;
 
   // Check if this is a system message that should use SystemMessageView
-  if (message.role === 'system' && (message.metadata?.systemMessageType as SystemMessageType)) {
+  if (message.role === 'system' && message.metadata && message.metadata.systemMessageType) {
     const messageType = message.metadata.systemMessageType as SystemMessageType;
 
     // Handle system messages with SystemMessageView
@@ -345,7 +350,31 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
           ) : mode === 'interactive' && message.role === 'assistant' ? (
             <InteractiveMessageContent message={message} isLight={isLight} />
           ) : (
-            <MarkdownMessageContent content={message.content} isLight={isLight} />
+            <>
+              {/* Display images if they exist in the message */}
+              {message.images && message.images.length > 0 && (
+                <div className="mb-3">
+                  <div className="flex flex-wrap gap-2">
+                    {message.images.map((image, imgIndex) => (
+                      <div key={imgIndex} className="relative border border-gray-300 rounded overflow-hidden">
+                        <img
+                          src={image.url}
+                          alt={`${imgIndex + 1}`}
+                          className="w-auto max-w-full h-auto max-h-48 object-contain"
+                          onError={e => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.parentElement!.innerHTML =
+                              '<div class="p-2 text-xs text-red-500">Error loading image</div>';
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <MarkdownMessageContent content={message.content} isLight={isLight} />
+            </>
           )}
         </div>
       </div>

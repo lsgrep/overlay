@@ -70,13 +70,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       // Add to dragged images
       setDraggedImages([...draggedImages, { url: imageUrl }]);
 
-      // Insert markdown image at cursor position or append to end
-      const cursorPosition = textAreaRef.current?.selectionStart || input.length;
-      const markdownImage = `![image](${imageUrl}) `;
-
-      const newInput = input.substring(0, cursorPosition) + markdownImage + input.substring(cursorPosition);
-
-      setInput(newInput);
+      // Don't insert markdown into input text anymore
+      // Just add the image to draggedImages array, which has already been done above
+      console.log('Image added to draggedImages without modifying input text');
     } else if (imageUrl) {
       console.log('URL failed validation as an image:', imageUrl);
     } else {
@@ -117,16 +113,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t border-border">
-      {/* Debug info showing dragged images count */}
-      <div className="mb-2 text-xs text-gray-500">Debug: {draggedImages.length} image(s) dragged</div>
+      {/* Image thumbnails count indicator - only show if there are images */}
+      {draggedImages.length > 0 && (
+        <div className="mb-2 text-xs text-gray-500">
+          {draggedImages.length} image{draggedImages.length > 1 ? 's' : ''} attached
+        </div>
+      )}
       {draggedImages.length > 0 && (
         <div className="mb-2 flex flex-col gap-2">
           {draggedImages.map((img, index) => (
             <div key={index} className="relative group border border-gray-300 p-2 rounded">
-              {/* Debug info showing image URL */}
-              <div className="mb-2 text-xs text-gray-700 break-all">
-                <strong>Image URL:</strong> {img.url}
-              </div>
               <div className="flex">
                 <img
                   src={img.url}

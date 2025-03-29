@@ -384,9 +384,8 @@ export const ChatInterface = forwardRef<
               const dataUrl = event.target.result.toString();
               console.log('Processed image file to data URL');
               setDraggedImages(prev => [...prev, { url: dataUrl }]);
-              // Automatically insert markdown image placeholder into input
-              const markdownImage = `![Uploaded Image]\n`;
-              setInput(prevInput => prevInput + markdownImage);
+              // Don't add markdown to input text, just add to draggedImages array
+              console.log('Image added to draggedImages from file upload');
             }
           };
           reader.readAsDataURL(file);
@@ -397,9 +396,8 @@ export const ChatInterface = forwardRef<
     else if (imageUrl && isValidImageUrl(imageUrl)) {
       console.log('Adding valid image URL to state:', imageUrl);
       setDraggedImages(prev => [...prev, { url: imageUrl }]);
-      // Automatically insert markdown image into input
-      const markdownImage = `![image](${imageUrl})\n`;
-      setInput(prevInput => prevInput + markdownImage);
+      // Don't add markdown to input text, just add to draggedImages array
+      console.log('Image added to draggedImages from URL drop');
     }
   };
 
