@@ -204,6 +204,7 @@ export const ChatInterface = forwardRef<
             responseTimestamp,
             pageContextIncluded: !!includePageContext,
             pageTitle: activeTabTitle, // Add page title to metadata
+            images: displayMessage.images,
           },
         });
         console.log('Completion saved to database');

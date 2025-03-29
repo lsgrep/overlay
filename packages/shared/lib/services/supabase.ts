@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import type { Database } from '../database.types';
+import type { Database, Json } from '../database.types';
 
 // Replace with your Supabase project URL and anon key
 const supabaseUrl = 'https://qwmoocakwkzdifssijdh.supabase.co';
@@ -315,6 +315,7 @@ export async function saveCompletion({
   questionId = null,
   modelInfo = {},
   metadata = null,
+  prompt = null,
 }: {
   promptContent: string;
   responseContent: string;
@@ -326,6 +327,7 @@ export async function saveCompletion({
     modelDisplayName?: string;
   };
   metadata?: Record<string, unknown> | null;
+  prompt?: Json | null;
 }) {
   try {
     const user = await getCurrentUserFromStorage();
@@ -356,6 +358,7 @@ export async function saveCompletion({
         model_provider: modelInfo.modelProvider || null,
         model_display_name: modelInfo.modelDisplayName || null,
         metadata,
+        prompt,
       } as Database['public']['Tables']['completions']['Insert'])
       .select();
 
