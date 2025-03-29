@@ -22,31 +22,32 @@ const getLanguageName = async () => {
   return getLanguageNameFromCode(targetLang) || 'English';
 };
 
+// Define context menu actions with correct types
 const CONTEXT_MENU_ACTIONS = [
   {
     id: 'translate',
     title: '🔄 Translate',
-    contexts: ['selection'],
+    contexts: ['selection'] as chrome.contextMenus.ContextType[],
   },
   {
     id: 'explain',
     title: '🤖 Explain This',
-    contexts: ['selection'],
+    contexts: ['selection'] as chrome.contextMenus.ContextType[],
   },
   {
     id: 'improve',
     title: '✨ Improve Writing',
-    contexts: ['selection'],
+    contexts: ['selection'] as chrome.contextMenus.ContextType[],
   },
   {
     id: 'summarize',
     title: '📋 Summarize',
-    contexts: ['selection'],
+    contexts: ['selection'] as chrome.contextMenus.ContextType[],
   },
   {
     id: 'take-note',
     title: '📝 Take Note',
-    contexts: ['selection'],
+    contexts: ['selection'] as chrome.contextMenus.ContextType[],
   },
 ];
 
@@ -110,7 +111,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   chrome.contextMenus.create({
     id: 'overlay-actions',
     title: ' Overlay AI',
-    contexts: ['selection'],
+    contexts: ['selection'] as chrome.contextMenus.ContextType[],
   });
 
   // Create child menu items for each action
@@ -123,57 +124,65 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 // Handle context menu click
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.selectionText && tab?.windowId) {
     const actionId = info.menuItemId as string;
 
-    // First open the side panel
-    await chrome.sidePanel.open({ windowId: tab.windowId });
+    // First open the side panel - using direct callback approach instead of async/await
+    // to preserve the user gesture context
+    chrome.sidePanel.open({ windowId: tab.windowId });
 
     // Then send the message after a small delay to ensure panel is ready
-    setTimeout(async () => {
-      try {
-        await chrome.runtime.sendMessage({
+    setTimeout(() => {
+      chrome.runtime.sendMessage(
+        {
           type: 'CONTEXT_MENU_ACTION',
           actionId,
           text: info.selectionText,
           url: tab.url, // Pass the current URL
-        });
-        console.log('Sent context menu action:', { actionId, text: info.selectionText, url: tab.url });
-      } catch (error) {
-        console.error('Error sending message:', error);
-        // Try sending to all tabs if direct message fails
-        const tabs = await chrome.tabs.query({});
-        for (const tab of tabs) {
-          if (tab.id) {
-            try {
-              await chrome.tabs.sendMessage(tab.id, {
-                type: 'CONTEXT_MENU_ACTION',
-                actionId,
-                text: info.selectionText,
-                url: tab.url,
-              });
-              console.log('Sent message to tab:', tab.id);
-            } catch (e) {
-              console.log('Could not send to tab:', tab.id, e);
-            }
+        },
+        () => {
+          if (chrome.runtime.lastError) {
+            console.error('Error sending message:', chrome.runtime.lastError);
+            // Try sending to all tabs if direct message fails
+            chrome.tabs.query({}, tabs => {
+              for (const tab of tabs) {
+                if (tab.id) {
+                  chrome.tabs.sendMessage(
+                    tab.id,
+                    {
+                      type: 'CONTEXT_MENU_ACTION',
+                      actionId,
+                      text: info.selectionText,
+                      url: tab.url,
+                    },
+                    () => {
+                      if (!chrome.runtime.lastError) {
+                        console.log('Sent message to tab:', tab.id);
+                      } else {
+                        console.log('Could not send to tab:', tab.id, chrome.runtime.lastError);
+                      }
+                    },
+                  );
+                }
+              }
+            });
+          } else {
+            console.log('Sent context menu action:', { actionId, text: info.selectionText, url: tab.url });
           }
-        }
-      }
+        },
+      );
     }, 500);
   }
 });
 
 // Handle messages from content script
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'OPEN_SIDE_PANEL' && sender.tab?.windowId) {
-    try {
-      await chrome.sidePanel.open({ windowId: sender.tab.windowId });
-      sendResponse({ success: true });
-    } catch (error) {
-      console.error('Error opening side panel:', error);
-      sendResponse({ success: false, error });
-    }
+    // Use callback style to preserve user gesture
+    chrome.sidePanel.open({ windowId: sender.tab.windowId });
+    sendResponse({ success: true });
     return true; // Required for async sendResponse
   }
+  return false; // Add return value for all code paths
 });
