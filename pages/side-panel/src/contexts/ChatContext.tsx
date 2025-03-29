@@ -11,7 +11,6 @@ const initialChatState: ChatState = {
 const initialChatConfig: ChatConfig = {
   mode: 'conversational',
   selectedModel: '',
-  contextMenuAction: undefined,
 };
 
 // Action types
@@ -74,10 +73,6 @@ export const ChatProvider: React.FC<{
     [config],
   );
 
-  const setContextMenuAction = useCallback((action: ContextMenuAction | undefined) => {
-    setConfig(prev => ({ ...prev, contextMenuAction: action }));
-  }, []);
-
   const setMode = useCallback((mode: ChatMode) => {
     setConfig(prev => ({ ...prev, mode }));
   }, []);
@@ -86,7 +81,6 @@ export const ChatProvider: React.FC<{
     state,
     config,
     sendMessage,
-    setContextMenuAction,
     setMode,
   };
 

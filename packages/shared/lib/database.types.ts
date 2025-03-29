@@ -3,16 +3,66 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      auth_details: {
+        Row: {
+          access_token: string;
+          created_at: string;
+          email: string;
+          expiry_date: number | null;
+          id: number;
+          id_token: string | null;
+          metadata: Json | null;
+          refresh_token: string | null;
+          scopes: string[] | null;
+          uid: string;
+          updated_at: string;
+          user_info: Json | null;
+          vendor: string;
+        };
+        Insert: {
+          access_token: string;
+          created_at?: string;
+          email: string;
+          expiry_date?: number | null;
+          id?: number;
+          id_token?: string | null;
+          metadata?: Json | null;
+          refresh_token?: string | null;
+          scopes?: string[] | null;
+          uid: string;
+          updated_at?: string;
+          user_info?: Json | null;
+          vendor: string;
+        };
+        Update: {
+          access_token?: string;
+          created_at?: string;
+          email?: string;
+          expiry_date?: number | null;
+          id?: number;
+          id_token?: string | null;
+          metadata?: Json | null;
+          refresh_token?: string | null;
+          scopes?: string[] | null;
+          uid?: string;
+          updated_at?: string;
+          user_info?: Json | null;
+          vendor?: string;
+        };
+        Relationships: [];
+      };
       completions: {
         Row: {
           completion_id: string;
           created_at: string;
           id: number;
+          is_public: boolean;
           metadata: Json | null;
           mode: string | null;
           model_display_name: string | null;
           model_name: string | null;
           model_provider: string | null;
+          prompt: Json | null;
           prompt_content: string;
           prompt_timestamp: number | null;
           question_id: string | null;
@@ -25,11 +75,13 @@ export type Database = {
           completion_id?: string;
           created_at?: string;
           id?: number;
+          is_public?: boolean;
           metadata?: Json | null;
           mode?: string | null;
           model_display_name?: string | null;
           model_name?: string | null;
           model_provider?: string | null;
+          prompt?: Json | null;
           prompt_content: string;
           prompt_timestamp?: number | null;
           question_id?: string | null;
@@ -42,11 +94,13 @@ export type Database = {
           completion_id?: string;
           created_at?: string;
           id?: number;
+          is_public?: boolean;
           metadata?: Json | null;
           mode?: string | null;
           model_display_name?: string | null;
           model_name?: string | null;
           model_provider?: string | null;
+          prompt?: Json | null;
           prompt_content?: string;
           prompt_timestamp?: number | null;
           question_id?: string | null;
