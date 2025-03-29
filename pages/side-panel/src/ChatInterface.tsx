@@ -82,6 +82,8 @@ export const ChatInterface = forwardRef<
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pageContext, setPageContext] = useState<PageContext | null>(null);
+  const [draggedImages, setDraggedImages] = useState<Array<{ url: string; altText?: string }>>([]);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // Update translations when language changes
   useEffect(() => {
@@ -330,8 +332,59 @@ export const ChatInterface = forwardRef<
     }
   };
 
+  // Drag and drop handlers for the entire side panel
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+    // Log all available data formats
+    console.log('Available data formats:');
+    for (let i = 0; i < e.dataTransfer.types.length; i++) {
+      console.log(`- ${e.dataTransfer.types[i]}`);
+    }
+    const imageUrl =
+      e.dataTransfer.getData('text/uri-list') ||
+      e.dataTransfer.getData('overlay/image') ||
+      e.dataTransfer.getData('text/plain');
+    console.log('Detected image URL:', imageUrl);
+
+    // Validate that it's an image URL
+    if (imageUrl && isValidImageUrl(imageUrl)) {
+      console.log('Adding valid image URL to state:', imageUrl);
+      setDraggedImages([...draggedImages, { url: imageUrl }]);
+      // Automatically insert markdown image into input
+      const markdownImage = `![image](${imageUrl})\n`;
+      setInput(prevInput => prevInput + markdownImage);
+    }
+  };
+
+  // Helper function to check if a URL points to an image
+  const isValidImageUrl = (url: string): boolean => {
+    // Simple validation to check if it's a URL and likely an image
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+    // Check if it's a URL format and has image extension or common image hosting domains
+    const isUrl = url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:image/');
+    const hasImageExtension = imageExtensions.some(ext => url.toLowerCase().includes(ext));
+    const isImageHostingUrl = url.includes('imgur.com') || url.includes('ibb.co') || url.includes('twimg.com');
+
+    return isUrl && (hasImageExtension || isImageHostingUrl || url.startsWith('data:image/'));
+  };
+
   return (
-    <div className="flex flex-col h-full" style={{ fontFamily, fontSize: `${Number(fontSize)}px` }}>
+    <div
+      className={`flex flex-col h-full ${isDraggingOver ? 'bg-primary/10' : ''}`}
+      style={{ fontFamily, fontSize: `${Number(fontSize)}px` }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}>
       {/* @ts-expect-error - HeaderComponent props types will be fixed in a separate PR */}
       <HeaderComponent fontFamily={fontFamily} fontSize={Number(fontSize)} />
 
@@ -354,6 +407,8 @@ export const ChatInterface = forwardRef<
         isLoading={isLoading}
         fontFamily={fontFamily}
         fontSize={Number(fontSize)}
+        draggedImages={draggedImages}
+        setDraggedImages={setDraggedImages}
       />
     </div>
   );

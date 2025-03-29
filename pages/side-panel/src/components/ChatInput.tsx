@@ -17,6 +17,8 @@ interface ChatInputProps {
   isLoading: boolean;
   fontFamily: string;
   fontSize: number;
+  draggedImages?: DraggedImage[];
+  setDraggedImages?: React.Dispatch<React.SetStateAction<DraggedImage[]>>;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -26,10 +28,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   isLoading,
   fontFamily,
   fontSize,
+  draggedImages: externalDraggedImages,
+  setDraggedImages: externalSetDraggedImages,
 }) => {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [draggedImages, setDraggedImages] = useState<DraggedImage[]>([]);
+  const [localDraggedImages, setLocalDraggedImages] = useState<DraggedImage[]>([]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Use either external or local state for dragged images
+  const draggedImages = externalDraggedImages || localDraggedImages;
+  const setDraggedImages = externalSetDraggedImages || setLocalDraggedImages;
   // Handle drag events
   const handleDragOver = (e: React.DragEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -105,7 +113,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     if (!input) {
       setDraggedImages([]);
     }
-  }, [input]);
+  }, [input, setDraggedImages]);
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t border-border">
