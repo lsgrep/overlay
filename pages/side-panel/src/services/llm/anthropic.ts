@@ -1,8 +1,8 @@
 import { anthropicKeyStorage } from '@extension/storage';
 import type { Message, LLMConfig, LLMService } from './types';
-import Anthropic from '@anthropic-ai/sdk';
-import type { Messages } from '@anthropic-ai/sdk/resources';
+import { Anthropic } from '@anthropic-ai/sdk';
 import type { PageContext } from './prompts';
+import type { MessageParam, ContentBlockParam, ImageBlockParam } from '@anthropic-ai/sdk/resources/messages';
 
 /**
  * Helper function to convert ArrayBuffer to base64 string in browser environment
@@ -121,11 +121,88 @@ export class AnthropicService implements LLMService {
         }
       }
 
-      // Convert messages to Anthropic format (standard approach)
-      const anthropicMessages = messages.map(msg => ({
-        role: msg.role.toLowerCase() === 'user' ? 'user' : 'assistant',
-        content: msg.content,
-      })) as Messages.MessageParam[];
+      // Convert messages to Anthropic format with support for images
+      const anthropicMessages: MessageParam[] = [];
+
+      for (const msg of messages) {
+        const role = msg.role.toLowerCase() === 'user' ? 'user' : 'assistant';
+
+        // Check if the message contains images
+        if (msg.images && msg.images.length > 0) {
+          try {
+            // Format message with image content
+            const content: ContentBlockParam[] = [];
+
+            // Fetch and process images
+            const imagePromises = msg.images.map(async image => {
+              try {
+                // Fetch the image from the URL
+                const response = await fetch(image.url);
+                if (!response.ok) {
+                  throw new Error(`Failed to fetch image: ${response.status}`);
+                }
+
+                // Convert to ArrayBuffer then to base64
+                const imageBuffer = await response.arrayBuffer();
+                const base64Data = arrayBufferToBase64(imageBuffer);
+
+                return {
+                  type: 'image',
+                  source: {
+                    type: 'base64',
+                    media_type: image.mimeType || 'image/jpeg',
+                    data: base64Data,
+                  },
+                } as ImageBlockParam;
+              } catch (imageError) {
+                console.error('Error processing image:', imageError);
+                return null;
+              }
+            });
+
+            // Wait for all image processing to complete
+            const imageContents = await Promise.all(imagePromises);
+
+            // Add successfully processed images to content
+            for (const imageContent of imageContents) {
+              if (imageContent) {
+                content.push(imageContent);
+              }
+            }
+
+            // Add text content if present
+            if (msg.content) {
+              content.push({
+                type: 'text',
+                text: msg.content,
+              });
+            }
+
+            // Only add the message if we have at least one content item
+            if (content.length > 0) {
+              anthropicMessages.push({
+                role,
+                content,
+              });
+            }
+          } catch (error) {
+            console.error('Error processing images for Anthropic:', error);
+            // Fallback to text-only message
+            if (msg.content) {
+              anthropicMessages.push({
+                role,
+                content: msg.content,
+              });
+            }
+          }
+        } else {
+          // Standard text-only message
+          anthropicMessages.push({
+            role,
+            content: msg.content,
+          });
+        }
+      }
 
       // Create the message with the SDK
       const response = await client.messages.create({

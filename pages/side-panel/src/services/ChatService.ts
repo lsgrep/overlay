@@ -178,12 +178,14 @@ export class ChatService {
       },
     };
 
-    // Add images to the message if available and using Gemini
-    if (images.length > 0 && modelInfo.provider === 'gemini') {
-      console.log(`Adding ${images.length} images to Gemini message`);
+    // Add images to the message if available and using a provider that supports images
+    if (images.length > 0 && (modelInfo.provider === 'gemini' || modelInfo.provider === 'anthropic')) {
+      console.log(`Adding ${images.length} images to ${modelInfo.provider} message`);
       userMessage.images = images;
     } else if (images.length > 0) {
-      console.log(`Images provided but model ${modelInfo.provider} doesn't support them. Only Gemini supports images.`);
+      console.log(
+        `Images provided but model ${modelInfo.provider} doesn't support them. Only Gemini and Anthropic support images.`,
+      );
     }
 
     const chatMessages = messages.concat(userMessage);
@@ -199,9 +201,11 @@ export class ChatService {
       }
 
       if (selectedModel.startsWith('claude')) {
+        // Preserve images when mapping messages for Anthropic
         const anthropicMessages = chatMessages.map(msg => ({
           role: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.content,
+          images: msg.images, // Pass the images to the Anthropic service
         }));
         llmService = new AnthropicService(selectedModel);
         response = await llmService.generateCompletion(anthropicMessages, prompt, undefined, pageContext);
