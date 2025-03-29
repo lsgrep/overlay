@@ -12,12 +12,14 @@ import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
 import type { PageContext } from './services/llm/prompts';
+import type { MessageImage } from './services/llm/types';
 
 // We're using the Task interface directly from the API module
 
 export interface Message {
   role: string;
   content: string;
+  images?: MessageImage[];
   model?: {
     name: string;
     displayName?: string;
@@ -116,6 +118,11 @@ export const ChatInterface = forwardRef<
       console.error('Error extracting page context:', err);
     }
 
+    // Log if we have images to send
+    if (draggedImages.length > 0) {
+      console.log(`Sending ${draggedImages.length} images with message to Gemini:`, draggedImages);
+    }
+
     // Get the active tab URL and title from the extracted context
     const activeTabUrl = extractedPageContext?.url || ''; // Fallback to empty string if undefined
     const activeTabTitle = extractedPageContext?.title || ''; // Fallback to empty string if undefined
@@ -130,6 +137,11 @@ export const ChatInterface = forwardRef<
         sourceUrl: activeTabUrl,
       },
     };
+
+    // Add images to the message if available
+    if (draggedImages.length > 0) {
+      displayMessage.images = draggedImages;
+    }
     setMessages(prev => [...prev, displayMessage]);
     setIsLoading(true);
     setError(null);
@@ -148,6 +160,8 @@ export const ChatInterface = forwardRef<
         // @ts-expect-error - ChatService should handle null pageContext
         pageContext: includePageContext ? extractedPageContext : null,
         messages,
+        // Pass images to the service if available
+        images: draggedImages,
         openaiModels,
         geminiModels,
         anthropicModels,
@@ -202,6 +216,8 @@ export const ChatInterface = forwardRef<
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setIsLoading(false);
+      // Clear the draggedImages after sending the message
+      setDraggedImages([]);
     }
   };
 
@@ -356,10 +372,31 @@ export const ChatInterface = forwardRef<
       e.dataTransfer.getData('text/plain');
     console.log('Detected image URL:', imageUrl);
 
-    // Validate that it's an image URL
-    if (imageUrl && isValidImageUrl(imageUrl)) {
+    // Handle file drops (actual image files)
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      // Process each dropped file
+      for (let i = 0; i < e.dataTransfer.files.length; i++) {
+        const file = e.dataTransfer.files[i];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = event => {
+            if (event.target && event.target.result) {
+              const dataUrl = event.target.result.toString();
+              console.log('Processed image file to data URL');
+              setDraggedImages(prev => [...prev, { url: dataUrl }]);
+              // Automatically insert markdown image placeholder into input
+              const markdownImage = `![Uploaded Image]\n`;
+              setInput(prevInput => prevInput + markdownImage);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    }
+    // Handle image URL drops
+    else if (imageUrl && isValidImageUrl(imageUrl)) {
       console.log('Adding valid image URL to state:', imageUrl);
-      setDraggedImages([...draggedImages, { url: imageUrl }]);
+      setDraggedImages(prev => [...prev, { url: imageUrl }]);
       // Automatically insert markdown image into input
       const markdownImage = `![image](${imageUrl})\n`;
       setInput(prevInput => prevInput + markdownImage);

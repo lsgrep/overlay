@@ -1,7 +1,7 @@
 import { geminiKeyStorage } from '@extension/storage';
-import type { LLMConfig, LLMService, Message, StructuredOutputConfig } from './types';
+import type { LLMConfig, LLMService, Message, MessageImage, StructuredOutputConfig } from './types';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import type { Schema } from '@google/generative-ai';
+import type { Schema, Part } from '@google/generative-ai';
 import { TaskPlanSchema } from '../task/types';
 import type { PageContext } from './prompts';
 
@@ -93,15 +93,57 @@ export class GeminiService implements LLMService {
   }
 
   /**
+   * Process and prepare image for Gemini API
+   * This will fetch the image data if it's a URL
+   */
+  private async processImage(image: MessageImage): Promise<Part> {
+    try {
+      // Gemini can accept image URLs directly in some cases
+      if (image.url.startsWith('data:image/')) {
+        // Data URL case (already encoded)
+        return {
+          inlineData: {
+            data: image.url.split(',')[1], // Extract base64 data without the prefix
+            mimeType: image.mimeType || 'image/jpeg', // Use provided mimeType or default
+          },
+        };
+      } else {
+        // Remote URL case - fetch the image and convert to base64
+        const response = await fetch(image.url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch image: ${response.status}`);
+        }
+        const blob = await response.blob();
+        const mimeType = image.mimeType || blob.type || 'image/jpeg';
+        // Convert the blob to base64
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Data = (reader.result as string).split(',')[1];
+            resolve({
+              inlineData: {
+                data: base64Data,
+                mimeType,
+              },
+            });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch (error) {
+      console.error('Error processing image for Gemini:', error);
+      throw new Error(`Failed to process image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
    * Format our Message type to Google's Part type
    */
-  private formatMessages(
-    messages: Message[],
-    context: string,
-  ): Array<{ role: string; parts: Array<{ text: string }> }> {
+  private async formatMessages(messages: Message[], context: string): Promise<Array<{ role: string; parts: Part[] }>> {
     // For Gemini, we need to convert our messages to their format
     // and handle the system context appropriately
-    const formattedMessages: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+    const formattedMessages: Array<{ role: string; parts: Part[] }> = [];
 
     // First, check if there are user messages
     const hasUserMessage = messages.some(msg => msg.role === 'user');
@@ -141,9 +183,45 @@ export class GeminiService implements LLMService {
         content = `${context}\n\n${content}`;
       }
 
+      // Process the text content to handle images properly
+      let cleanedContent = content;
+
+      // Create an array to hold all parts (text and images)
+      const parts: Part[] = [];
+
+      // Process images if present
+      if (msg.images && msg.images.length > 0) {
+        console.log(`Processing ${msg.images.length} images for message`);
+
+        // Clean the text content to remove markdown image references
+        // This regex matches markdown image syntax: ![alt text](url)
+        const imageRegex = /!\[.*?\]\(.*?\)\n?/g;
+        cleanedContent = cleanedContent.replace(imageRegex, '');
+
+        // Add cleaned text content as the first part if it's not empty after removing image references
+        if (cleanedContent.trim()) {
+          parts.push({ text: cleanedContent });
+        }
+
+        // Process each image and add it as a part
+        for (const image of msg.images) {
+          try {
+            const imagePart = await this.processImage(image);
+            parts.push(imagePart);
+          } catch (error) {
+            console.error('Error adding image to message:', error);
+            // Continue with other images if one fails
+          }
+        }
+      } else {
+        // No images, just add the text content
+        parts.push({ text: cleanedContent });
+      }
+
+      // Add the formatted message with all parts
       formattedMessages.push({
         role,
-        parts: [{ text: content }],
+        parts,
       });
     }
 
@@ -157,7 +235,7 @@ export class GeminiService implements LLMService {
     messages: Message[],
     prompt: string,
     config?: LLMConfig,
-    context: PageContext,
+    context?: PageContext,
   ): Promise<string> {
     try {
       // Adjust temperature based on the mode
@@ -219,7 +297,7 @@ export class GeminiService implements LLMService {
       }
 
       // Format the messages for Gemini API (standard approach)
-      const formattedMessages = this.formatMessages(messages, prompt);
+      const formattedMessages = await this.formatMessages(messages, prompt);
 
       // Generate content with standard approach
       const contentResult = await model.generateContent({

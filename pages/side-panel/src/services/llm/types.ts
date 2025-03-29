@@ -1,8 +1,18 @@
 import type { PageContext } from './prompts';
 
+export interface MessageImage {
+  url: string;
+  mimeType?: string;
+}
+
 export interface Message {
   role: string;
   content: string;
+  /**
+   * Optional array of image data to include with the message
+   * Currently only supported by Gemini
+   */
+  images?: MessageImage[];
 }
 
 export interface LLMConfig {

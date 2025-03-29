@@ -4,10 +4,11 @@ import { AnthropicService } from './llm/anthropic';
 import { GeminiService } from './llm/gemini';
 import { OpenAIService } from './llm/openai';
 import { OllamaService } from './llm/ollama';
-import type { LLMService } from './llm/types';
+import type { LLMService, MessageImage } from './llm/types';
 interface Message {
   role: string;
   content: string;
+  images?: MessageImage[];
   model?: {
     name: string;
     displayName?: string;
@@ -33,6 +34,7 @@ interface ChatOptions {
   mode: 'interactive' | 'conversational';
   pageContext: PageContext;
   messages: Message[];
+  images?: MessageImage[];
   openaiModels?: ModelInfo[];
   geminiModels?: ModelInfo[];
   anthropicModels?: ModelInfo[];
@@ -100,6 +102,7 @@ export class ChatService {
     mode,
     pageContext,
     messages,
+    images = [],
     openaiModels = [],
     geminiModels = [],
     anthropicModels = [],
@@ -166,14 +169,24 @@ export class ChatService {
 
     // Prepare messages for the selected model
     const questionId = Date.now().toString();
-    const chatMessages = messages.concat({
+    const userMessage: Message = {
       role: 'user',
       content: input,
       metadata: {
         questionId,
         timestamp: Date.now(),
       },
-    });
+    };
+
+    // Add images to the message if available and using Gemini
+    if (images.length > 0 && modelInfo.provider === 'gemini') {
+      console.log(`Adding ${images.length} images to Gemini message`);
+      userMessage.images = images;
+    } else if (images.length > 0) {
+      console.log(`Images provided but model ${modelInfo.provider} doesn't support them. Only Gemini supports images.`);
+    }
+
+    const chatMessages = messages.concat(userMessage);
 
     let response: string = '';
     let llmService: LLMService;
