@@ -20,6 +20,60 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
+/**
+ * Detect image MIME type from ArrayBuffer by examining the file signature (magic bytes)
+ */
+function detectImageMimeType(buffer: ArrayBuffer): string | null {
+  // Get the first bytes to check the file signature
+  const arr = new Uint8Array(buffer).subarray(0, 8);
+
+  // Check for PNG signature: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    arr[0] === 0x89 &&
+    arr[1] === 0x50 &&
+    arr[2] === 0x4e &&
+    arr[3] === 0x47 &&
+    arr[4] === 0x0d &&
+    arr[5] === 0x0a &&
+    arr[6] === 0x1a &&
+    arr[7] === 0x0a
+  ) {
+    return 'image/png';
+  }
+
+  // Check for JPEG signature: FF D8 FF
+  if (arr[0] === 0xff && arr[1] === 0xd8 && arr[2] === 0xff) {
+    return 'image/jpeg';
+  }
+
+  // Check for GIF signature: 'GIF87a' or 'GIF89a'
+  if (
+    arr[0] === 0x47 &&
+    arr[1] === 0x49 &&
+    arr[2] === 0x46 &&
+    arr[3] === 0x38 &&
+    (arr[4] === 0x37 || arr[4] === 0x39) &&
+    arr[5] === 0x61
+  ) {
+    return 'image/gif';
+  }
+
+  // Check for WebP signature: RIFF ???? WEBP
+  if (arr[0] === 0x52 && arr[1] === 0x49 && arr[2] === 0x46 && arr[3] === 0x46) {
+    // WebP has RIFF at offset 0 and WEBP at offset 8, but we only have 8 bytes...
+    // We'd need more bytes to check for WebP properly
+    return 'image/webp';
+  }
+
+  // Check for BMP signature: 'BM'
+  if (arr[0] === 0x42 && arr[1] === 0x4d) {
+    return 'image/bmp';
+  }
+
+  // Unknown image type
+  return null;
+}
+
 export class AnthropicService implements LLMService {
   private model: string;
   private client: Anthropic | null = null;
@@ -146,11 +200,15 @@ export class AnthropicService implements LLMService {
                 const imageBuffer = await response.arrayBuffer();
                 const base64Data = arrayBufferToBase64(imageBuffer);
 
+                // Detect image type based on header bytes
+                const mimeType = detectImageMimeType(imageBuffer) || image.mimeType || 'image/png';
+                console.log('Using image MIME type:', mimeType);
+
                 return {
                   type: 'image',
                   source: {
                     type: 'base64',
-                    media_type: image.mimeType || 'image/jpeg',
+                    media_type: mimeType,
                     data: base64Data,
                   },
                 } as ImageBlockParam;
