@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { overlayApi, type TaskList, type Task } from '@extension/shared/lib/services/api';
 import { PlusIcon, TrashIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { Button, Card, CardHeader, CardTitle, CardContent, Checkbox } from '@extension/ui';
 
 interface TaskManagerProps {
@@ -14,6 +15,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
   // Define fetchTaskLists with useCallback to prevent infinite loops
   const fetchTaskLists = useCallback(async () => {
@@ -92,6 +94,9 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
     if (!selectedListId) return;
 
     try {
+      // Set the currently updating taskId to show the spinner
+      setUpdatingTaskId(taskId);
+
       // Optimistic UI update - update the local state immediately
       setTasks(prevTasks =>
         prevTasks.map(task =>
@@ -122,6 +127,9 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
       console.error('Error updating task:', err);
       // Revert optimistic update on error
       fetchTasks(selectedListId);
+    } finally {
+      // Clear the updating taskId when operation completes
+      setUpdatingTaskId(null);
     }
   };
 
@@ -205,20 +213,22 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
             {/* New Task Form */}
             {selectedListId && (
               <form onSubmit={handleCreateTask} className="mb-4 flex">
-                <input
-                  type="text"
-                  placeholder="Add a new task..."
-                  value={newTaskTitle}
-                  onChange={e => setNewTaskTitle(e.target.value)}
-                  className="flex-grow p-2 rounded-l-lg border-r-0 border-input focus:outline-none focus:ring-2 focus:ring-ring transition-all bg-background/80 text-foreground"
-                />
+                <div className="flex-grow rounded-l-lg border-r-0 border border-input focus-within:ring-2 focus-within:ring-ring transition-all bg-background/80">
+                  <input
+                    type="text"
+                    placeholder="Add a new task..."
+                    value={newTaskTitle}
+                    onChange={e => setNewTaskTitle(e.target.value)}
+                    className="w-full p-2 bg-transparent border-none outline-none text-foreground"
+                  />
+                </div>
                 <Button
                   type="submit"
                   disabled={!newTaskTitle.trim()}
                   variant="default"
                   size="icon"
                   className="rounded-l-none rounded-r-lg">
-                  <PlusIcon className="w-5 h-5" />
+                  {loading ? <ArrowPathIcon className="w-5 h-5 animate-spin" /> : <PlusIcon className="w-5 h-5" />}
                 </Button>
               </form>
             )}
@@ -241,11 +251,17 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
                         : 'bg-card/40 hover:bg-card/70 shadow-sm hover:shadow-md'
                     } ${task.status === 'completed' ? 'border-l-4 border-blue-500' : ''}`}>
                     <div className="flex items-start gap-3">
-                      <Checkbox
-                        checked={task.status === 'completed'}
-                        onCheckedChange={() => handleUpdateTaskStatus(task.id, task.status !== 'completed')}
-                        className={`mt-1 flex-shrink-0 ${task.status === 'completed' ? 'data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500' : ''}`}
-                      />
+                      {updatingTaskId === task.id ? (
+                        <div className="mt-1 flex-shrink-0 w-4 h-4">
+                          <ArrowPathIcon className="w-4 h-4 text-blue-500 animate-spin" />
+                        </div>
+                      ) : (
+                        <Checkbox
+                          checked={task.status === 'completed'}
+                          onCheckedChange={() => handleUpdateTaskStatus(task.id, task.status !== 'completed')}
+                          className={`mt-1 flex-shrink-0 ${task.status === 'completed' ? 'data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500' : ''}`}
+                        />
+                      )}
 
                       <div className="flex-grow">
                         <div
