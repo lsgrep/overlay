@@ -1,8 +1,37 @@
 import { chromeStorageKeys } from './supabase';
 
+// Completion interfaces
+export interface CompletionMetadata {
+  images?: Array<{ url: string; original_url?: string }>;
+  [key: string]: unknown;
+}
+
+export interface CompletionData {
+  completion_id?: string;
+  uid?: string;
+  prompt_content: string;
+  response_content: string;
+  source_url?: string | null;
+  prompt_timestamp?: string | null;
+  response_timestamp?: string | null;
+  model_name?: string | null;
+  model_provider?: string | null;
+  model_display_name?: string | null;
+  question_id?: string | null;
+  mode?: string | null;
+  metadata?: CompletionMetadata | null;
+  is_public?: boolean;
+}
+
+export interface CompletionResponse {
+  success: boolean;
+  completion: CompletionData;
+  message: string;
+}
+
 // Base URL for Overlay API
-const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
-// const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
+// const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
+const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
 
 // Default task list ID
 const DEFAULT_TASK_LIST_ID = 'MDU1MjgyMTk4ODAzMTg5NDI3MjA6MDow';
@@ -176,5 +205,17 @@ export const overlayApi = {
       console.error('[API] Error checking authentication status:', error);
       return false;
     }
+  },
+
+  /**
+   * Save a completion with image processing support
+   * @param completionData The completion data to save
+   * @returns The saved completion information
+   */
+  async createCompletion(completionData: CompletionData): Promise<CompletionResponse> {
+    return makeAuthenticatedRequest<CompletionResponse>('/completions', {
+      method: 'POST',
+      body: JSON.stringify(completionData),
+    });
   },
 };

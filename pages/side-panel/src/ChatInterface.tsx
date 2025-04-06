@@ -2,7 +2,7 @@ import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
-import { saveCompletion } from '@extension/shared/lib/services/supabase';
+// Import is now handled through overlayApi
 import { overlayApi, type Task } from '@extension/shared/lib/services/api';
 import type { SystemMessageType } from './components/SystemMessageView';
 
@@ -186,22 +186,20 @@ export const ChatInterface = forwardRef<
         },
       ]);
 
-      // Save completion to Supabase
+      // Save completion to database using the API
       try {
-        await saveCompletion({
-          promptContent: displayMessage.content,
-          responseContent: response,
-          sourceUrl: activeTabUrl,
-          questionId,
-          modelInfo: {
-            modelName: model.name,
-            modelProvider: model.provider,
-            modelDisplayName: model.displayName,
-          },
+        await overlayApi.createCompletion({
+          prompt_content: displayMessage.content,
+          response_content: response,
+          source_url: activeTabUrl,
+          question_id: questionId,
+          model_name: model.name,
+          model_provider: model.provider,
+          model_display_name: model.displayName,
+          mode: mode,
+          prompt_timestamp: displayMessage.metadata?.timestamp ? displayMessage.metadata.timestamp.toString() : null,
+          response_timestamp: responseTimestamp.toString(),
           metadata: {
-            mode,
-            promptTimestamp: displayMessage.metadata?.timestamp,
-            responseTimestamp,
             pageContextIncluded: !!includePageContext,
             pageTitle: activeTabTitle, // Add page title to metadata
             images: displayMessage.images,
