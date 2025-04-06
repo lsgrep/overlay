@@ -1,11 +1,9 @@
-import '@src/NewTab.css';
-import '@src/NewTab.scss';
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, defaultLanguageStorage } from '@extension/storage';
 import type { DevLocale } from '@extension/i18n';
 import { t } from '@extension/i18n';
 import { useState, useEffect } from 'react';
-import { AITools } from './components/AITools';
+import { TaskManager } from './components/TaskManager';
 import quotesData from './quotes.json';
 
 const NewTab = () => {
@@ -43,23 +41,20 @@ const NewTab = () => {
   }, []);
 
   return (
-    <div
-      className={`min-h-screen flex flex-col overflow-hidden ${isLight ? 'bg-gradient-to-br from-blue-50 to-purple-50' : 'bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900'}`}>
+    <div className="min-h-screen flex flex-col overflow-hidden">
       {/* Header with Overlay logo */}
       <div className="flex items-center justify-between px-8 py-6 relative z-20">
         <div className="flex items-center">
           <img src="/icon-128.png" alt="Overlay icon" className="w-8 h-8 mr-3" />
-          <h1 className={`text-xl font-bold ${isLight ? 'text-gray-800' : 'text-white'}`}>{t('extensionName')}</h1>
+          <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+            {t('extensionName')}
+          </h1>
         </div>
         <div className="flex items-center space-x-4">
-          <a
-            href="chrome://extensions"
-            className={`text-sm ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
+          <a href="chrome://extensions" className="text-sm text-muted-foreground hover:text-primary transition-colors">
             {t('extensions', 'Extensions')}
           </a>
-          <a
-            href="chrome://bookmarks"
-            className={`text-sm ${isLight ? 'text-gray-600 hover:text-gray-900' : 'text-gray-300 hover:text-white'}`}>
+          <a href="chrome://bookmarks" className="text-sm text-muted-foreground hover:text-primary transition-colors">
             {t('bookmarks', 'Bookmarks')}
           </a>
         </div>
@@ -74,44 +69,29 @@ const NewTab = () => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-start pt-8 pb-16 px-4">
-        {/* Quote section */}
-        <div
-          className={`max-w-3xl w-full mx-auto p-8 mb-12 text-center relative rounded-2xl shadow-lg backdrop-blur-sm ${isLight ? 'bg-white/30' : 'bg-gray-800/30'}`}>
-          <span className={`absolute top-0 left-4 text-6xl font-serif ${isLight ? 'text-gray-200' : 'text-gray-700'}`}>
-            "
-          </span>
-          <span
-            className={`absolute bottom-0 right-0 text-8xl font-serif ${isLight ? 'text-gray-200' : 'text-gray-700'}`}>
-            "
-          </span>
+        <div className="w-full max-w-6xl mx-auto mb-8">
+          {/* Task Manager - Full width */}
+          <TaskManager isLight={isLight} />
+        </div>
 
-          <div className={`relative z-10 ${isLight ? 'text-gray-800' : 'text-gray-200'}`}>
-            <blockquote className="text-2xl font-serif italic mb-6 leading-relaxed px-8">
-              <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-                {randomQuote.text}
-              </span>
-            </blockquote>
-            <div className="flex flex-col items-center space-y-2">
-              <div className="flex items-center space-x-4">
-                <div className={`w-12 h-0.5 ${isLight ? 'bg-indigo-200' : 'bg-indigo-700'}`} />
-                <div className={`w-2 h-2 rounded-full ${isLight ? 'bg-purple-300' : 'bg-purple-600'}`} />
-                <div className={`w-12 h-0.5 ${isLight ? 'bg-purple-200' : 'bg-purple-700'}`} />
-              </div>
-              <div className="flex flex-col space-y-1">
-                <p
-                  className={`text-sm uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>
-                  {randomQuote.category}
-                </p>
-                <p className={`text-sm italic ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
-                  — {randomQuote.author}
-                </p>
+        {/* AI Tools section */}
+        {/* <AITools isLight={isLight} /> */}
+        {/* Quote section - Bottom (small) */}
+        <div className="w-full max-w-3xl mx-auto mt-8">
+          <div
+            className={`p-4 text-center relative rounded-xl shadow-sm backdrop-blur-sm ${isLight ? 'bg-card/20' : 'bg-card/20'}`}>
+            <div className={`relative z-10 ${isLight ? 'text-primary' : 'text-primary-dark'}`}>
+              <blockquote className="text-sm font-serif italic mb-2 leading-relaxed">
+                <span className="text-blue-500">"{randomQuote.text}"</span>
+              </blockquote>
+              <div className="flex justify-center items-center space-x-2">
+                <p className="text-xs italic text-blue-500">— {randomQuote.author}</p>
+                <span className="w-1 h-1 rounded-full bg-blue-500" />
+                <p className="text-xs uppercase tracking-widest font-light text-blue-500">{randomQuote.category}</p>
               </div>
             </div>
           </div>
         </div>
-
-        {/* AI Tools section */}
-        <AITools isLight={isLight} />
       </div>
     </div>
   );

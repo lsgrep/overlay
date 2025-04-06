@@ -37,6 +37,13 @@ const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
 const DEFAULT_TASK_LIST_ID = '';
 
 // Task interfaces
+export interface TaskList {
+  id: string;
+  title: string;
+  updated?: string;
+  selfLink?: string;
+}
+
 export interface Task {
   id: string;
   taskId: string;
@@ -128,6 +135,15 @@ async function makeAuthenticatedRequest<T>(endpoint: string, options: RequestIni
  * API client for Overlay services
  */
 export const overlayApi = {
+  /**
+   * Get all task lists for the authenticated user
+   * @returns An array of task list objects
+   */
+  async getTaskLists(): Promise<TaskList[]> {
+    const response = await makeAuthenticatedRequest<{ taskLists: TaskList[] }>('/tasks/lists');
+    return response.taskLists || [];
+  },
+
   /**
    * Get tasks from a specified list or the default list
    * @param listId The ID of the task list to fetch tasks from (optional, uses default if not provided)
