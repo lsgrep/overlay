@@ -244,4 +244,18 @@ export const overlayApi = {
       body: JSON.stringify(completionData),
     });
   },
+
+  /**
+   * Get user preferences including theme, default task list, etc.
+   * @returns User preferences with success status and preference data
+   */
+  async getUserPreferences() {
+    try {
+      const { getUserPreferences } = await import('./supabase');
+      return getUserPreferences();
+    } catch (error) {
+      console.error('[API] Error getting user preferences:', error);
+      return { success: false, error: (error as Error).message, data: null };
+    }
+  },
 };

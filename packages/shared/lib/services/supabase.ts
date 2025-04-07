@@ -460,3 +460,38 @@ export async function deleteCompletion(completionId: string) {
     return { success: false, error: (error as Error).message };
   }
 }
+
+/**
+ * Get user preferences
+ * @returns User preferences with success status and any error message
+ */
+export async function getUserPreferences() {
+  try {
+    const user = await getCurrentUserFromStorage();
+    if (!user) {
+      console.error('[SUPABASE] Cannot get preferences: User not authenticated');
+      return { success: false, error: 'User not authenticated', data: null };
+    }
+
+    const supabase = createClient();
+    const { data, error } = await supabase.from('user_preferences').select('*').eq('user_id', user.id).single();
+
+    if (error) {
+      // If the error is because the record wasn't found, return an empty preferences object
+      if (error.code === 'PGRST116') {
+        // PostgreSQL "not found" error code
+        console.log('[SUPABASE] No preferences found for user, returning defaults');
+        return { success: true, data: {} };
+      }
+
+      console.error('[SUPABASE] Error getting user preferences:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    console.log('[SUPABASE] Retrieved user preferences');
+    return { success: true, data };
+  } catch (error) {
+    console.error('[SUPABASE] Error in getUserPreferences:', error);
+    return { success: false, error: (error as Error).message, data: null };
+  }
+}
