@@ -50,6 +50,21 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
   const [editTaskDueDate, setEditTaskDueDate] = useState<Date | undefined>(undefined);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
 
+  // Define fetchTasks with useCallback to prevent infinite loops
+  const fetchTasks = useCallback(async (listId: string) => {
+    try {
+      setLoading(true);
+      const tasksData = await overlayApi.getTasks(listId);
+      setTasks(tasksData);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load tasks. Please try again.');
+      console.error('Error fetching tasks:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Define fetchTaskLists with useCallback to prevent infinite loops
   const fetchTaskLists = useCallback(async () => {
     try {
@@ -81,7 +96,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
     if (selectedListId) {
       fetchTasks(selectedListId);
     }
-  }, [selectedListId]);
+  }, [selectedListId, fetchTasks]);
 
   // Add selection of first task list if none selected but lists are available
   useEffect(() => {
@@ -89,20 +104,6 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
       setSelectedListId(taskLists[0].id);
     }
   }, [taskLists, selectedListId]);
-
-  const fetchTasks = async (listId: string) => {
-    try {
-      setLoading(true);
-      const tasksData = await overlayApi.getTasks(listId);
-      setTasks(tasksData);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load tasks. Please try again.');
-      console.error('Error fetching tasks:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -289,11 +290,12 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
     <div className="w-full max-w-6xl mx-auto relative z-10">
       <div className="flex items-center justify-center mb-6">
         <img src="/icon-128.png" alt="Overlay" className="w-8 h-8 mr-3" />
-        <h2 className={`text-2xl font-semibold ${isLight ? 'text-gray-800' : 'text-gray-100'}`}>Your Tasks</h2>
+        <h2 className="text-2xl font-semibold">Your Tasks</h2>
       </div>
 
       {error && (
-        <div className={`mb-4 p-3 rounded-lg ${isLight ? 'bg-red-50 text-red-700' : 'bg-red-900/20 text-red-400'}`}>
+        <div
+          className={`mb-4 p-3 rounded-lg ${isLight ? 'bg-indigo-100 text-indigo-700' : 'bg-indigo-900/20 text-indigo-400'}`}>
           {error}
         </div>
       )}
@@ -400,7 +402,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
 
                       <div className="flex-grow">
                         <div
-                          className={`font-medium transition-all duration-200 ${task.status === 'completed' ? 'text-gray-400 line-through' : ''}`}>
+                          className={`font-medium transition-all duration-200 ${task.status === 'completed' ? (isLight ? 'text-indigo-400 line-through' : 'text-indigo-500 line-through') : isLight ? 'text-indigo-700' : 'text-indigo-200'}`}>
                           {task.title}
                         </div>
 
@@ -447,62 +449,90 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
 
       {/* Task Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
+        <DialogContent className="sm:max-w-[450px] backdrop-blur-sm bg-white border-gray-200 dark:bg-gray-900/90 dark:border-gray-800 shadow-lg">
+          <DialogHeader className="pb-2 border-b border-gray-100 dark:border-gray-800/30">
+            <div className="flex items-center">
+              <img src="/icon-128.png" alt="Overlay" className="w-5 h-5 mr-2" />
+              <DialogTitle className="text-gray-800 dark:text-gray-200 font-medium">Edit Task</DialogTitle>
+            </div>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-5 py-5">
             <div className="grid gap-2">
-              <Label htmlFor="taskTitle">Title</Label>
+              <Label htmlFor="taskTitle" className="text-gray-700 dark:text-gray-300 font-medium">
+                Title
+              </Label>
               <input
                 id="taskTitle"
                 value={editTaskTitle}
                 onChange={e => setEditTaskTitle(e.target.value)}
-                className="w-full p-2 border border-input rounded-md bg-background text-foreground"
+                className="w-full p-3 border border-gray-200 dark:border-gray-700/50 rounded-md bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-gray-600 transition-all shadow-sm"
                 placeholder="Task title"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="taskNotes">Notes</Label>
+              <Label htmlFor="taskNotes" className="text-gray-700 dark:text-gray-300 font-medium">
+                Notes
+              </Label>
               <Textarea
                 id="taskNotes"
                 value={editTaskNotes}
                 onChange={e => setEditTaskNotes(e.target.value)}
                 placeholder="Add notes or details..."
-                className="min-h-[80px]"
+                className="min-h-[100px] p-3 border border-gray-200 dark:border-gray-700/50 rounded-md bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-gray-600 transition-all shadow-sm resize-none"
               />
             </div>
             <div className="grid gap-2">
-              <Label>Due Date</Label>
+              <Label htmlFor="taskDueDate" className="text-gray-700 dark:text-gray-300 font-medium">
+                Due Date
+              </Label>
               <div className="flex items-center space-x-2">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
+                      id="taskDueDate"
                       variant="outline"
-                      className={`w-full justify-start text-left font-normal ${
-                        !editTaskDueDate && 'text-muted-foreground'
+                      className={`w-full justify-start text-left p-3 border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 font-normal ${
+                        !editTaskDueDate && 'text-gray-400 dark:text-gray-500'
                       }`}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                       {editTaskDueDate ? formatTaskDueDate(editTaskDueDate.toISOString()) : 'Select a date'}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={editTaskDueDate} onSelect={setEditTaskDueDate} initialFocus />
+                  <PopoverContent
+                    className="w-auto p-0 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md"
+                    align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editTaskDueDate}
+                      onSelect={setEditTaskDueDate}
+                      initialFocus
+                      className="rounded-md border-0 text-gray-900 dark:text-gray-100"
+                    />
                   </PopoverContent>
                 </Popover>
                 {editTaskDueDate && (
-                  <Button variant="ghost" size="icon" onClick={() => setEditTaskDueDate(undefined)} className="h-8 w-8">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditTaskDueDate(undefined)}
+                    className="h-10 w-10 rounded-full bg-white dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
                     <X className="h-4 w-4" />
                   </Button>
                 )}
               </div>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+          <DialogFooter className="border-t border-gray-100 dark:border-gray-800/30 pt-3">
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+              className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-800 dark:hover:text-gray-200">
               Cancel
             </Button>
-            <Button onClick={handleSaveTaskChanges} disabled={!editTaskTitle.trim()}>
+            <Button
+              onClick={handleSaveTaskChanges}
+              disabled={!editTaskTitle.trim()}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-gray-800 dark:hover:bg-gray-700 text-white shadow-sm disabled:opacity-50 disabled:pointer-events-none">
               {updatingTaskId === editingTask?.id ? (
                 <>
                   <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" /> Saving

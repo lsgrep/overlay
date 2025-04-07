@@ -65,9 +65,7 @@ const NewTab = () => {
       <div className="flex items-center justify-between px-8 py-6 relative z-20">
         <div className="flex items-center">
           <img src="/icon-128.png" alt="Overlay icon" className="w-8 h-8 mr-3" />
-          <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-            {t('extensionName')}
-          </h1>
+          <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">{t('extensionName')}</h1>
         </div>
         <div className="flex items-center space-x-4">
           <a href="chrome://extensions" className="text-sm text-muted-foreground hover:text-primary transition-colors">

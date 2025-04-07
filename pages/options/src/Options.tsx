@@ -110,9 +110,7 @@ const Options = () => {
               alt="Overlay"
               className="h-8 w-8"
             />
-            <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-              Overlay
-            </h1>
+            <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">Overlay</h1>
           </div>
         </div>
       </motion.div>
