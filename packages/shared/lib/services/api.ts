@@ -33,9 +33,6 @@ export interface CompletionResponse {
 const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
 // const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
 
-// Default task list ID
-const DEFAULT_TASK_LIST_ID = '';
-
 // Task interfaces
 export interface TaskList {
   id: string;
@@ -149,7 +146,7 @@ export const overlayApi = {
    * @param listId The ID of the task list to fetch tasks from (optional, uses default if not provided)
    * @returns An array of task objects
    */
-  async getTasks(listId: string = DEFAULT_TASK_LIST_ID) {
+  async getTasks(listId: string) {
     const response = await makeAuthenticatedRequest<{ tasks: Task[] }>(`/tasks?listId=${listId}`);
     return response.tasks || [];
   },
@@ -162,7 +159,7 @@ export const overlayApi = {
     return makeAuthenticatedRequest<Task>('/tasks', {
       method: 'POST',
       body: JSON.stringify({
-        listId: taskData.listId || DEFAULT_TASK_LIST_ID,
+        listId: taskData.listId,
         title: taskData.title,
         notes: taskData.notes,
         due: taskData.due ? new Date(taskData.due).toISOString() : undefined,
@@ -176,26 +173,39 @@ export const overlayApi = {
    * @param taskData The new task data
    * @param listId The ID of the list containing the task (optional, uses default if not provided)
    */
-  async updateTask(taskId: string, taskData: Partial<Task>, listId: string = DEFAULT_TASK_LIST_ID) {
-    // add taskId and listId to the request body
-    taskData.taskId = taskId;
-    taskData.listId = listId;
-    return makeAuthenticatedRequest<Task>(`/tasks?listId=${listId}&taskId=${taskId}`, {
+  async updateTask(taskId: string, taskData: Partial<Task>, listId: string) {
+    // Make sure we're using the correct task ID field
+    // The API uses 'taskId' field from the Task object for the actual Google Tasks API ID
+    const actualTaskIdToUse = taskData.taskId || taskId;
+
+    // Create payload with required fields
+    const payload = {
+      ...taskData,
+      taskId: actualTaskIdToUse,
+      listId: listId, // Include listId in the request body
+    };
+
+    console.log('Sending task update with data:', payload);
+
+    return makeAuthenticatedRequest<Task>(`/tasks?listId=${listId}&taskId=${actualTaskIdToUse}`, {
       method: 'PATCH',
-      body: JSON.stringify({
-        ...taskData,
-      }),
+      body: JSON.stringify(payload),
     });
   },
 
   /**
    * Delete a task
    * @param taskId The ID of the task to delete
-   * @param listId The ID of the list containing the task (optional, uses default if not provided)
+   * @param listId The ID of the list containing the task
    */
-  async deleteTask(taskId: string, listId: string = DEFAULT_TASK_LIST_ID) {
+  async deleteTask(taskId: string, listId: string) {
+    // Include task info in the query parameters and also send listId in the request body for consistency
     return makeAuthenticatedRequest<void>(`/tasks?listId=${listId}&taskId=${taskId}`, {
       method: 'DELETE',
+      body: JSON.stringify({
+        taskId,
+        listId,
+      }),
     });
   },
 

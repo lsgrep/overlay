@@ -1,10 +1,27 @@
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
 import { exampleThemeStorage, defaultLanguageStorage } from '@extension/storage';
-import type { DevLocale } from '@extension/i18n';
 import { t } from '@extension/i18n';
+import type { DevLocale } from '@extension/i18n/lib/type';
 import { useState, useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
 import quotesData from './quotes.json';
+
+// Define interfaces for quotes data structure
+interface QuoteData {
+  text: string;
+  author: string;
+}
+
+interface CategoryData {
+  name: string;
+  quotes: QuoteData[];
+}
+
+interface QuotesData {
+  categories: {
+    [key: string]: CategoryData;
+  };
+}
 
 const NewTab = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -16,7 +33,7 @@ const NewTab = () => {
   useEffect(() => {
     if (defaultLanguage) {
       // Set the locale directly from storage
-      t.devLocale = defaultLanguage as DevLocale;
+      t.devLocale = defaultLanguage;
       console.log('NewTab: Language set to', defaultLanguage);
 
       // Update document title with translated "New Page"
@@ -25,15 +42,17 @@ const NewTab = () => {
   }, [defaultLanguage]);
 
   useEffect(() => {
-    const categories = Object.keys(quotesData.categories);
+    // Type cast quotesData to our interface
+    const typedQuotesData = quotesData as unknown as QuotesData;
+    const categories = Object.keys(typedQuotesData.categories);
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const categoryQuotes = quotesData.categories[randomCategory].quotes;
+    const categoryQuotes = typedQuotesData.categories[randomCategory].quotes;
     const randomQuoteData = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
 
     setRandomQuote({
       text: randomQuoteData.text,
       author: randomQuoteData.author,
-      category: quotesData.categories[randomCategory].name,
+      category: typedQuotesData.categories[randomCategory].name,
     });
 
     // Set document title
@@ -79,15 +98,20 @@ const NewTab = () => {
         {/* Quote section - Bottom (small) */}
         <div className="w-full max-w-3xl mx-auto mt-8">
           <div
-            className={`p-4 text-center relative rounded-xl shadow-sm backdrop-blur-sm ${isLight ? 'bg-card/20' : 'bg-card/20'}`}>
-            <div className={`relative z-10 ${isLight ? 'text-primary' : 'text-primary-dark'}`}>
+            className={`p-4 text-center relative rounded-xl shadow-sm backdrop-blur-sm ${isLight ? 'bg-card/30' : 'bg-card/30'}`}>
+            <div className={`relative z-10`}>
               <blockquote className="text-sm font-serif italic mb-2 leading-relaxed">
-                <span className="text-blue-500">"{randomQuote.text}"</span>
+                <span className={`${isLight ? 'text-gray-700' : 'text-gray-300'}`}>"{randomQuote.text}"</span>
               </blockquote>
               <div className="flex justify-center items-center space-x-2">
-                <p className="text-xs italic text-blue-500">— {randomQuote.author}</p>
-                <span className="w-1 h-1 rounded-full bg-blue-500" />
-                <p className="text-xs uppercase tracking-widest font-light text-blue-500">{randomQuote.category}</p>
+                <p className={`text-xs italic ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                  — {randomQuote.author}
+                </p>
+                <span className={`w-1 h-1 rounded-full ${isLight ? 'bg-gray-400' : 'bg-gray-500'}`} />
+                <p
+                  className={`text-xs uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                  {randomQuote.category}
+                </p>
               </div>
             </div>
           </div>
