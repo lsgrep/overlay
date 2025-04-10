@@ -146,8 +146,9 @@ export const overlayApi = {
    * @param listId The ID of the task list to fetch tasks from (optional, uses default if not provided)
    * @returns An array of task objects
    */
-  async getTasks(listId: string) {
-    const response = await makeAuthenticatedRequest<{ tasks: Task[] }>(`/tasks?listId=${listId}`);
+  async getTasks(listId: string | undefined) {
+    const path = listId ? `/tasks?listId=${listId}` : '/tasks';
+    const response = await makeAuthenticatedRequest<{ tasks: Task[] }>(path);
     return response.tasks || [];
   },
 
