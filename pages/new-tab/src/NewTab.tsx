@@ -1,5 +1,6 @@
 import { useStorage, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage, defaultLanguageStorage } from '@extension/storage';
+import { overlayApi } from '@extension/shared/lib/services/api';
+import { exampleThemeStorage, defaultLanguageStorage, userPreferencesStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
 import type { DevLocale } from '@extension/i18n/lib/type';
 import { useState, useEffect } from 'react';
@@ -26,14 +27,66 @@ interface QuotesData {
 const NewTab = () => {
   const theme = useStorage(exampleThemeStorage);
   const defaultLanguage = useStorage(defaultLanguageStorage);
+  const userPreferences = useStorage(userPreferencesStorage);
   const isLight = theme === 'light';
   const [randomQuote, setRandomQuote] = useState({ text: '', author: '', category: '' });
+
+  // Initialize user preferences if null
+  useEffect(() => {
+    const initUserPreferences = async () => {
+      if (userPreferences === null) {
+        try {
+          // Try to fetch user preferences from the API first
+          const apiPreferences = await overlayApi.getUserPreferences();
+          console.log('API Preferences:', apiPreferences);
+          if (apiPreferences.success && apiPreferences.data) {
+            // If API preferences exist, use those
+            // Extract values safely with type checking
+            let apiTheme = theme; // Keep current theme as default
+            let apiDefaultTaskList = '';
+
+            // Only update theme if it's one of the valid theme options ('light' or 'dark')
+            if (
+              typeof apiPreferences.data.theme === 'string' &&
+              (apiPreferences.data.theme === 'light' || apiPreferences.data.theme === 'dark')
+            ) {
+              apiTheme = apiPreferences.data.theme as 'light' | 'dark';
+            }
+
+            if (typeof apiPreferences.data.default_task_list === 'string') {
+              apiDefaultTaskList = apiPreferences.data.default_task_list;
+            }
+
+            userPreferencesStorage.set({
+              theme: apiTheme,
+              default_task_list: apiDefaultTaskList,
+            });
+          } else {
+            // If API preferences don't exist, set defaults
+            userPreferencesStorage.set({
+              theme: theme,
+              default_task_list: '',
+            });
+          }
+        } catch (error) {
+          console.error('Failed to fetch user preferences:', error);
+          // Fallback to defaults on error
+          userPreferencesStorage.set({
+            theme: theme,
+            default_task_list: '',
+          });
+        }
+      }
+    };
+
+    initUserPreferences();
+  }, [userPreferences, theme]);
 
   // Update translations when language changes
   useEffect(() => {
     if (defaultLanguage) {
       // Set the locale directly from storage
-      t.devLocale = defaultLanguage;
+      t.devLocale = defaultLanguage as DevLocale;
       console.log('NewTab: Language set to', defaultLanguage);
 
       // Update document title with translated "New Page"
@@ -88,7 +141,7 @@ const NewTab = () => {
       <div className="flex-1 flex flex-col items-center justify-start pt-8 pb-16 px-4">
         <div className="w-full max-w-6xl mx-auto mb-8">
           {/* Task Manager - Full width */}
-          <TaskManager isLight={isLight} />
+          <TaskManager isLight={isLight} userPreferences={userPreferences} />
         </div>
 
         {/* AI Tools section */}

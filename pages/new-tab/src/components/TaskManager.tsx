@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { tasksStorage } from '@extension/storage';
 import { overlayApi, type TaskList, type Task } from '@extension/shared/lib/services/api';
 import {
   PlusIcon,
@@ -30,11 +31,14 @@ import {
   Label,
 } from '@extension/ui';
 
+import type { UserPreferences } from '@extension/storage/lib/impl/userPreferencesStorage';
+
 interface TaskManagerProps {
   isLight: boolean;
+  userPreferences: UserPreferences | null;
 }
 
-export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
+export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferences }) => {
   const [taskLists, setTaskLists] = useState<TaskList[]>([]);
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -55,9 +59,44 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
     async (listId: string) => {
       try {
         setLoading(true);
-        const tasksData = await overlayApi.getTasks(listId);
-        setTasks(tasksData);
-        setError(null);
+
+        // Try to get tasks from cache first
+        const cachedTasks = await tasksStorage.get();
+        const listTasks = cachedTasks[listId];
+
+        if (listTasks && listTasks.length > 0) {
+          // Use cached tasks if available
+          console.log('Using cached tasks for list:', listId);
+          setTasks(listTasks);
+          setError(null);
+          setLoading(false);
+
+          // Fetch fresh data in the background
+          overlayApi
+            .getTasks(listId)
+            .then(tasksData => {
+              // Update cache and state if there are differences
+              if (JSON.stringify(tasksData) !== JSON.stringify(listTasks)) {
+                setTasks(tasksData);
+                // Update cache
+                tasksStorage.set(prevCache => ({
+                  ...prevCache,
+                  [listId]: tasksData,
+                }));
+              }
+            })
+            .catch(e => console.error('Background task refresh error:', e));
+        } else {
+          // Fetch from API if no cache
+          const tasksData = await overlayApi.getTasks(listId);
+          setTasks(tasksData);
+          // Update cache
+          tasksStorage.set(prevCache => ({
+            ...prevCache,
+            [listId]: tasksData,
+          }));
+          setError(null);
+        }
       } catch (err) {
         setError('Failed to load tasks. Please try again.');
         console.error('Error fetching tasks:', err);
@@ -65,7 +104,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
         setLoading(false);
       }
     },
-    [selectedListId],
+    [], // No dependency needed as listId is passed as an argument
   );
 
   // Define fetchTaskLists with useCallback to prevent infinite loops
@@ -75,30 +114,20 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
       const lists = await overlayApi.getTaskLists();
       setTaskLists(lists);
 
-      // Try to get user preferences for default task list
-      try {
-        const preferences = await overlayApi.getUserPreferences();
+      // Use preferences from props rather than fetching again
+      if (userPreferences && userPreferences.default_task_list) {
+        // Check if the default list exists in the fetched lists
+        const defaultListExists = lists.some(list => list.id === userPreferences.default_task_list);
 
-        if (preferences.success && preferences.data && preferences.data.default_task_list) {
-          // Check if the default list exists in the fetched lists
-          const defaultListExists = lists.some(list => list.id === preferences.data.default_task_list);
-
-          if (defaultListExists && !selectedListId) {
-            setSelectedListId(preferences.data.default_task_list);
-          } else if (lists.length > 0 && !selectedListId) {
-            // Fallback to first list if default list not found
-            setSelectedListId(lists[0].id);
-          }
+        if (defaultListExists && !selectedListId) {
+          setSelectedListId(userPreferences.default_task_list);
         } else if (lists.length > 0 && !selectedListId) {
-          // Fallback to first list if no preferences
+          // Fallback to first list if default list not found
           setSelectedListId(lists[0].id);
         }
-      } catch (prefErr) {
-        console.error('Error fetching user preferences:', prefErr);
-        // Fallback to first list if preferences fetch fails
-        if (lists.length > 0 && !selectedListId) {
-          setSelectedListId(lists[0].id);
-        }
+      } else if (lists.length > 0 && !selectedListId) {
+        // Fallback to first list if no preferences
+        setSelectedListId(lists[0].id);
       }
 
       setError(null);
@@ -108,7 +137,14 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight }) => {
     } finally {
       setLoading(false);
     }
-  }, [selectedListId]);
+  }, [selectedListId, userPreferences]);
+
+  // Use default task list from user preferences
+  useEffect(() => {
+    if (userPreferences && userPreferences.default_task_list && !selectedListId) {
+      setSelectedListId(userPreferences.default_task_list);
+    }
+  }, [userPreferences, selectedListId]);
 
   // Fetch task lists on component mount
   useEffect(() => {
