@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'; // Added useRef
 import { motion } from 'framer-motion';
+import { LoadingDots } from './UI/LoadingDots';
 import { overlayApi, type TaskList, type Task } from '@extension/shared/lib/services/api';
 import {
   PlusIcon,
@@ -76,6 +77,8 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     if (!skipLoadingIndicator) setTasksLoading(true);
     setError(null);
     try {
+      // Use the overlayApi with the listId
+      // The API now includes a cache-busting mechanism
       const tasksData = await overlayApi.getTasks(listId);
       setTasks(tasksData);
     } catch (err) {
@@ -149,16 +152,29 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     e.preventDefault();
     const title = newTaskTitle.trim();
     if (!title || !selectedListId) return;
-    const tempId = `temp-${Date.now()}`;
+
+    // Show that we're adding a task
+    const tempId = `temp-add-${Date.now()}`;
     addUpdatingTaskId(tempId);
+
+    // Clear input field immediately for better UX
     setNewTaskTitle('');
+
     try {
-      await overlayApi.createTask({ listId: selectedListId, title });
+      // Make the API call to create the task and explicitly wait for it to complete
+      const createResult = await overlayApi.createTask({ listId: selectedListId, title });
+
+      // Only after the create API completes, fetch the tasks
+      // This ensures we get the latest data including our new task
       await fetchTasks(selectedListId, true);
+
+      // If the create API returned a specific task object, we could use it here
+      // But for robustness, we rely on the fetchTasks call to ensure consistency
     } catch (err) {
       setError('Failed to create task. Please try again.');
       console.error('Error creating task:', err);
     } finally {
+      // Remove the updating indicator
       removeUpdatingTaskId(tempId);
     }
   };
@@ -346,8 +362,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
         <h2 className="text-xl font-semibold">Your Tasks</h2>
         {showGlobalSpinner && (
           <div className="ml-3 flex items-center h-6 transition-all duration-300">
-            <ArrowPathIcon className="w-5 h-5 animate-spin text-blue-500" />
-            <span className="ml-2 text-sm text-blue-500 whitespace-nowrap">{getGlobalLoadingText()}</span>
+            <LoadingDots color="bg-blue-500" className="mt-0" />
           </div>
         )}
       </div>
@@ -391,9 +406,10 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
         )}
         {/* Loading/No Lists Message */}
         {taskListsLoading && (
-          <p className={`text-sm text-center py-8 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-            Loading task lists...
-          </p>
+          <div className="text-center py-8">
+            <p className={`text-sm mb-2 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>Loading task lists</p>
+            <LoadingDots />
+          </div>
         )}
         {!taskListsLoading && taskLists.length === 0 && !error && (
           <p className={`text-sm text-center py-8 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -408,9 +424,15 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
               <div className="flex-grow relative">
                 <Input
                   type="text"
-                  placeholder="Add a new task and press Enter..."
+                  placeholder="Add a new task and press Enter or Cmd+Enter..."
                   value={newTaskTitle}
                   onChange={e => setNewTaskTitle(e.target.value)}
+                  onKeyDown={e => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                      e.preventDefault();
+                      handleCreateTask(e);
+                    }
+                  }}
                   className="w-full p-2 rounded-r-none border-r-0"
                   disabled={isUpdating}
                   aria-label="New task title"
@@ -429,9 +451,10 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
 
             {/* Tasks List Area */}
             {tasksLoading ? (
-              <p className={`text-center py-8 font-medium ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-                Loading tasks...
-              </p>
+              <div className="text-center py-8">
+                <p className={`font-medium mb-2 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>Loading tasks</p>
+                <LoadingDots />
+              </div>
             ) : tasks.length === 0 ? (
               <p className={`text-center py-8 font-medium ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
                 No tasks in this list. Add one above!
@@ -542,7 +565,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                               disabled={isTaskUpdating || !inlineEditValues.title.trim()} // Disable if updating or title empty
                               aria-label="Save changes">
                               {isTaskUpdating ? (
-                                <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                                <LoadingDots size={4} color="bg-white/80" className="mt-0 mx-auto" />
                               ) : (
                                 <>
                                   <CheckIcon className="h-4 w-4 mr-1" /> Save
@@ -568,7 +591,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             />
                             {isTaskUpdating && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <ArrowPathIcon className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+                                <LoadingDots size={4} color="bg-blue-500/80" className="mt-0 mx-auto" />
                               </div>
                             )}
                           </div>

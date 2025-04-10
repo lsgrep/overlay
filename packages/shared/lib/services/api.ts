@@ -167,7 +167,9 @@ export const overlayApi = {
    * @returns An array of task objects
    */
   async getTasks(listId: string | undefined) {
-    const path = listId ? `/tasks?listId=${listId}` : '/tasks';
+    // Add cache busting parameter to prevent browser caching
+    const cacheBuster = `_t=${Date.now()}`;
+    const path = listId ? `/tasks?listId=${listId}&${cacheBuster}` : `/tasks?${cacheBuster}`;
     const response = await makeAuthenticatedRequest<{ tasks: Task[] }>(path);
     return response.tasks || [];
   },

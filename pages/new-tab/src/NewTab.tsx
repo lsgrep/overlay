@@ -130,7 +130,7 @@ const NewTab = () => {
           <div>
             <a
               href="/options/index.html"
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-500 dark:hover:bg-blue-800 transition-colors"
               title={t('options', 'Options')}>
               <Cog6ToothIcon className="w-5 h-5 text-muted-foreground" />
             </a>
