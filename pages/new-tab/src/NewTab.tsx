@@ -5,6 +5,7 @@ import { t } from '@extension/i18n';
 import type { DevLocale } from '@extension/i18n/lib/type';
 import { useState, useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
+import CalendarView from './components/CalendarView';
 import quotesData from './quotes.json';
 
 // Define interfaces for quotes data structure
@@ -147,12 +148,19 @@ const NewTab = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-8">
-        <div className="w-full max-w-6xl mx-auto relative z-10">
-          {/* Task Manager */}
-          <TaskManager isLight={isLight} userPreferences={userPreferences} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+          {/* Task Manager - Takes 2/3 of the width on large screens and above */}
+          <div className="lg:col-span-2">
+            <TaskManager isLight={isLight} userPreferences={userPreferences} />
+          </div>
 
-          {/* Quote section */}
-          <div className="w-full max-w-3xl mx-auto mt-8">
+          {/* Calendar View - Takes 1/3 of the width on large screens and above */}
+          <div className="lg:col-span-1">
+            <CalendarView isLight={isLight} />
+          </div>
+
+          {/* Quote section - Full width below the columns */}
+          <div className="col-span-1 lg:col-span-3 mt-8">
             <div
               className={`p-4 text-center relative rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
               <div className={`relative z-10`}>

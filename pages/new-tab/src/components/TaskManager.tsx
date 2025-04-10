@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogClose,
   Textarea,
   Popover,
   PopoverContent,
@@ -342,7 +343,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     <div className="w-full max-w-6xl mx-auto relative z-10">
       <div className="flex items-center mb-6">
         <h2 className="text-xl font-semibold">Your Tasks</h2>
-        {loading && <ArrowPathIcon className="ml-2 w-4 h-4 animate-spin text-indigo-400" />}
+        {loading && <ArrowPathIcon className="ml-2 w-4 h-4 animate-spin text-blue-400" />}
       </div>
 
       {error && (
@@ -355,7 +356,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
       {taskLists.length === 0 ? (
         <div
           className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
-          <p className={`text-sm text-center ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>
+          <p className={`text-sm text-center ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
             {loading ? 'Loading task lists...' : 'No task lists found.'}
           </p>
         </div>
@@ -504,6 +505,10 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent
           className={`sm:max-w-md ${isLight ? 'bg-white border border-black/10' : 'bg-black border border-white/10'}`}>
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
           <DialogHeader>
             <DialogTitle>Edit Task</DialogTitle>
           </DialogHeader>

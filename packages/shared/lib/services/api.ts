@@ -67,6 +67,26 @@ export interface UpdateTaskData {
   due?: string;
 }
 
+export interface CalendarEvent {
+  id: string;
+  summary: string;
+  description?: string;
+  location?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+  };
+  end: {
+    dateTime?: string;
+    date?: string;
+  };
+  attendees?: Array<{
+    email: string;
+    displayName?: string;
+    responseStatus?: 'accepted' | 'tentative' | 'declined' | 'needsAction';
+  }>;
+}
+
 /**
  * Get authentication headers for API requests using the stored Supabase tokens
  */
@@ -211,6 +231,42 @@ export const overlayApi = {
   },
 
   /**
+   * Get calendar events within a specified date range
+   * @param startDate Start date in ISO format
+   * @param endDate End date in ISO format
+   * @returns An array of calendar event objects
+   */
+  async getCalendarEvents(startDate: string, endDate: string): Promise<CalendarEvent[]> {
+    try {
+      const response = await makeAuthenticatedRequest<{ events: CalendarEvent[] }>(
+        `/events?start=${startDate}&end=${endDate}`,
+      );
+      return response.events || [];
+    } catch (error) {
+      console.error('[API] Error fetching calendar events:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Fetch upcoming calendar events
+   * @param days Number of days to look ahead (default: 7)
+   * @returns An array of upcoming calendar events
+   */
+  async getUpcomingEvents(days: number = 7): Promise<CalendarEvent[]> {
+    try {
+      const today = new Date();
+      const endDate = new Date();
+      endDate.setDate(today.getDate() + days);
+
+      return this.getCalendarEvents(today.toISOString(), endDate.toISOString());
+    } catch (error) {
+      console.error('[API] Error fetching upcoming events:', error);
+      return [];
+    }
+  },
+
+  /**
    * Format a date for display
    * @param dateString Date string to format
    */
@@ -218,6 +274,26 @@ export const overlayApi = {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  },
+
+  /**
+   * Format date and time for an event
+   * @param dateTimeString DateTime string in ISO format
+   * @returns Formatted date and time strings
+   */
+  formatEventDateTime(dateTime?: string, dateOnly?: string): { date: string; time: string; isAllDay: boolean } {
+    if (!dateTime && !dateOnly) {
+      return { date: '', time: '', isAllDay: false };
+    }
+
+    const date = dateTime ? new Date(dateTime) : new Date(dateOnly!);
+    const isAllDay = !dateTime;
+
+    return {
+      date: date.toLocaleDateString(),
+      time: isAllDay ? '' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isAllDay,
+    };
   },
 
   /**
