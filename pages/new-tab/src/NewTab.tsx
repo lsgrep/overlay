@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
 import CalendarView from './components/CalendarView';
 import quotesData from './quotes.json';
+import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 // Define interfaces for quotes data structure
 interface QuoteData {
@@ -126,14 +127,12 @@ const NewTab = () => {
             <img src="/icon-128.png" alt="Overlay icon" className="h-8 w-8" />
             <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">{t('extensionName')}</h1>
           </div>
-          <div className="flex items-center space-x-4">
+          <div>
             <a
-              href="chrome://extensions"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              {t('extensions', 'Extensions')}
-            </a>
-            <a href="chrome://bookmarks" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              {t('bookmarks', 'Bookmarks')}
+              href="/options/index.html"
+              className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+              title={t('options', 'Options')}>
+              <Cog6ToothIcon className="w-5 h-5 text-muted-foreground" />
             </a>
           </div>
         </div>
