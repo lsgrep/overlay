@@ -113,20 +113,28 @@ const NewTab = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${isLight ? 'bg-white text-black' : 'bg-black text-white'}`}>
       {/* Header with Overlay logo */}
-      <div className="flex items-center justify-between px-8 py-6 relative z-20">
-        <div className="flex items-center">
-          <img src="/icon-128.png" alt="Overlay icon" className="w-8 h-8 mr-3" />
-          <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">{t('extensionName')}</h1>
-        </div>
-        <div className="flex items-center space-x-4">
-          <a href="chrome://extensions" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            {t('extensions', 'Extensions')}
-          </a>
-          <a href="chrome://bookmarks" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            {t('bookmarks', 'Bookmarks')}
-          </a>
+      <div
+        className={`w-full py-6 px-8 border-b sticky top-0 z-10 ${
+          isLight ? 'border-black/10 bg-white' : 'border-white/10 bg-black'
+        }`}>
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src="/icon-128.png" alt="Overlay icon" className="h-8 w-8" />
+            <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">{t('extensionName')}</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <a
+              href="chrome://extensions"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              {t('extensions', 'Extensions')}
+            </a>
+            <a href="chrome://bookmarks" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              {t('bookmarks', 'Bookmarks')}
+            </a>
+          </div>
         </div>
       </div>
 
@@ -137,32 +145,30 @@ const NewTab = () => {
         />
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-start pt-8 pb-16 px-4">
-        <div className="w-full max-w-6xl mx-auto mb-8">
-          {/* Task Manager - Full width */}
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto p-8">
+        <div className="w-full max-w-6xl mx-auto relative z-10">
+          {/* Task Manager */}
           <TaskManager isLight={isLight} userPreferences={userPreferences} />
-        </div>
 
-        {/* AI Tools section */}
-        {/* <AITools isLight={isLight} /> */}
-        {/* Quote section - Bottom (small) */}
-        <div className="w-full max-w-3xl mx-auto mt-8">
-          <div
-            className={`p-4 text-center relative rounded-xl shadow-sm backdrop-blur-sm ${isLight ? 'bg-card/30' : 'bg-card/30'}`}>
-            <div className={`relative z-10`}>
-              <blockquote className="text-sm font-serif italic mb-2 leading-relaxed">
-                <span className={`${isLight ? 'text-gray-700' : 'text-gray-300'}`}>"{randomQuote.text}"</span>
-              </blockquote>
-              <div className="flex justify-center items-center space-x-2">
-                <p className={`text-xs italic ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-                  — {randomQuote.author}
-                </p>
-                <span className={`w-1 h-1 rounded-full ${isLight ? 'bg-gray-400' : 'bg-gray-500'}`} />
-                <p
-                  className={`text-xs uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-                  {randomQuote.category}
-                </p>
+          {/* Quote section */}
+          <div className="w-full max-w-3xl mx-auto mt-8">
+            <div
+              className={`p-4 text-center relative rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+              <div className={`relative z-10`}>
+                <blockquote className="text-sm font-serif italic mb-2 leading-relaxed">
+                  <span className={`${isLight ? 'text-gray-700' : 'text-gray-300'}`}>"{randomQuote.text}"</span>
+                </blockquote>
+                <div className="flex justify-center items-center space-x-2">
+                  <p className={`text-xs italic ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                    — {randomQuote.author}
+                  </p>
+                  <span className={`w-1 h-1 rounded-full ${isLight ? 'bg-gray-400' : 'bg-gray-500'}`} />
+                  <p
+                    className={`text-xs uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                    {randomQuote.category}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

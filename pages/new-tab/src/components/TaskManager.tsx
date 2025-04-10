@@ -1,15 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { tasksStorage } from '@extension/storage';
 import { overlayApi, type TaskList, type Task } from '@extension/shared/lib/services/api';
-import {
-  PlusIcon,
-  TrashIcon,
-  ChevronRightIcon,
-  ClockIcon,
-  PencilIcon,
-  CalendarIcon,
-  XMarkIcon as X,
-} from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon, PencilIcon, CalendarIcon, XMarkIcon as X } from '@heroicons/react/24/outline';
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import {
   Button,
@@ -348,60 +340,56 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
 
   return (
     <div className="w-full max-w-6xl mx-auto relative z-10">
-      <div className="flex items-center justify-center mb-6">
-        <img src="/icon-128.png" alt="Overlay" className="w-8 h-8 mr-3" />
-        <h2 className="text-2xl font-semibold">Your Tasks</h2>
+      <div className="flex items-center mb-6">
+        <h2 className="text-xl font-semibold">Your Tasks</h2>
+        {loading && <ArrowPathIcon className="ml-2 w-4 h-4 animate-spin text-indigo-400" />}
       </div>
 
       {error && (
         <div
-          className={`mb-4 p-3 rounded-lg ${isLight ? 'bg-indigo-100 text-indigo-700' : 'bg-indigo-900/20 text-indigo-400'}`}>
+          className={`mb-4 p-3 rounded-lg border ${isLight ? 'bg-red-50 border-red-200 text-red-700' : 'bg-red-900/10 border-red-800/30 text-red-400'}`}>
           {error}
         </div>
       )}
 
-      <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${loading ? 'opacity-70' : ''}`}>
-        {/* Task Lists Panel (Left) */}
-        <Card className="md:col-span-1 backdrop-blur-sm bg-card/80 border-border shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className={`${isLight ? 'text-gray-800' : 'text-gray-100'}`}>Task Lists</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {taskLists.length === 0 ? (
-              <p className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-                {loading ? 'Loading task lists...' : 'No task lists found.'}
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {taskLists.map(list => (
-                  <li key={list.id}>
-                    <button
-                      onClick={() => setSelectedListId(list.id)}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex justify-between items-center ${
-                        selectedListId === list.id
-                          ? 'bg-gray-800 text-white shadow-sm dark:bg-gray-100 dark:text-gray-900'
-                          : isLight
-                            ? 'hover:bg-gray-100 text-gray-900 hover:shadow-sm'
-                            : 'hover:bg-gray-800 text-gray-100 hover:shadow-sm'
-                      }`}>
-                      <span className="font-medium">{list.title}</span>
-                      {selectedListId === list.id && <ChevronRightIcon className="w-5 h-5" />}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+      {taskLists.length === 0 ? (
+        <div
+          className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+          <p className={`text-sm text-center ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>
+            {loading ? 'Loading task lists...' : 'No task lists found.'}
+          </p>
+        </div>
+      ) : (
+        <div
+          className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+          {/* Custom Tab UI */}
+          <div className="mb-6">
+            <div className="flex overflow-x-auto space-x-1 pb-2">
+              {taskLists.map(list => (
+                <Button
+                  key={list.id}
+                  onClick={() => setSelectedListId(list.id)}
+                  variant={selectedListId === list.id ? 'default' : 'outline'}
+                  className={`whitespace-nowrap px-4 py-2 ${
+                    selectedListId === list.id
+                      ? 'bg-blue-500 text-white'
+                      : `${isLight ? 'hover:bg-gray-100 text-gray-900' : 'hover:bg-gray-900 text-gray-100'}`
+                  }`}>
+                  {list.title}
+                </Button>
+              ))}
+            </div>
+          </div>
 
-        {/* Tasks Panel (Right) */}
-        <Card className="md:col-span-2 backdrop-blur-sm bg-card/80 border-border shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className={`${isLight ? 'text-gray-800' : 'text-gray-100'}`}>
-              {(selectedListId && taskLists.find(list => list.id === selectedListId)?.title) || 'Tasks'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          {/* Content for selected tab */}
+          <div>
+            {selectedListId && (
+              <div className="mb-4">
+                <h3 className={`text-lg font-medium ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+                  {taskLists.find(list => list.id === selectedListId)?.title}
+                </h3>
+              </div>
+            )}
             {/* New Task Form */}
             {selectedListId && (
               <form onSubmit={handleCreateTask} className="mb-4 flex">
@@ -419,7 +407,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                   disabled={!newTaskTitle.trim()}
                   variant="default"
                   size="icon"
-                  className="rounded-l-none rounded-r-lg">
+                  className="rounded-l-none rounded-r-lg bg-blue-500 hover:bg-blue-600">
                   {loading ? <ArrowPathIcon className="w-5 h-5 animate-spin" /> : <PlusIcon className="w-5 h-5" />}
                 </Button>
               </form>
@@ -441,158 +429,136 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                     key={task.id}
                     className={`rounded-lg p-3 transition-all duration-200 mb-3 ${
                       isLight
-                        ? 'bg-card/60 hover:bg-card/90 shadow-sm hover:shadow-md'
-                        : 'bg-card/40 hover:bg-card/70 shadow-sm hover:shadow-md'
-                    } ${task.status === 'completed' ? 'border-l-4 border-gray-400' : ''}`}>
+                        ? 'bg-white hover:bg-gray-50 border border-gray-200'
+                        : 'bg-gray-900/40 hover:bg-gray-900/50 border border-gray-800/30'
+                    } ${task.status === 'completed' ? 'border-l-4 border-blue-400' : ''}`}>
                     <div className="flex items-start gap-3">
                       {updatingTaskId === task.id ? (
                         <div className="mt-1 flex-shrink-0 w-4 h-4">
-                          <ArrowPathIcon className="w-4 h-4 text-gray-500 animate-spin" />
+                          <ArrowPathIcon className="animate-spin text-blue-600 dark:text-blue-400" />
                         </div>
                       ) : (
                         <Checkbox
+                          id={`task-${task.id}`}
                           checked={task.status === 'completed'}
-                          onCheckedChange={checked => {
-                            console.log('Checkbox changed:', checked);
-                            handleUpdateTaskStatus(task.id, checked === true);
-                          }}
-                          className={`mt-1 flex-shrink-0 ${task.status === 'completed' ? 'data-[state=checked]:bg-gray-600 data-[state=checked]:border-gray-600' : ''}`}
+                          onCheckedChange={checked => handleUpdateTaskStatus(task.id, checked === true)}
+                          className="mt-1"
                         />
                       )}
 
                       <div className="flex-grow">
-                        <div
-                          className={`font-medium transition-all duration-200 ${task.status === 'completed' ? (isLight ? 'text-indigo-400 line-through' : 'text-indigo-500 line-through') : isLight ? 'text-indigo-700' : 'text-indigo-200'}`}>
-                          {task.title}
+                        <div className="flex justify-between items-start">
+                          <div className="flex-grow">
+                            <label
+                              htmlFor={`task-${task.id}`}
+                              className={`text-md font-medium cursor-pointer ${task.status === 'completed' ? (isLight ? 'text-gray-400 line-through' : 'text-gray-500 line-through') : isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+                              {task.title}
+                            </label>
+
+                            {task.notes && (
+                              <p
+                                className={`mt-1 text-sm ${task.status === 'completed' ? (isLight ? 'text-gray-400' : 'text-gray-500') : isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                                {task.notes}
+                              </p>
+                            )}
+
+                            {task.due && (
+                              <div className="flex items-center mt-1">
+                                <CalendarIcon className="w-4 h-4 mr-1 text-blue-500" />
+                                <span
+                                  className={`text-xs ${new Date(task.due) < new Date() && task.status !== 'completed' ? 'text-red-500' : isLight ? 'text-blue-500' : 'text-blue-400'}`}>
+                                  {formatTaskDueDate(task.due)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex gap-1 ml-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className={`h-7 w-7 text-xs ${isLight ? 'text-gray-500 hover:bg-gray-100' : 'text-gray-400 hover:bg-gray-800/50'}`}
+                              onClick={() => handleEditTask(task)}>
+                              <PencilIcon className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className={`h-7 w-7 text-xs ${isLight ? 'text-red-500 hover:bg-gray-100' : 'text-red-400 hover:bg-gray-800/50'}`}
+                              onClick={() => handleDeleteTask(task.id)}>
+                              <TrashIcon className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
-
-                        {task.notes && (
-                          <div
-                            className={`mt-2 text-sm ${isLight ? 'text-gray-600' : 'text-gray-400'} p-2 rounded-md ${isLight ? 'bg-gray-50' : 'bg-gray-800/30'}`}>
-                            {task.notes}
-                          </div>
-                        )}
-
-                        {task.due && (
-                          <div
-                            className={`text-xs mt-2 flex items-center px-2 py-1 rounded-full w-fit ${isLight ? 'bg-gray-100 text-gray-600' : 'bg-gray-800 text-gray-300'}`}>
-                            <ClockIcon className="w-3 h-3 mr-1" />
-                            {formatTaskDueDate(task.due)}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex space-x-1">
-                        <Button
-                          onClick={() => handleEditTask(task)}
-                          variant="ghost"
-                          size="icon"
-                          className={`flex-shrink-0 h-7 w-7 ${isLight ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100' : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800'}`}>
-                          <PencilIcon className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          onClick={() => handleDeleteTask(task.id)}
-                          variant="ghost"
-                          size="icon"
-                          className={`flex-shrink-0 h-7 w-7 ${isLight ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100' : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800'}`}>
-                          <TrashIcon className="w-4 h-4" />
-                        </Button>
                       </div>
                     </div>
                   </li>
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      )}
 
       {/* Task Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[450px] backdrop-blur-sm bg-white border-gray-200 dark:bg-gray-900/90 dark:border-gray-800 shadow-lg">
-          <DialogHeader className="pb-2 border-b border-gray-100 dark:border-gray-800/30">
-            <div className="flex items-center">
-              <img src="/icon-128.png" alt="Overlay" className="w-5 h-5 mr-2" />
-              <DialogTitle className="text-gray-800 dark:text-gray-200 font-medium">Edit Task</DialogTitle>
-            </div>
+        <DialogContent
+          className={`sm:max-w-md ${isLight ? 'bg-white border border-black/10' : 'bg-black border border-white/10'}`}>
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-5 py-5">
+          <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="taskTitle" className="text-gray-700 dark:text-gray-300 font-medium">
-                Title
-              </Label>
+              <Label htmlFor="taskTitle">Title</Label>
               <input
+                type="text"
                 id="taskTitle"
                 value={editTaskTitle}
                 onChange={e => setEditTaskTitle(e.target.value)}
-                className="w-full p-3 border border-gray-200 dark:border-gray-700/50 rounded-md bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-gray-600 transition-all shadow-sm"
+                className="w-full p-2 rounded-md border border-input bg-background text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder="Task title"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="taskNotes" className="text-gray-700 dark:text-gray-300 font-medium">
-                Notes
-              </Label>
+              <Label htmlFor="taskNotes">Notes</Label>
               <Textarea
                 id="taskNotes"
                 value={editTaskNotes}
                 onChange={e => setEditTaskNotes(e.target.value)}
                 placeholder="Add notes or details..."
-                className="min-h-[100px] p-3 border border-gray-200 dark:border-gray-700/50 rounded-md bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-gray-600 transition-all shadow-sm resize-none"
+                className="min-h-[100px] resize-none"
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="taskDueDate" className="text-gray-700 dark:text-gray-300 font-medium">
-                Due Date
-              </Label>
+              <Label htmlFor="taskDueDate">Due Date</Label>
               <div className="flex items-center space-x-2">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button
-                      id="taskDueDate"
-                      variant="outline"
-                      className={`w-full justify-start text-left p-3 border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 font-normal ${
-                        !editTaskDueDate && 'text-gray-400 dark:text-gray-500'
-                      }`}>
-                      <CalendarIcon className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                    <Button id="taskDueDate" variant="outline" className="w-full justify-start text-left">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
                       {editTaskDueDate ? formatTaskDueDate(editTaskDueDate.toISOString()) : 'Select a date'}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent
-                    className="w-auto p-0 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md"
-                    align="start">
-                    <Calendar
-                      mode="single"
-                      selected={editTaskDueDate}
-                      onSelect={setEditTaskDueDate}
-                      initialFocus
-                      className="rounded-md border-0 text-gray-900 dark:text-gray-100"
-                    />
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={editTaskDueDate} onSelect={setEditTaskDueDate} initialFocus />
                   </PopoverContent>
                 </Popover>
                 {editTaskDueDate && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditTaskDueDate(undefined)}
-                    className="h-10 w-10 rounded-full bg-white dark:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                  <Button variant="ghost" size="icon" onClick={() => setEditTaskDueDate(undefined)}>
                     <X className="h-4 w-4" />
                   </Button>
                 )}
               </div>
             </div>
           </div>
-          <DialogFooter className="border-t border-gray-100 dark:border-gray-800/30 pt-3">
-            <Button
-              variant="outline"
-              onClick={() => setIsEditDialogOpen(false)}
-              className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:text-gray-800 dark:hover:text-gray-200">
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
             </Button>
             <Button
               onClick={handleSaveTaskChanges}
               disabled={!editTaskTitle.trim()}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-gray-800 dark:hover:bg-gray-700 text-white shadow-sm disabled:opacity-50 disabled:pointer-events-none">
+              className="bg-blue-500 hover:bg-blue-600 text-white">
               {updatingTaskId === editingTask?.id ? (
                 <>
                   <ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" /> Saving
