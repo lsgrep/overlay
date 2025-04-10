@@ -277,10 +277,31 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
         notes: inlineEditValues.notes.trim() || null, // API expects null to clear
         due: formattedDueDate, // API expects YYYY-MM-DD or null
       };
-      await overlayApi.updateTask(originalTask.taskId || taskIdBeingSaved, updatePayload, selectedListId);
+      const updatedTask = await overlayApi.updateTask(
+        originalTask.taskId || taskIdBeingSaved,
+        updatePayload,
+        selectedListId,
+      );
 
-      // 4. Success: Fetch to confirm state (Recommended)
-      await fetchTasks(selectedListId, true);
+      // 4. Update local state with the response from API
+      if (updatedTask) {
+        setTasks(currentTasks =>
+          currentTasks.map(task =>
+            task.id === taskIdBeingSaved || task.taskId === taskIdBeingSaved
+              ? {
+                  ...task,
+                  title: trimmedTitle,
+                  notes: inlineEditValues.notes.trim() || undefined,
+                  due: formattedDueDate || undefined,
+                  ...updatedTask,
+                }
+              : task,
+          ),
+        );
+      } else {
+        // If the API doesn't return the updated task, fetch all tasks
+        await fetchTasks(selectedListId, true);
+      }
     } catch (err) {
       setError('Failed to save task changes. Please try again.');
       console.error('Error saving task changes:', err);
@@ -448,6 +469,12 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             className="text-md font-medium w-full" // Match display font size
                             disabled={isTaskUpdating}
                             aria-label="Edit task title"
+                            onKeyDown={e => {
+                              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                                e.preventDefault();
+                                handleSaveInlineChanges();
+                              }
+                            }}
                           />
                           {/* Edit Notes */}
                           <Textarea
@@ -457,33 +484,34 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             className="text-sm w-full min-h-[60px] resize-y" // Match display size
                             disabled={isTaskUpdating}
                             aria-label="Edit task notes"
+                            onKeyDown={e => {
+                              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                                e.preventDefault();
+                                handleSaveInlineChanges();
+                              }
+                            }}
                           />
                           {/* Edit Due Date */}
                           <div className="flex items-center space-x-2">
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className={`w-full justify-start text-left font-normal bg-transparent ${!inlineEditValues.dueDate ? 'text-muted-foreground' : ''}`}
-                                  disabled={isTaskUpdating}>
-                                  <CalendarIcon className="mr-2 h-4 w-4" />
-                                  {inlineEditValues.dueDate ? (
-                                    formatTaskDueDate(inlineEditValues.dueDate)
-                                  ) : (
-                                    <span>Set due date</span>
-                                  )}
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={inlineEditValues.dueDate}
-                                  onSelect={date => handleInlineInputChange('dueDate', date)}
-                                  initialFocus
-                                />
-                              </PopoverContent>
-                            </Popover>
+                            <div className="flex-grow">
+                              <Label htmlFor={`due-date-${editingTaskId}`} className="block mb-1 text-sm">
+                                Due Date
+                              </Label>
+                              <Input
+                                id={`due-date-${editingTaskId}`}
+                                type="date"
+                                className="w-full"
+                                value={
+                                  inlineEditValues.dueDate ? inlineEditValues.dueDate.toISOString().split('T')[0] : ''
+                                }
+                                onChange={e => {
+                                  const dateStr = e.target.value;
+                                  const date = dateStr ? new Date(dateStr) : undefined;
+                                  handleInlineInputChange('dueDate', date);
+                                }}
+                                disabled={isTaskUpdating}
+                              />
+                            </div>
                             {inlineEditValues.dueDate && (
                               <Button
                                 variant="ghost"
@@ -525,7 +553,9 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                         </div>
                       ) : (
                         /* === DISPLAY UI === */
-                        <div className="p-3 flex items-start gap-3">
+                        <div
+                          className="p-3 flex items-start gap-3"
+                          onDoubleClick={() => !isCompleted && startEditingTask(task)}>
                           {/* Checkbox and Spinner */}
                           <div className="mt-1 flex-shrink-0 w-4 h-4 relative">
                             <Checkbox
