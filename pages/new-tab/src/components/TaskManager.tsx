@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { tasksStorage } from '@extension/storage';
 import { overlayApi, type TaskList, type Task } from '@extension/shared/lib/services/api';
 import { PlusIcon, TrashIcon, PencilIcon, CalendarIcon, XMarkIcon as X } from '@heroicons/react/24/outline';
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
@@ -36,6 +35,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [taskListsLoading, setTaskListsLoading] = useState<boolean>(true);
   const [newTaskTitle, setNewTaskTitle] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
@@ -49,61 +49,59 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
 
   // Define fetchTasks with useCallback to prevent infinite loops
   const fetchTasks = useCallback(
-    async (listId: string) => {
+    async (listId: string, skipLoading = false) => {
       try {
-        setLoading(true);
-
-        // Try to get tasks from cache first
-        const cachedTasks = await tasksStorage.get();
-        const listTasks = cachedTasks[listId];
-
-        if (listTasks && listTasks.length > 0) {
-          // Use cached tasks if available
-          console.log('Using cached tasks for list:', listId);
-          setTasks(listTasks);
-          setError(null);
-          setLoading(false);
-
-          // Fetch fresh data in the background
-          overlayApi
-            .getTasks(listId)
-            .then(tasksData => {
-              // Update cache and state if there are differences
-              if (JSON.stringify(tasksData) !== JSON.stringify(listTasks)) {
-                setTasks(tasksData);
-                // Update cache
-                tasksStorage.set(prevCache => ({
-                  ...prevCache,
-                  [listId]: tasksData,
-                }));
-              }
-            })
-            .catch(e => console.error('Background task refresh error:', e));
-        } else {
-          // Fetch from API if no cache
-          const tasksData = await overlayApi.getTasks(listId);
-          setTasks(tasksData);
-          // Update cache
-          tasksStorage.set(prevCache => ({
-            ...prevCache,
-            [listId]: tasksData,
-          }));
-          setError(null);
+        if (!skipLoading) {
+          setLoading(true);
         }
+
+        // Store current task IDs that are being updated
+        const updatingId = updatingTaskId;
+
+        // Get current tasks for potential merging
+        const currentTasks = [...tasks];
+        const currentTaskMap = new Map();
+
+        currentTasks.forEach(task => {
+          currentTaskMap.set(task.id, task);
+        });
+
+        // Fetch tasks directly from API
+        const tasksData = await overlayApi.getTasks(listId);
+
+        // If we have an updatingTaskId, preserve that task's current state
+        if (updatingId) {
+          const mergedTasks = tasksData.map(serverTask => {
+            const existingTask = currentTaskMap.get(serverTask.id);
+            if (existingTask && existingTask.id === updatingId) {
+              // Keep local version of a task being updated
+              return existingTask;
+            }
+            return serverTask;
+          });
+
+          setTasks(mergedTasks);
+        } else {
+          // No task being updated, just use the server data
+          setTasks(tasksData);
+        }
+
+        setError(null);
       } catch (err) {
         setError('Failed to load tasks. Please try again.');
         console.error('Error fetching tasks:', err);
       } finally {
+        // Always clear loading state regardless of skipLoading parameter
         setLoading(false);
       }
     },
-    [], // No dependency needed as listId is passed as an argument
+    [updatingTaskId, tasks], // Add tasks as a dependency
   );
 
   // Define fetchTaskLists with useCallback to prevent infinite loops
   const fetchTaskLists = useCallback(async () => {
     try {
-      setLoading(true);
+      setTaskListsLoading(true);
       const lists = await overlayApi.getTaskLists();
       setTaskLists(lists);
 
@@ -128,7 +126,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
       setError('Failed to load task lists. Please try again.');
       console.error('Error fetching task lists:', err);
     } finally {
-      setLoading(false);
+      setTaskListsLoading(false);
     }
   }, [selectedListId, userPreferences]);
 
@@ -147,6 +145,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
   // Fetch tasks when selected list changes
   useEffect(() => {
     if (selectedListId) {
+      // Fetch tasks immediately without a delay
       fetchTasks(selectedListId);
     }
   }, [selectedListId, fetchTasks]);
@@ -160,27 +159,53 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
 
   const handleCreateTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTaskTitle.trim() || !selectedListId) return;
+    const title = newTaskTitle.trim();
+    if (!title || !selectedListId) return;
 
-    // Temporarily show loading state
-    setLoading(true);
+    // Create a temporary optimistic task object
+    const tempTask: Task = {
+      id: `temp-${Date.now()}`,
+      taskId: `temp-${Date.now()}`,
+      title: title,
+      status: 'needsAction',
+      listId: selectedListId,
+    };
+
+    // Clear input immediately for better UX
+    setNewTaskTitle('');
+
+    // Add the task to the UI immediately
+    setTasks(currentTasks => [...currentTasks, tempTask]);
+
+    // Show loading indicator
+    const tempTaskId = tempTask.id;
+    setUpdatingTaskId(tempTaskId);
+
+    // Update loading state to make sure the indicator is shown
+    setLoading(false);
+
     try {
-      console.log('Creating task with listId:', selectedListId, 'title:', newTaskTitle.trim());
-      // Create new task with the API
-      const newTask = await overlayApi.createTask({
+      // Create task data object
+      const taskData = {
         listId: selectedListId,
-        title: newTaskTitle.trim(),
-      });
-      console.log('Task created successfully:', newTask);
+        title: title,
+      };
 
-      // Refresh tasks
-      fetchTasks(selectedListId);
-      setNewTaskTitle('');
+      // Create new task with the API
+      await overlayApi.createTask(taskData);
+
+      // Clear updating state immediately
+      setUpdatingTaskId(null);
+
+      // Refresh task list
+      fetchTasks(selectedListId, true);
     } catch (err) {
       setError('Failed to create task. Please try again.');
       console.error('Error creating task:', err);
-    } finally {
-      setLoading(false);
+
+      // Remove the temporary task on error
+      setTasks(currentTasks => currentTasks.filter(task => task.id !== tempTaskId));
+      setUpdatingTaskId(null);
     }
   };
 
@@ -191,6 +216,9 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
       // Set the currently updating taskId to show the spinner
       setUpdatingTaskId(taskId);
 
+      // Update loading state to make sure the indicator is shown
+      setLoading(false);
+
       // Find the complete task object to get the actual taskId
       const taskToUpdate = tasks.find(task => task.id === taskId);
       if (!taskToUpdate) {
@@ -200,45 +228,33 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
         return;
       }
 
-      // Log the full task object for debugging
-      console.log('Task to update:', taskToUpdate);
-
-      // Optimistic UI update - update the local state immediately
-      setTasks(prevTasks =>
-        prevTasks.map(task =>
-          task.id === taskId ? { ...task, status: completed ? 'completed' : 'needsAction' } : task,
-        ),
+      // Update the local task immediately for a smoother UI experience
+      const updatedStatus = completed ? 'completed' : 'needsAction';
+      setTasks(currentTasks =>
+        currentTasks.map(task => (task.id === taskId ? { ...task, status: updatedStatus } : task)),
       );
 
-      console.log('Updating task status:', {
+      // Prepare API call payload
+      const updatePayload = {
         id: taskId,
-        taskId: taskToUpdate.taskId, // Use the correct taskId from the task object
+        taskId: taskToUpdate.taskId,
+        status: updatedStatus,
         listId: selectedListId,
-        status: completed ? 'completed' : 'needsAction',
-      });
+      };
 
-      // Then perform the API call - include all required fields in the payload
-      const result = await overlayApi.updateTask(
-        taskId,
-        {
-          id: taskId,
-          taskId: taskToUpdate.taskId, // Use the correct taskId from the task object
-          status: completed ? 'completed' : 'needsAction',
-          listId: selectedListId, // Include listId explicitly in the payload
-        },
-        selectedListId,
-      );
-      console.log('Task update result:', result);
+      // Update task status via API
+      await overlayApi.updateTask(taskId, updatePayload, selectedListId);
 
-      // Don't refresh tasks after successful update since we already updated optimistically
-      // This prevents UI flickering and unnecessary API calls
+      // Clear updating state immediately
+      setUpdatingTaskId(null);
+
+      // Refresh task list
+      fetchTasks(selectedListId, true);
     } catch (err) {
       setError('Failed to update task. Please try again.');
       console.error('Error updating task:', err);
-      // Revert optimistic update on error
+      // Refresh to ensure consistent state
       fetchTasks(selectedListId);
-    } finally {
-      // Clear the updating taskId when operation completes
       setUpdatingTaskId(null);
     }
   };
@@ -247,32 +263,41 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     if (!selectedListId) return;
 
     try {
+      // Set updating state for visual feedback
+      setUpdatingTaskId(taskId);
+
+      // Update loading state to make sure the indicator is shown
+      setLoading(false);
+
       // Find the complete task object to get the actual taskId
       const taskToDelete = tasks.find(task => task.id === taskId);
       if (!taskToDelete) {
         console.error('Task not found in local state:', taskId);
         setError('Failed to delete task: Task not found');
+        setUpdatingTaskId(null);
         return;
       }
 
       // Make sure we have a valid taskId, fallback to the local id if taskId is undefined
       const actualTaskId = taskToDelete.taskId || taskToDelete.id;
-      console.log('Task to delete:', taskToDelete, 'Using taskId:', actualTaskId);
 
-      // Optimistic UI update - remove task from local state
-      setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+      // Remove the task from UI immediately (optimistic update)
+      setTasks(currentTasks => currentTasks.filter(task => task.id !== taskId));
 
-      // Using query parameters for task deletion as per updated API
-      // Pass the taskId from the task object, with fallback to local ID
+      // Call the API to delete the task
       await overlayApi.deleteTask(actualTaskId, selectedListId);
 
-      // Refresh tasks to ensure consistency
-      fetchTasks(selectedListId);
+      // Clear updating state immediately
+      setUpdatingTaskId(null);
+
+      // Refresh task list
+      fetchTasks(selectedListId, true);
     } catch (err) {
       setError('Failed to delete task. Please try again.');
       console.error('Error deleting task:', err);
-      // Revert optimistic update on error
+      // Refresh to ensure consistent state
       fetchTasks(selectedListId);
+      setUpdatingTaskId(null);
     }
   };
 
@@ -298,8 +323,22 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     try {
       setUpdatingTaskId(editingTask.id);
 
+      // Update loading state to make sure the indicator is shown
+      setLoading(false);
+
       // Format due date if provided
       const dueDate = editTaskDueDate ? editTaskDueDate.toISOString() : undefined;
+
+      // Create the updated task for optimistic UI update
+      const updatedTask = {
+        ...editingTask,
+        title: editTaskTitle,
+        notes: editTaskNotes,
+        due: dueDate,
+      };
+
+      // Update the task locally immediately
+      setTasks(currentTasks => currentTasks.map(task => (task.id === editingTask.id ? updatedTask : task)));
 
       // Prepare update payload
       const updatePayload = {
@@ -311,30 +350,23 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
         listId: selectedListId,
       };
 
-      console.log('Updating task with changes:', updatePayload);
-
-      // Optimistic UI update
-      setTasks(prevTasks =>
-        prevTasks.map(task =>
-          task.id === editingTask.id ? { ...task, title: editTaskTitle, notes: editTaskNotes, due: dueDate } : task,
-        ),
-      );
-
-      // Call API to update task
-      await overlayApi.updateTask(editingTask.id, updatePayload, selectedListId);
-
-      // Close the dialog
+      // Close the dialog immediately for better UX
       setIsEditDialogOpen(false);
       setEditingTask(null);
 
-      // Refresh tasks to ensure data consistency
-      fetchTasks(selectedListId);
+      // Make API call to update the task
+      await overlayApi.updateTask(editingTask.id, updatePayload, selectedListId);
+
+      // Clear updating state immediately
+      setUpdatingTaskId(null);
+
+      // Refresh task list
+      fetchTasks(selectedListId, true);
     } catch (err) {
       setError('Failed to update task. Please try again.');
       console.error('Error updating task details:', err);
-      // Revert optimistic update on error
+      // Refresh to ensure consistent state
       fetchTasks(selectedListId);
-    } finally {
       setUpdatingTaskId(null);
     }
   };
@@ -343,7 +375,14 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     <div className="w-full max-w-6xl mx-auto relative z-10">
       <div className="flex items-center mb-6">
         <h2 className="text-xl font-semibold">Your Tasks</h2>
-        {loading && <ArrowPathIcon className="ml-2 w-4 h-4 animate-spin text-blue-400" />}
+        {(loading || taskListsLoading || updatingTaskId) && (
+          <div className="ml-3 flex items-center h-6 transition-all duration-300">
+            <ArrowPathIcon className="w-5 h-5 animate-spin text-blue-500" />
+            <span className="ml-2 text-sm text-blue-500 whitespace-nowrap">
+              {taskListsLoading ? 'Loading task lists...' : updatingTaskId ? 'Updating task...' : 'Loading tasks...'}
+            </span>
+          </div>
+        )}
       </div>
 
       {error && (
@@ -434,18 +473,23 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                         : 'bg-gray-900/40 hover:bg-gray-900/50 border border-gray-800/30'
                     } ${task.status === 'completed' ? 'border-l-4 border-blue-400' : ''}`}>
                     <div className="flex items-start gap-3">
-                      {updatingTaskId === task.id ? (
-                        <div className="mt-1 flex-shrink-0 w-4 h-4">
-                          <ArrowPathIcon className="animate-spin text-blue-600 dark:text-blue-400" />
-                        </div>
-                      ) : (
+                      <div className="mt-1 flex-shrink-0 w-4 h-4 relative">
+                        {/* Always render the checkbox for consistent layout */}
                         <Checkbox
                           id={`task-${task.id}`}
                           checked={task.status === 'completed'}
                           onCheckedChange={checked => handleUpdateTaskStatus(task.id, checked === true)}
-                          className="mt-1"
+                          disabled={updatingTaskId === task.id}
+                          className={`${updatingTaskId === task.id ? 'opacity-0' : 'opacity-100'} transition-opacity`}
                         />
-                      )}
+
+                        {/* Overlay the spinner when updating */}
+                        {updatingTaskId === task.id && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <ArrowPathIcon className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
+                          </div>
+                        )}
+                      </div>
 
                       <div className="flex-grow">
                         <div className="flex justify-between items-start">
