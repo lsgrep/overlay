@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'; // Added useRef
+import { motion } from 'framer-motion';
 import { overlayApi, type TaskList, type Task } from '@extension/shared/lib/services/api';
 import {
   PlusIcon,
@@ -318,14 +319,14 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto relative z-10">
+    <div className="w-full max-w-7xl mx-auto relative z-10">
       {/* Header and Global Loading Indicator */}
       <div className="flex items-center mb-6">
         <h2 className="text-xl font-semibold">Your Tasks</h2>
         {showGlobalSpinner && (
           <div className="ml-3 flex items-center h-6 transition-all duration-300">
-            <ArrowPathIcon className="w-5 h-5 animate-spin text-indigo-500" />
-            <span className="ml-2 text-sm text-indigo-500 whitespace-nowrap">{getGlobalLoadingText()}</span>
+            <ArrowPathIcon className="w-5 h-5 animate-spin text-blue-500" />
+            <span className="ml-2 text-sm text-blue-500 whitespace-nowrap">{getGlobalLoadingText()}</span>
           </div>
         )}
       </div>
@@ -342,10 +343,10 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
       )}
 
       {/* Main Content Area */}
-      <div
-        className={`space-y-8 p-4 md:p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
-        {' '}
-        {/* Reduced padding on small screens */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
         {/* Task Lists Tabs */}
         {!taskListsLoading && taskLists.length > 0 && (
           <div className="mb-6">
@@ -358,7 +359,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                   className={`whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 rounded-none border-b-2 text-sm md:text-base ${
                     /* Adjusted padding/text size */
                     selectedListId === list.id
-                      ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400 font-semibold'
+                      ? 'border-blue-500 text-blue-600 dark:text-blue-400 font-semibold'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
                   }`}>
                   {list.title}
@@ -399,7 +400,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                 disabled={!newTaskTitle.trim() || isUpdating}
                 variant="default"
                 size="icon"
-                className="rounded-l-none rounded-r-md bg-indigo-500 hover:bg-indigo-600 h-auto px-3 md:px-4" /* Adjusted padding */
+                className="rounded-l-none rounded-r-md bg-blue-500 hover:bg-blue-600 h-auto px-3 md:px-4" /* Adjusted padding */
                 aria-label="Add task">
                 <PlusIcon className="w-5 h-5" />
               </Button>
@@ -429,8 +430,8 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                       className={`rounded-lg transition-all duration-200 border ${
                         isBeingEdited
                           ? isLight
-                            ? 'bg-indigo-50 border-indigo-200'
-                            : 'bg-indigo-900/20 border-indigo-700/30' // Highlight editing task
+                            ? 'bg-white border-black/10'
+                            : 'bg-black border-white/10'
                           : isLight
                             ? 'bg-white hover:bg-gray-50 border-gray-200'
                             : 'bg-gray-900/40 hover:bg-gray-900/50 border-gray-800/30'
@@ -464,7 +465,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className={`w-full justify-start text-left font-normal ${!inlineEditValues.dueDate ? 'text-muted-foreground' : ''}`}
+                                  className={`w-full justify-start text-left font-normal bg-transparent ${!inlineEditValues.dueDate ? 'text-muted-foreground' : ''}`}
                                   disabled={isTaskUpdating}>
                                   <CalendarIcon className="mr-2 h-4 w-4" />
                                   {inlineEditValues.dueDate ? (
@@ -508,7 +509,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             <Button
                               variant="default"
                               size="sm"
-                              className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                              className="bg-blue-500 hover:bg-blue-600 text-white"
                               onClick={handleSaveInlineChanges}
                               disabled={isTaskUpdating || !inlineEditValues.title.trim()} // Disable if updating or title empty
                               aria-label="Save changes">
@@ -537,7 +538,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             />
                             {isTaskUpdating && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <ArrowPathIcon className="w-4 h-4 animate-spin text-indigo-600 dark:text-indigo-400" />
+                                <ArrowPathIcon className="w-4 h-4 animate-spin text-blue-600 dark:text-blue-400" />
                               </div>
                             )}
                           </div>
@@ -568,11 +569,11 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                                         ? 'text-gray-400'
                                         : 'text-gray-500'
                                       : isLight
-                                        ? 'text-indigo-600'
-                                        : 'text-indigo-400'
+                                        ? 'text-blue-600'
+                                        : 'text-blue-400'
                                 }`}>
                                 <CalendarIcon
-                                  className={`w-3.5 h-3.5 mr-1 ${isCompleted ? 'text-gray-400 dark:text-gray-600' : 'text-indigo-500'}`}
+                                  className={`w-3.5 h-3.5 mr-1 ${isCompleted ? 'text-gray-400 dark:text-gray-600' : 'text-blue-500'}`}
                                 />
                                 <span>
                                   {formatTaskDueDate(task.due)}
@@ -614,7 +615,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
             )}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Dialog component removed */}
     </div>
