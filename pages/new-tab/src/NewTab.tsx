@@ -6,6 +6,7 @@ import type { DevLocale } from '@extension/i18n/lib/type';
 import { useState, useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
 import CalendarView from './components/CalendarView';
+import { LoginGuard } from './components/LoginGuard';
 import quotesData from './quotes.json';
 import { Settings, SunIcon, MoonIcon } from 'lucide-react';
 
@@ -160,17 +161,21 @@ const NewTab = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
-          {/* Task Manager - Takes 2/3 of the width on large screens and above */}
-          <div className="lg:col-span-2">
-            <TaskManager userPreferences={userPreferences} />
-          </div>
+          <LoginGuard>
+            <>
+              {/* Task Manager - Takes 2/3 of the width on large screens and above */}
+              <div className="lg:col-span-2">
+                <TaskManager userPreferences={userPreferences} />
+              </div>
 
-          {/* Calendar View - Takes 1/3 of the width on large screens and above */}
-          <div className="lg:col-span-1">
-            <CalendarView />
-          </div>
+              {/* Calendar View - Takes 1/3 of the width on large screens and above */}
+              <div className="lg:col-span-1">
+                <CalendarView />
+              </div>
+            </>
+          </LoginGuard>
 
-          {/* Quote section - Full width below the columns */}
+          {/* Quote section - Full width below the columns - Always visible */}
           <div className="col-span-1 lg:col-span-3 mt-8">
             <div className="p-4 text-center relative rounded-lg border border-border bg-card">
               <div className={`relative z-10`}>

@@ -454,6 +454,22 @@
     "description": "Loading text when signing in",
     "message": "Signing in..."
   },
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "Sign in to view your tasks and calendar"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "Your data is securely synced across devices"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "Login Overlay"
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "Authentication is required to access task and calendar features"
+  },
   "sidepanel_welcome_title": {
     "description": "Welcome title in side panel",
     "message": "Welcome to Overlay"
