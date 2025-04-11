@@ -443,6 +443,7 @@ export const ChatInterface = forwardRef<
           anthropicModels={anthropicModels}
           isLoadingModels={isLoadingModels}
           modelError={modelError}
+          isLight={isLight}
         />
       </div>
 

@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import '@extension/ui/dist/global.css';
+import '../../../packages/ui/dist/global.css';
 import Options from '@src/Options';
 
 function init() {

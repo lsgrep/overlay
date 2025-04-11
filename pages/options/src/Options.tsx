@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import { Cog6ToothIcon, PaintBrushIcon } from '@heroicons/react/24/solid';
+import { Cog6ToothIcon, PaintBrushIcon, SunIcon, MoonIcon } from '@heroicons/react/24/solid';
 import { UserIcon } from '@heroicons/react/24/outline';
 import { OpenAIIcon, GeminiIcon, AnthropicIcon } from '@extension/ui';
 import { t } from '@extension/i18n';
@@ -112,6 +112,17 @@ const Options = () => {
             />
             <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">Overlay</h1>
           </div>
+          <button
+            onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
+            className={`p-2 rounded-full transition-colors ${
+              isLight ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : 'bg-gray-800 hover:bg-gray-700 text-gray-200'
+            }`}
+            data-tooltip-id="theme-tooltip"
+            data-tooltip-content={
+              isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')
+            }>
+            {isLight ? <MoonIcon className="w-4 h-4" /> : <SunIcon className="w-4 h-4" />}
+          </button>
         </div>
       </motion.div>
 
@@ -174,6 +185,7 @@ const Options = () => {
                   anthropicModels={anthropicModels}
                   isLoadingModels={isLoadingModels}
                   modelError={modelError}
+                  isLight={isLight}
                 />
               )}
 

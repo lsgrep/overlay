@@ -27,6 +27,7 @@ export interface ModelSelectorProps {
   anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
   isLoadingModels?: boolean;
   modelError?: string | null;
+  isLight?: boolean;
 }
 
 export const ModelSelector = ({
@@ -38,6 +39,7 @@ export const ModelSelector = ({
   anthropicModels = [],
   isLoadingModels = false,
   modelError = null,
+  isLight = true,
 }: ModelSelectorProps) => {
   const [open, setOpen] = useState(false);
 
@@ -48,7 +50,11 @@ export const ModelSelector = ({
       </Label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button id="model-selector" variant="outline" role="combobox" className="w-full justify-between">
+          <Button
+            id="model-selector"
+            variant="outline"
+            role="combobox"
+            className={`w-full justify-between ${isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}`}>
             <div className="flex items-center gap-2">
               {selectedModel ? (
                 <>
@@ -83,11 +89,15 @@ export const ModelSelector = ({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0">
-          <Command>
-            <CommandInput placeholder={t('sidepanel_search_models')} />
+        <PopoverContent
+          className={`w-[400px] p-0 ${isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}`}>
+          <Command className={isLight ? 'bg-white' : 'bg-gray-900'}>
+            <CommandInput
+              placeholder={t('sidepanel_search_models')}
+              className={isLight ? 'border-gray-200' : 'border-gray-700 text-white'}
+            />
             <CommandEmpty>{t('sidepanel_no_model_found')}</CommandEmpty>
-            <CommandList>
+            <CommandList className="max-h-[300px]">
               {isLoadingModels ? (
                 <div className="py-6 text-center text-sm">{t('sidepanel_loading_models')}</div>
               ) : modelError ? (
@@ -96,11 +106,12 @@ export const ModelSelector = ({
                 <>
                   {/* OpenAI Models */}
                   {openaiModels.length > 0 && (
-                    <CommandGroup heading="OpenAI Models">
+                    <CommandGroup heading="OpenAI Models" className={!isLight ? 'text-gray-300' : ''}>
                       {openaiModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
+                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
@@ -119,11 +130,12 @@ export const ModelSelector = ({
 
                   {/* Gemini Models */}
                   {geminiModels.length > 0 && (
-                    <CommandGroup heading="Gemini Models">
+                    <CommandGroup heading="Gemini Models" className={!isLight ? 'text-gray-300' : ''}>
                       {geminiModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
+                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
@@ -142,11 +154,12 @@ export const ModelSelector = ({
 
                   {/* Anthropic Models */}
                   {anthropicModels.length > 0 && (
-                    <CommandGroup heading="Anthropic Models">
+                    <CommandGroup heading="Anthropic Models" className={!isLight ? 'text-gray-300' : ''}>
                       {anthropicModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
+                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
@@ -165,11 +178,12 @@ export const ModelSelector = ({
 
                   {/* Ollama Models */}
                   {ollamaModels.length > 0 && (
-                    <CommandGroup heading="Ollama Models">
+                    <CommandGroup heading="Ollama Models" className={!isLight ? 'text-gray-300' : ''}>
                       {ollamaModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
+                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
