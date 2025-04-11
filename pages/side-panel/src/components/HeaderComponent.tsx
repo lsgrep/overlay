@@ -10,9 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@extension/ui';
-import { ChevronDown, LogOut, Settings } from 'lucide-react';
+import { ChevronDown, LogOut, Settings, SunIcon, MoonIcon } from 'lucide-react';
 import { t } from '@extension/i18n';
 import icon from '../../../../chrome-extension/public/icon-128.png';
+import { useStorage } from '@extension/shared';
+import { exampleThemeStorage } from '@extension/storage';
 import {
   createClient,
   signInWithProvider,
@@ -25,6 +27,8 @@ type HeaderComponentProps = Record<never, never>;
 
 export const HeaderComponent: FC<HeaderComponentProps> = () => {
   const supabase = createClient();
+  const theme = useStorage(exampleThemeStorage);
+  const isLight = theme === 'light';
   const [user, setUser] = useState<{
     id: string;
     email?: string;
@@ -128,7 +132,7 @@ export const HeaderComponent: FC<HeaderComponentProps> = () => {
   };
 
   return (
-    <div className="flex items-center justify-between p-2 border-b border-border">
+    <div className="flex items-center justify-between p-2 border-b border-border bg-background text-foreground">
       {user ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -173,14 +177,24 @@ export const HeaderComponent: FC<HeaderComponentProps> = () => {
           <span>{t('sidepanel_sign_in')}</span>
         </Button>
       )}
-      <Button
-        size="icon"
-        variant="ghost"
-        className="h-8 w-8"
-        onClick={() => chrome.runtime.openOptionsPage()}
-        title="Settings">
-        <Settings className="h-4 w-4" />
-      </Button>
+      <div className="flex items-center">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
+          title={isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')}>
+          {isLight ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={() => chrome.runtime.openOptionsPage()}
+          title={t('settings', 'Settings')}>
+          <Settings className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 };

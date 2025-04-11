@@ -22,6 +22,7 @@ interface SystemMessageViewProps {
   onCopy?: (data: SystemMessageData) => void;
   onToggleComplete?: (completed: boolean, data: SystemMessageData) => void;
   onUpdate?: (data: SystemMessageData, updatedTask: Task) => Promise<void>;
+  isLight?: boolean;
 }
 
 export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
@@ -31,13 +32,14 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
   onCopy,
   onToggleComplete,
   onUpdate,
+  isLight = true,
 }) => {
   const { type, content, timestamp, sourceUrl, metadata } = data;
 
   // Loading state view
   if (type === 'loading') {
     return (
-      <div className="relative p-3 my-2 border border-slate-200 dark:border-slate-700 bg-muted rounded-md shadow-sm">
+      <div className="relative p-3 my-2 border border-border bg-muted rounded-md shadow-sm">
         <div className="flex items-center gap-3">
           {/* Gradient pulsing icon similar to LoadingMessage */}
           <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center animate-pulse">
@@ -71,13 +73,13 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
   // Error state view
   if (type === 'error') {
     return (
-      <div className="relative p-3 my-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md shadow-sm">
+      <div className="relative p-3 my-2 bg-destructive/10 border border-destructive/20 rounded-md shadow-sm">
         <div className="flex items-center gap-3">
           {/* Error icon with similar styling to loading */}
-          <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-red-100 dark:bg-red-800/40">
+          <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-destructive/20">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-red-500 dark:text-red-400"
+              className="h-4 w-4 text-destructive"
               viewBox="0 0 20 20"
               fill="currentColor">
               <path
@@ -90,9 +92,9 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
 
           <div className="flex-1">
             <div className="flex items-center">
-              <span className="text-sm font-medium text-red-800 dark:text-red-400">Error</span>
+              <span className="text-sm font-medium text-destructive">Error</span>
             </div>
-            <p className="text-sm text-red-700 dark:text-red-300 mt-1">{content}</p>
+            <p className="text-sm text-destructive mt-1">{content}</p>
           </div>
         </div>
       </div>
@@ -102,13 +104,13 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
   // Info state view
   if (type === 'info') {
     return (
-      <div className="relative p-3 my-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md shadow-sm">
+      <div className="relative p-3 my-2 bg-primary/10 border border-primary/20 rounded-md shadow-sm">
         <div className="flex items-center gap-3">
           {/* Info icon with similar styling to loading */}
-          <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-blue-100 dark:bg-blue-800/40">
+          <div className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center bg-primary/20">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 text-blue-500 dark:text-blue-400"
+              className="h-4 w-4 text-primary"
               viewBox="0 0 20 20"
               fill="currentColor">
               <path
@@ -121,9 +123,9 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
 
           <div className="flex-1">
             <div className="flex items-center">
-              <span className="text-sm font-medium text-blue-800 dark:text-blue-400">Info</span>
+              <span className="text-sm font-medium text-primary">Info</span>
             </div>
-            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">{content}</p>
+            <p className="text-sm text-primary-foreground mt-1">{content}</p>
           </div>
         </div>
       </div>
@@ -180,7 +182,7 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
     return (
       <UnifiedTaskItem
         task={taskObject}
-        isLight={true}
+        isLight={isLight}
         timestamp={timestamp}
         sourceUrl={sourceUrl}
         onCopy={onCopy ? () => onCopy(data) : undefined}
@@ -228,8 +230,8 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = ({
 
   // Fallback for unknown types
   return (
-    <div className="p-3 my-2 bg-slate-100 dark:bg-slate-800 rounded-md">
-      <p className="text-sm text-gray-700 dark:text-gray-300">{content}</p>
+    <div className="p-3 my-2 bg-muted rounded-md border border-border">
+      <p className="text-sm text-foreground">{content}</p>
     </div>
   );
 };

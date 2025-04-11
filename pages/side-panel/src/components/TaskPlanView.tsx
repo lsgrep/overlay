@@ -71,29 +71,27 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
   };
 
   return (
-    <div className={`rounded-lg p-4 ${isLight ? 'bg-white' : 'bg-gray-900'}`}>
+    <div className="rounded-lg p-4 bg-card">
       <div className="flex justify-between items-center mb-3">
         <div>
-          <h3 className={`text-lg font-medium ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>{plan.task_type}</h3>
-          {state.error && <p className="text-sm text-red-500 mt-1">{state.error}</p>}
+          <h3 className="text-lg font-medium text-foreground">{plan.task_type}</h3>
+          {state.error && <p className="text-sm text-destructive mt-1">{state.error}</p>}
 
           {/* Task metadata */}
           <div className="flex flex-wrap gap-2 mt-2">
             {plan.metadata?.complexity && (
-              <span className={`text-xs px-2 py-1 rounded-full ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
+              <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
                 Complexity: {plan.metadata.complexity}
               </span>
             )}
             {plan.metadata?.estimated_time && (
-              <span
-                className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${isLight ? 'bg-gray-100' : 'bg-gray-800'}`}>
+              <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1 bg-muted text-muted-foreground">
                 <ClockIcon className="w-3 h-3" />
                 {plan.metadata.estimated_time}
               </span>
             )}
             {plan.metadata?.user_confirmation_required && (
-              <span
-                className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 text-amber-700 ${isLight ? 'bg-amber-100' : 'bg-amber-900/30'}`}>
+              <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1 text-amber-500 bg-amber-500/10">
                 <ExclamationTriangleIcon className="w-3 h-3" />
                 Requires confirmation
               </span>
@@ -103,8 +101,8 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
         <button
           onClick={executeAllSteps}
           disabled={state.executing}
-          className={`px-3 py-1.5 rounded-lg ${isLight ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'} 
-            hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2`}>
+          className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground
+            hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
           {state.executing ? (
             <>
               <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
@@ -118,8 +116,7 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
 
       {/* Plan explanation if available */}
       {plan.explanation && (
-        <div
-          className={`mb-4 p-3 text-sm rounded-lg ${isLight ? 'bg-blue-50 text-blue-800' : 'bg-blue-900/20 text-blue-100'}`}>
+        <div className="mb-4 p-3 text-sm rounded-lg bg-primary/10 text-primary-foreground">
           <div className="flex items-start gap-2">
             <InformationCircleIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
             <div>{plan.explanation}</div>
@@ -130,19 +127,19 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
         {plan.actions.map((action, i) => (
           <div
             key={action.id}
-            className={`flex items-start space-x-3 p-3 rounded-lg ${isLight ? 'bg-gray-50' : 'bg-gray-800'}
-              ${state.currentStep === i ? 'ring-2 ring-blue-500' : ''}
+            className={`flex items-start space-x-3 p-3 rounded-lg bg-muted
+              ${state.currentStep === i ? 'ring-2 ring-primary' : ''}
               ${state.retryCount[action.id] ? 'border-l-4 border-yellow-500' : ''}
-              ${state.actionStatuses[action.id] === 'loading' ? 'bg-blue-50' : ''}
-              ${state.actionStatuses[action.id] === 'complete' ? 'bg-green-50' : ''}
-              ${state.actionStatuses[action.id] === 'error' ? 'bg-red-50' : ''}`}>
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm">
+              ${state.actionStatuses[action.id] === 'loading' ? 'bg-primary/10' : ''}
+              ${state.actionStatuses[action.id] === 'complete' ? 'bg-success/10' : ''}
+              ${state.actionStatuses[action.id] === 'error' ? 'bg-destructive/10' : ''}`}>
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
               {i + 1}
             </div>
             <div className="flex-1">
-              <p className={`text-sm ${isLight ? 'text-gray-700' : 'text-gray-300'}`}>{action.description}</p>
+              <p className="text-sm text-foreground">{action.description}</p>
               <div className="mt-1">
-                <span className={`text-xs ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
+                <span className="text-xs text-muted-foreground">
                   Action: {action.type}
                   {action.parameters.query && <span className="ml-2">Query: {action.parameters.query}</span>}
                   {action.parameters.url && <span className="ml-2">URL: {action.parameters.url}</span>}

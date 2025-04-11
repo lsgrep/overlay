@@ -50,7 +50,7 @@ type SpinnerProps = {
 };
 
 const Spinner: React.FC<SpinnerProps> = ({ size = 16, className }) => (
-  <Loader2 size={size} className={cn('animate-spin text-blue-500', className)} />
+  <Loader2 size={size} className={cn('animate-spin text-primary', className)} />
 );
 
 // Task status checkbox component
@@ -71,9 +71,9 @@ const TaskStatusCheckbox: React.FC<TaskStatusCheckboxProps> = ({ taskId, status,
     {isLoading ? (
       <Spinner size={16} />
     ) : status === 'completed' ? (
-      <CheckSquare size={16} className="text-green-500" />
+      <CheckSquare size={16} className="text-success" />
     ) : (
-      <Square size={16} className="text-gray-400" />
+      <Square size={16} className="text-muted-foreground/60" />
     )}
   </Button>
 );
@@ -89,7 +89,7 @@ const DueDateDisplay: React.FC<DueDateDisplayProps> = ({ dueDate, showIcon = tru
   if (!dueDate) return null;
 
   return (
-    <div className={cn('flex items-center gap-1 text-xs text-gray-500', className)}>
+    <div className={cn('flex items-center gap-1 text-xs text-muted-foreground', className)}>
       {showIcon && <CalendarIcon size={12} />}
       <span>Due: {overlayApi.formatDate(dueDate)}</span>
     </div>
@@ -119,16 +119,16 @@ const TaskActions: React.FC<TaskActionsProps> = ({
   <div className="flex gap-1">
     {isExpanded && isEditMode ? (
       <Button variant="ghost" size="icon" onClick={onSave} disabled={isLoading} className="h-7 w-7 rounded-full">
-        {isLoading ? <Spinner size={14} /> : <Save size={14} className="text-green-500" />}
+        {isLoading ? <Spinner size={14} /> : <Save size={14} className="text-success" />}
       </Button>
     ) : (
       <Button variant="ghost" size="icon" onClick={onEdit} disabled={isLoading} className="h-7 w-7 rounded-full">
         {isEditMode ? (
-          <X size={14} className="text-gray-500" />
+          <X size={14} className="text-muted-foreground" />
         ) : isExpanded ? (
-          <Edit size={14} className="text-blue-500" />
+          <Edit size={14} className="text-primary" />
         ) : (
-          <Edit size={14} className="text-gray-500" />
+          <Edit size={14} className="text-muted-foreground" />
         )}
       </Button>
     )}
@@ -137,8 +137,12 @@ const TaskActions: React.FC<TaskActionsProps> = ({
       size="icon"
       onClick={onDelete}
       disabled={isLoading}
-      className="h-7 w-7 rounded-full hover:bg-red-100 dark:hover:bg-red-900/20">
-      {isLoading ? <Spinner size={14} className="text-red-500" /> : <Trash2 size={14} className="text-red-500" />}
+      className="h-7 w-7 rounded-full hover:bg-destructive/10">
+      {isLoading ? (
+        <Spinner size={14} className="text-destructive" />
+      ) : (
+        <Trash2 size={14} className="text-destructive" />
+      )}
     </Button>
   </div>
 );
@@ -206,9 +210,7 @@ const DateQuickButtons: React.FC<DateQuickButtonsProps> = ({ selectedDate, onSel
         <Badge
           key={item.label}
           variant={item.isSelected ? 'default' : 'secondary'}
-          className={`cursor-pointer ${
-            item.isSelected ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-blue-100 dark:hover:bg-blue-900'
-          }`}
+          className={`cursor-pointer ${item.isSelected ? 'bg-primary hover:bg-primary/90' : 'hover:bg-primary/10'}`}
           onClick={() => onSelect(item.getDate())}>
           {item.label}
         </Badge>
@@ -237,7 +239,7 @@ type TaskEditFormProps = {
 const TaskEditForm: React.FC<TaskEditFormProps> = ({ task, editedTask, isLoading, onInputChange, onSave }) => (
   <div className="space-y-3">
     <div>
-      <label htmlFor="taskTitle" className="block text-xs font-medium text-gray-500 mb-1">
+      <label htmlFor="taskTitle" className="block text-xs font-medium text-muted-foreground mb-1">
         Title
       </label>
       <input
@@ -246,11 +248,11 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({ task, editedTask, isLoading
         value={editedTask?.title || ''}
         onChange={e => onInputChange('title', e.target.value)}
         disabled={isLoading}
-        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm dark:bg-gray-700 dark:text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-70"
+        className="w-full p-2 border border-input rounded text-sm bg-background text-foreground focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-70"
       />
     </div>
     <div>
-      <label htmlFor="taskNotes" className="block text-xs font-medium text-gray-500 mb-1">
+      <label htmlFor="taskNotes" className="block text-xs font-medium text-muted-foreground mb-1">
         Notes
       </label>
       <textarea
@@ -258,11 +260,11 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({ task, editedTask, isLoading
         value={editedTask?.notes || ''}
         onChange={e => onInputChange('notes', e.target.value)}
         disabled={isLoading}
-        className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-800 min-h-[60px] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-70"
+        className="w-full p-2 border border-input rounded text-sm bg-background text-foreground min-h-[60px] focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-70"
       />
     </div>
     <div>
-      <label htmlFor="taskDueDate" className="block text-xs font-medium text-gray-500 mb-1">
+      <label htmlFor="taskDueDate" className="block text-xs font-medium text-muted-foreground mb-1">
         Due Date
       </label>
       <div className="flex flex-col">
@@ -270,7 +272,7 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({ task, editedTask, isLoading
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-full justify-start text-left font-normal bg-white dark:bg-gray-800 disabled:opacity-70"
+              className="w-full justify-start text-left font-normal bg-background disabled:opacity-70"
               disabled={isLoading}
               id="taskDueDate">
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -296,12 +298,12 @@ const TaskEditForm: React.FC<TaskEditFormProps> = ({ task, editedTask, isLoading
     </div>
     <div className="mt-4">
       <Button
-        className="w-full py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm disabled:opacity-70"
+        className="w-full py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm disabled:opacity-70"
         onClick={onSave}
         disabled={isLoading}>
         {isLoading ? (
           <>
-            <Spinner size={16} className="mr-2 text-white" />
+            <Spinner size={16} className="mr-2 text-primary-foreground" />
             Saving...
           </>
         ) : (
@@ -323,16 +325,16 @@ type TaskDetailsViewProps = {
 const TaskDetailsView: React.FC<TaskDetailsViewProps> = ({ task }) => (
   <>
     <div className="mb-2">
-      <div className="flex items-center gap-1 text-xs font-medium text-gray-500 mb-1">
+      <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground mb-1">
         <FileText size={12} />
         <span>Notes</span>
       </div>
       <div className="p-2 rounded text-sm min-h-[40px]">
-        {task.notes ? task.notes : <span className="text-gray-400 italic">No notes</span>}
+        {task.notes ? task.notes : <span className="text-muted-foreground/60 italic">No notes</span>}
       </div>
     </div>
 
-    <div className="text-xs text-gray-500 flex flex-col gap-1 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+    <div className="text-xs text-muted-foreground flex flex-col gap-1 mt-3 pt-2 border-t border-border">
       <div className="flex justify-between">
         <span>Task ID:</span>
         <span className="font-mono">{task.id.substring(0, 12)}...</span>
@@ -379,18 +381,12 @@ const TaskItem: React.FC<TaskItemProps> = ({
 }) => {
   const taskCardStyle = cn(
     'border rounded-md overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md relative',
-    isLight ? 'border-gray-200 bg-white' : 'border-gray-700 bg-gray-800',
+    'border-border bg-card',
   );
 
-  const headerStyle = cn(
-    'flex items-start gap-2 p-3 transition-colors',
-    isLight ? 'hover:bg-gray-50' : 'hover:bg-gray-700',
-  );
+  const headerStyle = cn('flex items-start gap-2 p-3 transition-colors', 'hover:bg-accent/50');
 
-  const expandedSectionStyle = cn(
-    'p-3 border-t',
-    isLight ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-700',
-  );
+  const expandedSectionStyle = cn('p-3 border-t', 'border-border bg-accent/50');
 
   const handleEdit = () => {
     // If already in edit mode, exit edit mode
@@ -559,7 +555,7 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
   if (tasks.length === 0) {
     return (
       <div className="my-2">
-        <div className="p-4 text-center text-gray-500 border border-dashed rounded-md bg-gray-50 dark:bg-gray-800">
+        <div className="p-4 text-center text-muted-foreground border border-dashed border-border rounded-md bg-muted">
           No tasks available
         </div>
       </div>

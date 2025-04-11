@@ -13,7 +13,7 @@ export const LoadingMessage: React.FC = () => {
       </div>
 
       {/* Loading message content */}
-      <div className="flex-1 p-3 mr-10 ml-2 bg-muted border border-muted-foreground/10 rounded-tl-lg rounded-bl-lg rounded-br-lg shadow-sm">
+      <div className="flex-1 p-3 mr-10 ml-2 bg-muted/20 border border-border rounded-tl-lg rounded-bl-lg rounded-br-lg shadow-sm">
         <div className="flex items-center gap-2">
           <ArrowPathIcon className="w-4 h-4 animate-spin text-muted-foreground" />
           <span className="text-sm text-muted-foreground">{t('sidepanel_thinking')}</span>

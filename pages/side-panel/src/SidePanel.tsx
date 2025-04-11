@@ -391,11 +391,15 @@ const SidePanel = () => {
               value={mode}
               onValueChange={(value: string) => value && setMode(value as 'conversational' | 'interactive')}
               className="flex-1">
-              <ToggleGroupItem value="conversational" className="flex-1 rounded-md">
+              <ToggleGroupItem
+                value="conversational"
+                className={`flex-1 rounded-md ${!isLight ? 'data-[state=on]:bg-gray-700 data-[state=on]:text-white' : ''}`}>
                 <MessageCircle className="mr-2 h-4 w-4" />
                 {t('sidepanel_conversational_mode')}
               </ToggleGroupItem>
-              <ToggleGroupItem value="interactive" className="flex-1 rounded-md">
+              <ToggleGroupItem
+                value="interactive"
+                className={`flex-1 rounded-md ${!isLight ? 'data-[state=on]:bg-gray-700 data-[state=on]:text-white' : ''}`}>
                 <Blocks className="mr-2 h-4 w-4" />
                 {t('sidepanel_interactive_mode')}
               </ToggleGroupItem>
@@ -420,7 +424,7 @@ const SidePanel = () => {
           modelError={error}
         />
       </div>
-      <Toaster />
+      <Toaster theme={isLight ? 'light' : 'dark'} />
     </div>
   );
 };

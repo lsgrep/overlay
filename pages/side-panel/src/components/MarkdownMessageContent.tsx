@@ -8,7 +8,8 @@ export const MarkdownMessageContent: React.FC<{
   isLight: boolean;
 }> = ({ content, isLight }) => {
   return (
-    <div className="prose dark:prose-invert max-w-full break-words overflow-wrap-anywhere text-sm leading-relaxed">
+    <div
+      className={`prose ${!isLight ? 'prose-invert' : ''} max-w-full break-words overflow-wrap-anywhere text-sm leading-relaxed`}>
       <ReactMarkdown
         components={{
           // Enhanced code blocks with syntax highlighting

@@ -50,7 +50,7 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
   // Card styles
   const noteCardStyle = cn(
     'border rounded-md overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md relative mb-3 w-full',
-    isLight ? 'border-gray-200 bg-white' : 'border-gray-700 bg-gray-800',
+    'border-border bg-card',
   );
 
   // Handle copy
@@ -105,7 +105,7 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
     return (
       <Card className={noteCardStyle}>
         <CardHeader className="p-3 pb-0 flex flex-row items-start justify-between">
-          <CardTitle className="text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center">
+          <CardTitle className="text-sm font-medium text-foreground flex items-center">
             <FileText className="h-4 w-4 mr-1 text-amber-500" /> Note
           </CardTitle>
           <div className="flex space-x-1">
@@ -125,15 +125,15 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
           </div>
         </CardHeader>
         <CardContent className="p-3 pt-2">
-          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{content}</p>
-          <div className="mt-2 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-foreground whitespace-pre-wrap">{content}</p>
+          <div className="mt-2 flex justify-between items-center text-xs text-muted-foreground">
             <span>{formattedDate}</span>
             {sourceUrl && (
               <a
                 href={sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline truncate max-w-[150px] flex items-center gap-1">
+                className="text-primary hover:underline truncate max-w-[150px] flex items-center gap-1">
                 <LinkIcon size={10} />
                 {(() => {
                   try {
@@ -152,16 +152,16 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
 
   // Edit mode
   return (
-    <Card className={cn(noteCardStyle, 'bg-white dark:bg-slate-800 relative')}>
+    <Card className={cn(noteCardStyle, 'bg-background relative')}>
       {isLoading && (
-        <div className="absolute inset-0 bg-black/5 dark:bg-black/20 flex items-center justify-center z-10 rounded-md">
-          <div className="bg-white dark:bg-gray-800 rounded-full p-2 shadow-md">
+        <div className="absolute inset-0 bg-foreground/5 flex items-center justify-center z-10 rounded-md">
+          <div className="bg-background rounded-full p-2 shadow-md">
             <Spinner size={24} />
           </div>
         </div>
       )}
       <CardHeader className="p-3 pb-0 flex flex-row items-start justify-between">
-        <CardTitle className="text-sm font-medium text-amber-600 dark:text-amber-400 flex items-center">
+        <CardTitle className="text-sm font-medium text-amber-500 flex items-center">
           <Edit className="h-4 w-4 mr-1" /> Edit Note
         </CardTitle>
         <div className="flex space-x-1">
@@ -172,7 +172,7 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
       </CardHeader>
       <CardContent className="p-3 space-y-3">
         <div>
-          <label htmlFor="note-content" className="block text-xs font-medium text-gray-500 mb-1">
+          <label htmlFor="note-content" className="block text-xs font-medium text-muted-foreground mb-1">
             Content
           </label>
           <Textarea
@@ -185,9 +185,9 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
           />
         </div>
         {sourceUrl && (
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-muted-foreground">
             <span className="font-medium">Source: </span>
-            <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+            <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
               {(() => {
                 try {
                   return new URL(sourceUrl).hostname;
@@ -201,7 +201,7 @@ export const UnifiedNoteView: React.FC<UnifiedNoteProps> = ({
       </CardContent>
       <CardFooter className="p-3 pt-0">
         <Button
-          className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white"
           onClick={handleSave}
           disabled={isLoading || !editedContent.trim()}>
           {isLoading ? (
@@ -232,7 +232,7 @@ export const UnifiedNoteListView: React.FC<{
   if (notes.length === 0) {
     return (
       <div className="my-2 w-full">
-        <div className="p-4 text-center text-gray-500 border border-dashed rounded-md bg-gray-50 dark:bg-gray-800 w-full">
+        <div className="p-4 text-center text-muted-foreground border border-dashed border-border rounded-md bg-muted w-full">
           <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
           <p>No notes available</p>
         </div>

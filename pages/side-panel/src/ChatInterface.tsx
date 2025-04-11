@@ -413,7 +413,7 @@ export const ChatInterface = forwardRef<
 
   return (
     <div
-      className={`flex flex-col h-full ${isDraggingOver ? 'bg-primary/10' : ''}`}
+      className={`flex flex-col h-full ${isDraggingOver ? 'bg-primary/10' : ''} bg-background text-foreground`}
       style={{ fontFamily, fontSize: `${Number(fontSize)}px` }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -433,7 +433,7 @@ export const ChatInterface = forwardRef<
         fontSize={Number(fontSize)}
       />
 
-      <div className="px-3 py-2 border-t border-border bg-muted/5">
+      <div className="px-3 py-2 border-t border-border bg-background">
         <ModelSelector
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}

@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
 import CalendarView from './components/CalendarView';
 import quotesData from './quotes.json';
-import { Settings } from 'lucide-react';
+import { Settings, SunIcon, MoonIcon } from 'lucide-react';
 
 // Define interfaces for quotes data structure
 interface QuoteData {
@@ -127,11 +127,21 @@ const NewTab = () => {
             <img src="/icon-128.png" alt="Overlay icon" className="h-8 w-8" />
             <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">{t('extensionName')}</h1>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
+              className={`p-2 rounded-md transition-colors ${
+                isLight ? 'hover:bg-gray-100 text-gray-800' : 'hover:bg-gray-800 text-gray-200'
+              }`}
+              title={
+                isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')
+              }>
+              {isLight ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
+            </button>
             <a
               href="/options/index.html"
-              className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
-              title="Settings">
+              className="p-2 rounded-md hover:bg-muted/50 transition-colors"
+              title={t('settings', 'Settings')}>
               <Settings className="h-4 w-4" />
             </a>
           </div>

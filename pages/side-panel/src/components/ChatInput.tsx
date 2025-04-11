@@ -124,7 +124,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   }, [input, setDraggedImages]);
 
   return (
-    <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-muted/10">
+    <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-background">
       {/* Image thumbnails gallery - only show if there are images */}
       {draggedImages.length > 0 && (
         <div className="mb-3">

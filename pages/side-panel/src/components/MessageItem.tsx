@@ -190,10 +190,10 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
       ? { isTaskList: message.metadata.isTaskList, tasks: message.metadata.tasks || [] }
       : { isTaskList: false, tasks: [] };
 
-  // Determine message style based on role
+  // Determine message style based on role and theme
   const messageContainerClasses = isUser
     ? `ml-10 mr-2 bg-primary/10 border border-primary/20 rounded-tr-lg rounded-bl-lg rounded-br-lg shadow-sm`
-    : `mr-10 ml-2 bg-muted border border-muted-foreground/10 rounded-tl-lg rounded-bl-lg rounded-br-lg shadow-sm`;
+    : `mr-10 ml-2 bg-muted border border-border rounded-tl-lg rounded-bl-lg rounded-br-lg shadow-sm`;
 
   // Get model/provider-specific accent color
   const accentColorClass = !isUser
@@ -228,6 +228,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message, index, isLigh
           sourceUrl,
           metadata: message.metadata,
         }}
+        isLight={isLight}
         onCopy={() => {
           navigator.clipboard.writeText(message.content);
           console.log('Copied to clipboard');

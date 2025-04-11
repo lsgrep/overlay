@@ -65,10 +65,10 @@ export const MessageList: React.FC<MessageListProps> = ({
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-3 space-y-4 max-w-full scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+    <div className="flex-1 overflow-y-auto p-3 space-y-4 max-w-full scrollbar-thin scrollbar-thumb-muted-foreground/30 bg-background text-foreground">
       {messages.length === 0 && (
         <div className="flex items-center justify-center h-full opacity-70">
-          <div className="text-center p-4 bg-muted/20 rounded-lg max-w-sm">
+          <div className="text-center p-4 bg-muted/20 border border-border rounded-lg max-w-sm">
             <h3 className="font-medium mb-2">{t('sidepanel_welcome_title', 'Welcome to Overlay')}</h3>
             <p className="text-sm text-muted-foreground">
               {t('sidepanel_welcome_message', 'Start a conversation or ask a question about the current page.')}

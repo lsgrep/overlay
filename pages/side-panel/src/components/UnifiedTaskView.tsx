@@ -515,7 +515,7 @@ export const UnifiedTaskListView: React.FC<{
   if (tasks.length === 0) {
     return (
       <div className="my-2 w-full">
-        <div className="p-4 text-center text-gray-500 border border-dashed rounded-md bg-gray-50 dark:bg-gray-800 w-full">
+        <div className="p-4 text-center text-muted-foreground border border-dashed border-border rounded-md bg-muted w-full">
           <FileText className="w-8 h-8 mx-auto mb-2 opacity-40" />
           <p>No tasks available</p>
         </div>
