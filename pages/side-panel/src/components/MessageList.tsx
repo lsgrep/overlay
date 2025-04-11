@@ -1,9 +1,12 @@
 import type React from 'react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { MessageItem } from './MessageItem';
 import { LoadingMessage } from './LoadingMessage';
 import { ErrorMessage } from './ErrorMessage';
 import type { PageContext } from '../services/llm/prompts';
+import { t } from '@extension/i18n';
+import { useStorage } from '@extension/shared';
+import { defaultLanguageStorage } from '@extension/storage';
 
 interface Message {
   role: string;
@@ -45,6 +48,16 @@ export const MessageList: React.FC<MessageListProps> = ({
   fontSize,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const defaultLanguage = useStorage(defaultLanguageStorage);
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // @ts-expect-error - DevLocale type not available from @extension/i18n
+      t.devLocale = defaultLanguage;
+      console.log('MessageList: Language set to', defaultLanguage);
+    }
+  }, [defaultLanguage]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -52,7 +65,17 @@ export const MessageList: React.FC<MessageListProps> = ({
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 max-w-full">
+    <div className="flex-1 overflow-y-auto p-3 space-y-4 max-w-full scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+      {messages.length === 0 && (
+        <div className="flex items-center justify-center h-full opacity-70">
+          <div className="text-center p-4 bg-muted/20 rounded-lg max-w-sm">
+            <h3 className="font-medium mb-2">{t('sidepanel_welcome_title', 'Welcome to Overlay')}</h3>
+            <p className="text-sm text-muted-foreground">
+              {t('sidepanel_welcome_message', 'Start a conversation or ask a question about the current page.')}
+            </p>
+          </div>
+        </div>
+      )}
       {messages.map((message, index) => (
         <MessageItem
           key={index}

@@ -58,7 +58,7 @@ const SidePanel = () => {
     const options = {
       type: 'basic' as chrome.notifications.TemplateType,
       iconUrl: chrome.runtime.getURL('icon-128.png'),
-      title: type === 'success' ? 'Note saved' : 'Error',
+      title: type === 'success' ? t('notification_success', 'Note saved') : t('notification_error', 'Error'),
       message: message,
       priority: 2,
       requireInteraction: false,
@@ -153,7 +153,10 @@ const SidePanel = () => {
               if (result.success) {
                 console.log('[SidePanel] Note saved successfully');
                 // Show success notification
-                showNotification('Note saved: Your note has been saved successfully.', 'success');
+                showNotification(
+                  t('note_saved_message', 'Note saved: Your note has been saved successfully.'),
+                  'success',
+                );
                 // Update the system message to show success
                 if (chatInterfaceRef.current && messageId) {
                   // Check if we have a note ID from the save result
@@ -172,13 +175,15 @@ const SidePanel = () => {
                 console.error('[SidePanel] Failed to save note:', result.error);
                 // Show error notification
                 showNotification(
-                  `Failed to save note: ${result.error || 'An error occurred while saving your note.'}`,
+                  t('note_save_failed', 'Failed to save note: {error}', {
+                    error: result.error || t('generic_error', 'An error occurred while saving your note.'),
+                  }),
                   'error',
                 );
                 // Update the system message to show error
                 if (chatInterfaceRef.current && messageId) {
                   const updatedMessage = {
-                    content: `Failed to save note: "${message.text}"`,
+                    content: t('note_save_failed_message', 'Failed to save note: "{text}"', { text: message.text }),
                     metadata: {
                       systemMessageType: 'error' as SystemMessageType,
                     },
@@ -374,10 +379,10 @@ const SidePanel = () => {
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <header className="p-4 border-b border-border">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <Label htmlFor="mode-selector" className="min-w-16">
+      <header className="p-3 border-b border-border shadow-sm">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <Label htmlFor="mode-selector" className="min-w-16 font-medium text-sm">
               {t('sidepanel_mode')}
             </Label>
             <ToggleGroup
@@ -386,12 +391,12 @@ const SidePanel = () => {
               value={mode}
               onValueChange={(value: string) => value && setMode(value as 'conversational' | 'interactive')}
               className="flex-1">
-              <ToggleGroupItem value="conversational" className="flex-1">
-                <MessageCircle className="mr-2" />
+              <ToggleGroupItem value="conversational" className="flex-1 rounded-md">
+                <MessageCircle className="mr-2 h-4 w-4" />
                 {t('sidepanel_conversational_mode')}
               </ToggleGroupItem>
-              <ToggleGroupItem value="interactive" className="flex-1">
-                <Blocks className="mr-2" />
+              <ToggleGroupItem value="interactive" className="flex-1 rounded-md">
+                <Blocks className="mr-2 h-4 w-4" />
                 {t('sidepanel_interactive_mode')}
               </ToggleGroupItem>
             </ToggleGroup>

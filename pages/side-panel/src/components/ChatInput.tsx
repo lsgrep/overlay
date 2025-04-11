@@ -3,6 +3,8 @@ import { useState, useRef, useEffect } from 'react';
 import { t } from '@extension/i18n';
 import { Button, Textarea } from '@extension/ui';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { useStorage } from '@extension/shared';
+import { defaultLanguageStorage } from '@extension/storage';
 
 // Interface for dragged image data
 interface DraggedImage {
@@ -34,6 +36,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [localDraggedImages, setLocalDraggedImages] = useState<DraggedImage[]>([]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const defaultLanguage = useStorage(defaultLanguageStorage);
+
+  // Update translations when language changes
+  useEffect(() => {
+    if (defaultLanguage) {
+      // @ts-expect-error - DevLocale type not available from @extension/i18n
+      t.devLocale = defaultLanguage;
+      console.log('ChatInput: Language set to', defaultLanguage);
+    }
+  }, [defaultLanguage]);
 
   // Use either external or local state for dragged images
   const draggedImages = externalDraggedImages || localDraggedImages;
@@ -112,54 +124,54 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   }, [input, setDraggedImages]);
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t border-border">
-      {/* Image thumbnails count indicator - only show if there are images */}
+    <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-muted/10">
+      {/* Image thumbnails gallery - only show if there are images */}
       {draggedImages.length > 0 && (
-        <div className="mb-2 text-xs text-gray-500">
-          {draggedImages.length} image{draggedImages.length > 1 ? 's' : ''} attached
-        </div>
-      )}
-      {draggedImages.length > 0 && (
-        <div className="mb-2 flex flex-col gap-2">
-          {draggedImages.map((img, index) => (
-            <div key={index} className="relative group border border-gray-300 p-2 rounded">
-              <div className="flex">
-                <img
-                  src={img.url}
-                  alt={img.altText || 'Dragged image'}
-                  className="w-16 h-16 object-cover rounded border border-border"
-                  onError={e => {
-                    // Show error if image fails to load
-                    const imgElement = e.currentTarget as HTMLImageElement;
-                    imgElement.style.display = 'none';
-                    const errorElement = imgElement.nextElementSibling as HTMLDivElement;
-                    if (errorElement) {
-                      errorElement.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="hidden w-16 h-16 items-center justify-center bg-red-100 text-red-800 text-xs rounded border border-red-300">
-                  Error loading image
+        <div className="mb-3">
+          <div className="text-xs text-muted-foreground font-medium mb-2">
+            {t('sidepanel_images_attached', '{count} image(s) attached', { count: draggedImages.length })}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {draggedImages.map((img, index) => (
+              <div key={index} className="relative group rounded-md overflow-hidden shadow-sm">
+                <div className="flex">
+                  <img
+                    src={img.url}
+                    alt={img.altText || 'Attached image'}
+                    className="w-16 h-16 object-cover"
+                    onError={e => {
+                      // Show error if image fails to load
+                      const imgElement = e.currentTarget as HTMLImageElement;
+                      imgElement.style.display = 'none';
+                      const errorElement = imgElement.nextElementSibling as HTMLDivElement;
+                      if (errorElement) {
+                        errorElement.style.display = 'flex';
+                      }
+                    }}
+                  />
+                  <div className="hidden w-16 h-16 items-center justify-center bg-red-100 text-red-800 text-xs">
+                    {t('sidepanel_image_error', 'Error loading image')}
+                  </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Remove image from state
+                    const newImages = [...draggedImages];
+                    newImages.splice(index, 1);
+                    setDraggedImages(newImages);
+
+                    // Remove the markdown image from input
+                    const markdownToRemove = `![image](${img.url}) `;
+                    setInput(input.replace(markdownToRemove, ''));
+                  }}
+                  className="absolute top-0 right-0 bg-background/80 backdrop-blur-sm hover:bg-destructive hover:text-white rounded-bl-md w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                  ×
+                </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  // Remove image from state
-                  const newImages = [...draggedImages];
-                  newImages.splice(index, 1);
-                  setDraggedImages(newImages);
-
-                  // Remove the markdown image from input
-                  const markdownToRemove = `![image](${img.url}) `;
-                  setInput(input.replace(markdownToRemove, ''));
-                }}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                ×
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
       <div className="flex space-x-2">
@@ -180,16 +192,17 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onDrop={handleDrop}
           placeholder={isDraggingOver ? 'Drop image here...' : t('sidepanel_message_placeholder')}
           style={{ fontFamily, fontSize: `${fontSize}px` }}
-          className={`flex-1 min-h-[40px] max-h-[200px] resize-none ${isDraggingOver ? 'border-2 border-dashed border-primary' : ''}`}
+          className={`flex-1 min-h-[40px] max-h-[200px] resize-none bg-background shadow-sm focus-visible:ring-primary ${
+            isDraggingOver ? 'border-2 border-dashed border-primary bg-primary/5' : ''
+          }`}
           disabled={isLoading}
         />
         <Button
           type="submit"
           disabled={isLoading || !input.trim()}
           style={{ fontFamily, fontSize: `${fontSize}px` }}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-auto"
           variant="default">
-          <span>{t('sidepanel_send')}</span>
           <PaperAirplaneIcon className="w-4 h-4" />
         </Button>
       </div>

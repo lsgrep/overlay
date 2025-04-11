@@ -433,7 +433,7 @@ export const ChatInterface = forwardRef<
         fontSize={Number(fontSize)}
       />
 
-      <div className="px-3 py-2 border-t border-border">
+      <div className="px-3 py-2 border-t border-border bg-muted/5">
         <ModelSelector
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
