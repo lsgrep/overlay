@@ -348,5 +348,13 @@
   "new_page": {
     "description": "Title for the new tab page",
     "message": "新しいページ"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Overlayへようこそ"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "AIを搭載したブラウザアシスタントがお手伝いする準備ができています。現在のページについて、または一般的な質問をお気軽にどうぞ。"
   }
 }

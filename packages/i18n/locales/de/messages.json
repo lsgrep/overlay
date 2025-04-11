@@ -348,5 +348,13 @@
   "new_page": {
     "description": "Title for the new tab page",
     "message": "Neue Seite"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Willkommen bei Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "Ihr KI-gesteuerter Browser-Assistent ist bereit zu helfen. Stellen Sie mir Fragen zur aktuellen Seite oder allgemeine Fragen."
   }
 }

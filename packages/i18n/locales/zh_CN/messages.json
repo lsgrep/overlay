@@ -413,5 +413,13 @@
   "new_page": {
     "description": "Title for the new tab page",
     "message": "新页面"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "欢迎使用 Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "您的人工智能浏览器助手已准备好为您提供帮助。请随时询问关于当前页面的问题或任何一般性问题。"
   }
 }

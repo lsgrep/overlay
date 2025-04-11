@@ -413,5 +413,13 @@
   "new_page": {
     "description": "Title for the new tab page",
     "message": "Nouvelle Page"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Bienvenue sur Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "Votre assistant de navigation alimenté par l'IA est prêt à vous aider. Posez-moi n'importe quelle question sur la page actuelle ou toute autre question générale."
   }
 }

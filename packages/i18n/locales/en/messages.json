@@ -453,5 +453,13 @@
   "popup_signing_in": {
     "description": "Loading text when signing in",
     "message": "Signing in..."
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Welcome to Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "Your AI-powered browser assistant is ready to help. Ask me anything about the current page or any general questions."
   }
 }

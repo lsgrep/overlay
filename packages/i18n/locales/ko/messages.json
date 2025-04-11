@@ -413,5 +413,13 @@
   "new_page": {
     "description": "Title for the new tab page",
     "message": "새 페이지"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Overlay에 오신 것을 환영합니다"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "AI 기반 브라우저 어시스턴트가 도와드릴 준비가 되었습니다. 현재 페이지에 관한 질문이나 일반적인 질문을 자유롭게 해보세요."
   }
 }
