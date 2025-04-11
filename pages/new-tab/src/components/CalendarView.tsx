@@ -13,7 +13,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, Button } from '@extension/ui';
 
 interface CalendarViewProps {
-  isLight: boolean;
+  // We no longer need isLight prop as we use design tokens
 }
 
 // Function to format event description with enhanced formatting
@@ -26,7 +26,7 @@ const formatEventDescription = (text: string): string => {
     text
       // Make sure all URLs are properly linked
       .replace(/(?<!(href="|src="))https?:\/\/[^\s<>]+/g, url => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${url}</a>`;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a>`;
       })
 
       // Add consistent styling to existing HTML elements
@@ -36,7 +36,7 @@ const formatEventDescription = (text: string): string => {
       .replace(/<i>(.*?)<\/i>/g, '<i class="italic">$1</i>')
 
       // Make sure all anchor tags have styling
-      .replace(/<a(?!.*class=)/g, '<a class="text-blue-500 hover:underline" ')
+      .replace(/<a(?!.*class=)/g, '<a class="text-primary hover:underline" ')
 
       // Add a bit of spacing after paragraphs
       .replace(/<\/p>/g, '</p><div class="h-2"></div>')
@@ -46,7 +46,7 @@ const formatEventDescription = (text: string): string => {
   );
 };
 
-export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
+export const CalendarView: React.FC<CalendarViewProps> = () => {
   const [upcomingEvents, setUpcomingEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,34 +127,29 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
   return (
     <div className="w-full relative z-10">
       <div className="flex items-center mb-6">
-        <h2 className="text-xl font-semibold">Calendar</h2>
-        {loading && <ArrowPathIcon className="ml-2 w-4 h-4 animate-spin text-blue-400" />}
+        <h2 className="text-xl font-semibold text-foreground">Calendar</h2>
+        {loading && <ArrowPathIcon className="ml-2 w-4 h-4 animate-spin text-primary" />}
       </div>
 
       {error && (
-        <div
-          className={`mb-4 p-3 rounded-lg border ${isLight ? 'bg-red-50 border-red-200 text-red-700' : 'bg-red-900/10 border-red-800/30 text-red-400'}`}>
+        <div className="mb-4 p-3 rounded-lg border border-destructive/20 bg-destructive/5 text-destructive">
           {error}
         </div>
       )}
 
-      <div
-        className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+      <div className="space-y-8 p-8 rounded-lg border border-border bg-card">
         {loading && dateKeys.length === 0 ? (
-          <p className={`text-center py-4 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-            Loading calendar events...
-          </p>
+          <p className="text-center py-4 text-muted-foreground">Loading calendar events...</p>
         ) : dateKeys.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6">
-            <CalendarIcon className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-2" />
-            <p className={`text-center ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>No upcoming events</p>
+            <CalendarIcon className="w-10 h-10 text-muted-foreground/50 mb-2" />
+            <p className="text-center text-muted-foreground">No upcoming events</p>
           </div>
         ) : (
           <div className="space-y-6">
             {dateKeys.map(dateKey => (
               <div key={dateKey} className="space-y-2">
-                <h3
-                  className={`text-sm font-semibold ${isLight ? 'text-gray-600' : 'text-gray-400'} flex items-center gap-2`}>
+                <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                   <CalendarIcon className="w-4 h-4" />
                   {getDateLabel(dateKey)}
                 </h3>
@@ -175,31 +170,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
                     return (
                       <div
                         key={event.id}
-                        className={`p-3 rounded-lg border ${
-                          isLight
-                            ? `bg-white ${isPastEvent ? 'border-gray-200' : isOngoing ? 'border-green-200' : 'border-blue-200'}`
-                            : `bg-gray-900/40 ${isPastEvent ? 'border-gray-800/30' : isOngoing ? 'border-green-800/50' : 'border-blue-800/50'}`
-                        } hover:shadow-md transition-all duration-200 cursor-pointer`}
+                        className={`p-3 rounded-lg border bg-card hover:shadow-md transition-all duration-200 cursor-pointer ${
+                          isPastEvent ? 'border-border/50' : isOngoing ? 'border-success/50' : 'border-primary/30'
+                        }`}
                         onClick={() => {
                           setSelectedEvent(event);
                           setEventDetailsOpen(true);
                         }}>
                         <div className="flex flex-col">
                           <div className="flex justify-between">
-                            <p className={`font-medium ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-                              {event.summary}
-                            </p>
+                            <p className="font-medium text-foreground">{event.summary}</p>
                             <div
                               className={`flex items-center text-xs ${
-                                isPastEvent
-                                  ? isLight
-                                    ? 'text-gray-500'
-                                    : 'text-gray-400'
-                                  : isOngoing
-                                    ? 'text-green-600'
-                                    : isLight
-                                      ? 'text-blue-500'
-                                      : 'text-blue-400'
+                                isPastEvent ? 'text-muted-foreground' : isOngoing ? 'text-success' : 'text-primary'
                               }`}>
                               <ClockIcon className="w-3 h-3 mr-1" />
                               <span>{formattedTime}</span>
@@ -209,14 +192,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
                           {/* Event details */}
                           <div className="mt-1 space-y-1">
                             {event.location && (
-                              <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <MapPinIcon className="w-3 h-3" />
                                 <span className="truncate">{event.location}</span>
                               </div>
                             )}
 
                             {event.attendees && event.attendees.length > 0 && (
-                              <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <UsersIcon className="w-3 h-3" />
                                 <span>
                                   {event.attendees.length} attendee{event.attendees.length > 1 ? 's' : ''}
@@ -226,7 +209,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
 
                             {event.description && (
                               <p
-                                className={`text-xs mt-1 truncate ${isLight ? 'text-gray-600' : 'text-gray-400'}`}
+                                className="text-xs mt-1 truncate text-muted-foreground"
                                 title={event.description.replace(/<[^>]*>?/gm, '')}>
                                 {event.description.replace(/<[^>]*>?/gm, '').substring(0, 50)}
                                 {event.description.replace(/<[^>]*>?/gm, '').length > 50 ? '...' : ''}
@@ -246,26 +229,25 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
 
       {/* Event Details Dialog */}
       <Dialog open={eventDetailsOpen} onOpenChange={setEventDetailsOpen}>
-        <DialogContent
-          className={`sm:max-w-md ${isLight ? 'bg-white border border-black/10' : 'bg-black border border-white/10'}`}>
-          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10">
-            <XMarkIcon className="h-4 w-4" />
+        <DialogContent className="sm:max-w-md bg-background border border-border text-foreground">
+          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10 bg-background">
+            <XMarkIcon className="h-4 w-4 text-foreground" />
             <span className="sr-only">Close</span>
           </DialogClose>
           <DialogHeader>
-            <DialogTitle className="pr-10">{selectedEvent?.summary}</DialogTitle>
+            <DialogTitle className="pr-10 text-foreground">{selectedEvent?.summary}</DialogTitle>
           </DialogHeader>
 
           {selectedEvent && (
             <div className="space-y-4 py-2">
               {/* Date and Time */}
               <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-full ${isLight ? 'bg-blue-100' : 'bg-blue-900/30'}`}>
-                  <ClockIcon className={`h-4 w-4 ${isLight ? 'text-blue-600' : 'text-blue-400'}`} />
+                <div className="p-2 rounded-full bg-primary/10">
+                  <ClockIcon className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium">Date & Time</h4>
-                  <div className="mt-1 text-sm">
+                  <h4 className="text-sm font-medium text-foreground">Date & Time</h4>
+                  <div className="mt-1 text-sm text-foreground">
                     {(() => {
                       const start = selectedEvent.start?.dateTime
                         ? new Date(selectedEvent.start.dateTime)
@@ -286,8 +268,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
                         const endTime = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                         return (
                           <>
-                            <div>{startDate}</div>
-                            <div className={`${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                            <div className="text-foreground">{startDate}</div>
+                            <div className="text-muted-foreground">
                               {startTime} - {endTime}
                             </div>
                           </>
@@ -319,12 +301,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
 
                         return (
                           <>
-                            <div>
+                            <div className="text-foreground">
                               {startDate === formattedAdjustedEndDate
                                 ? startDate
                                 : `${startDate} - ${formattedAdjustedEndDate}`}
                             </div>
-                            <div className={`${isLight ? 'text-gray-600' : 'text-gray-400'}`}>All day</div>
+                            <div className="text-muted-foreground">All day</div>
                           </>
                         );
                       }
@@ -336,12 +318,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
               {/* Location */}
               {selectedEvent.location && (
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-full ${isLight ? 'bg-blue-100' : 'bg-blue-900/30'}`}>
-                    <MapPinIcon className={`h-4 w-4 ${isLight ? 'text-blue-600' : 'text-blue-400'}`} />
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <MapPinIcon className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium">Location</h4>
-                    <p className="mt-1 text-sm break-words">{selectedEvent.location}</p>
+                    <h4 className="text-sm font-medium text-foreground">Location</h4>
+                    <p className="mt-1 text-sm break-words text-foreground">{selectedEvent.location}</p>
                   </div>
                 </div>
               )}
@@ -349,23 +331,25 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
               {/* Attendees */}
               {selectedEvent.attendees && selectedEvent.attendees.length > 0 && (
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-full ${isLight ? 'bg-blue-100' : 'bg-blue-900/30'}`}>
-                    <UsersIcon className={`h-4 w-4 ${isLight ? 'text-blue-600' : 'text-blue-400'}`} />
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <UsersIcon className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium">Attendees ({selectedEvent.attendees.length})</h4>
+                    <h4 className="text-sm font-medium text-foreground">
+                      Attendees ({selectedEvent.attendees.length})
+                    </h4>
                     <ul className="mt-1 text-sm space-y-1 max-h-32 overflow-y-auto">
                       {selectedEvent.attendees.map((attendee, index) => (
-                        <li key={index} className={`${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                        <li key={index} className="text-muted-foreground">
                           {attendee.displayName || attendee.email}
                           {attendee.responseStatus === 'accepted' && (
-                            <span className="ml-1 text-emerald-600 text-xs">(Accepted)</span>
+                            <span className="ml-1 text-success text-xs">(Accepted)</span>
                           )}
                           {attendee.responseStatus === 'tentative' && (
-                            <span className="ml-1 text-amber-600 text-xs">(Tentative)</span>
+                            <span className="ml-1 text-warning text-xs">(Tentative)</span>
                           )}
                           {attendee.responseStatus === 'declined' && (
-                            <span className="ml-1 text-rose-600 text-xs">(Declined)</span>
+                            <span className="ml-1 text-destructive text-xs">(Declined)</span>
                           )}
                         </li>
                       ))}
@@ -377,15 +361,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ isLight }) => {
               {/* Description */}
               {selectedEvent.description && (
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-full ${isLight ? 'bg-blue-100' : 'bg-blue-900/30'}`}>
-                    <CalendarIcon className={`h-4 w-4 ${isLight ? 'text-blue-600' : 'text-blue-400'}`} />
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <CalendarIcon className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium">Description</h4>
+                    <h4 className="text-sm font-medium text-foreground">Description</h4>
                     <div className="mt-1 max-h-60 overflow-y-auto">
                       {/* Format and render description with enhanced formatting */}
                       <div
-                        className={`event-description text-sm leading-relaxed ${isLight ? 'text-gray-700' : 'text-gray-300'}`}
+                        className="event-description text-sm leading-relaxed text-foreground"
                         dangerouslySetInnerHTML={{
                           __html: formatEventDescription(selectedEvent.description),
                         }}

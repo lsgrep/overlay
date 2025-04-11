@@ -28,7 +28,6 @@ import {
 import type { UserPreferences } from '@extension/storage/lib/impl/userPreferencesStorage';
 
 interface TaskManagerProps {
-  isLight: boolean;
   userPreferences: UserPreferences | null;
 }
 
@@ -39,7 +38,7 @@ interface InlineEditState {
   dueDate: Date | undefined;
 }
 
-export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferences }) => {
+export const TaskManager: React.FC<TaskManagerProps> = ({ userPreferences }) => {
   const [taskLists, setTaskLists] = useState<TaskList[]>([]);
   const [selectedListId, setSelectedListId] = useState<string>('');
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -359,18 +358,17 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
     <div className="w-full max-w-7xl mx-auto relative z-10">
       {/* Header and Global Loading Indicator */}
       <div className="flex items-center mb-6">
-        <h2 className="text-xl font-semibold">Your Tasks</h2>
+        <h2 className="text-xl font-semibold text-foreground">Your Tasks</h2>
         {showGlobalSpinner && (
           <div className="ml-3 flex items-center h-6 transition-all duration-300">
-            <LoadingDots color="bg-blue-500" className="mt-0" />
+            <LoadingDots color="bg-primary" className="mt-0" />
           </div>
         )}
       </div>
 
       {/* Error Display */}
       {error && (
-        <div
-          className={`mb-4 p-3 rounded-lg border ${isLight ? 'bg-red-50 border-red-200 text-red-700' : 'bg-red-900/10 border-red-800/30 text-red-400'}`}>
+        <div className="mb-4 p-3 rounded-lg border border-destructive/20 bg-destructive/5 text-destructive">
           {error}{' '}
           <Button variant="ghost" size="sm" onClick={() => setError(null)} className="ml-2">
             Dismiss
@@ -382,7 +380,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+        className="space-y-8 p-8 rounded-lg border border-border bg-card">
         {/* Task Lists Tabs */}
         {!taskListsLoading && taskLists.length > 0 && (
           <div className="mb-6">
@@ -395,7 +393,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                   className={`whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 rounded-none border-b-2 text-sm md:text-base ${
                     /* Adjusted padding/text size */
                     selectedListId === list.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400 font-semibold'
+                      ? 'border-primary text-primary font-semibold'
                       : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground'
                   }`}>
                   {list.title}
@@ -407,12 +405,12 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
         {/* Loading/No Lists Message */}
         {taskListsLoading && (
           <div className="text-center py-8">
-            <p className={`text-sm mb-2 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>Loading task lists</p>
-            <LoadingDots />
+            <p className="text-sm mb-2 text-muted-foreground">Loading task lists</p>
+            <LoadingDots color="bg-primary" />
           </div>
         )}
         {!taskListsLoading && taskLists.length === 0 && !error && (
-          <p className={`text-sm text-center py-8 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+          <p className="text-sm text-center py-8 text-muted-foreground">
             No task lists found. Create one in Google Tasks.
           </p>
         )}
@@ -443,7 +441,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                 disabled={!newTaskTitle.trim() || isUpdating}
                 variant="default"
                 size="icon"
-                className="rounded-l-none rounded-r-md bg-blue-500 hover:bg-blue-600 h-auto px-3 md:px-4" /* Adjusted padding */
+                className="rounded-l-none rounded-r-md bg-primary hover:bg-primary/90 h-auto px-3 md:px-4" /* Adjusted padding */
                 aria-label="Add task">
                 <PlusIcon className="w-5 h-5" />
               </Button>
@@ -452,11 +450,11 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
             {/* Tasks List Area */}
             {tasksLoading ? (
               <div className="text-center py-8">
-                <p className={`font-medium mb-2 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>Loading tasks</p>
-                <LoadingDots />
+                <p className="font-medium mb-2 text-muted-foreground">Loading tasks</p>
+                <LoadingDots color="bg-primary" />
               </div>
             ) : tasks.length === 0 ? (
-              <p className={`text-center py-8 font-medium ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+              <p className="text-center py-8 font-medium text-muted-foreground">
                 No tasks in this list. Add one above!
               </p>
             ) : (
@@ -472,13 +470,7 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                     <li
                       key={task.id}
                       className={`rounded-lg transition-all duration-200 border ${
-                        isBeingEdited
-                          ? isLight
-                            ? 'bg-white border-black/10'
-                            : 'bg-black border-white/10'
-                          : isLight
-                            ? 'bg-white hover:bg-gray-50 border-gray-200'
-                            : 'bg-gray-900/40 hover:bg-gray-900/50 border-gray-800/30'
+                        isBeingEdited ? 'bg-card border-border' : 'bg-card hover:bg-accent/30 border-border'
                       } ${isCompleted && !isBeingEdited ? 'opacity-60' : ''} ${isTaskUpdating && !isBeingEdited ? 'opacity-70 bg-muted/30' : ''}`}>
                       {/* === IN-PLACE EDITING UI === */}
                       {isBeingEdited ? (
@@ -560,12 +552,12 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             <Button
                               variant="default"
                               size="sm"
-                              className="bg-blue-500 hover:bg-blue-600 text-white"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground"
                               onClick={handleSaveInlineChanges}
                               disabled={isTaskUpdating || !inlineEditValues.title.trim()} // Disable if updating or title empty
                               aria-label="Save changes">
                               {isTaskUpdating ? (
-                                <LoadingDots size={4} color="bg-white/80" className="mt-0 mx-auto" />
+                                <LoadingDots size={4} color="bg-primary-foreground/80" className="mt-0 mx-auto" />
                               ) : (
                                 <>
                                   <CheckIcon className="h-4 w-4 mr-1" /> Save
@@ -601,13 +593,13 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                             <label
                               id={`task-label-${task.id}`} // ID for aria-labelledby
                               htmlFor={`task-${task.id}`} // Associates label with checkbox
-                              className={`text-md font-medium cursor-pointer ${isCompleted ? (isLight ? 'text-gray-500 line-through' : 'text-gray-500 line-through') : isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+                              className={`text-md font-medium cursor-pointer ${isCompleted ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                               {task.title}
                             </label>
 
                             {task.notes && (
                               <p
-                                className={`mt-1 text-sm whitespace-pre-wrap ${isCompleted ? (isLight ? 'text-gray-400' : 'text-gray-500') : isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                                className={`mt-1 text-sm whitespace-pre-wrap ${isCompleted ? 'text-muted-foreground/70' : 'text-muted-foreground'}`}>
                                 {task.notes}
                               </p>
                             )}
@@ -616,17 +608,13 @@ export const TaskManager: React.FC<TaskManagerProps> = ({ isLight, userPreferenc
                               <div
                                 className={`flex items-center mt-1 text-xs ${
                                   !isCompleted && new Date(task.due) < new Date(new Date().setHours(0, 0, 0, 0)) // Overdue check
-                                    ? 'text-red-500 font-medium'
+                                    ? 'text-destructive font-medium'
                                     : isCompleted
-                                      ? isLight
-                                        ? 'text-gray-400'
-                                        : 'text-gray-500'
-                                      : isLight
-                                        ? 'text-blue-600'
-                                        : 'text-blue-400'
+                                      ? 'text-muted-foreground/70'
+                                      : 'text-primary'
                                 }`}>
                                 <CalendarIcon
-                                  className={`w-3.5 h-3.5 mr-1 ${isCompleted ? 'text-gray-400 dark:text-gray-600' : 'text-blue-500'}`}
+                                  className={`w-3.5 h-3.5 mr-1 ${isCompleted ? 'text-muted-foreground/70' : 'text-primary'}`}
                                 />
                                 <span>
                                   {formatTaskDueDate(task.due)}

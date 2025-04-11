@@ -85,19 +85,19 @@ const AI_TOOLS: AITool[] = [
   },
 ];
 
-interface AIToolsProps {
-  isLight: boolean;
-}
+interface AIToolsProps {}
 
-export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
+export const AITools: React.FC<AIToolsProps> = () => {
   const categories = Array.from(new Set(AI_TOOLS.map(tool => tool.category)));
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 relative z-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {categories.map(category => (
-          <div key={category} className={`space-y-4 relative ${isLight ? 'text-gray-800' : 'text-white'}`}>
-            <h3 className="text-black font-medium mb-4">{category === 'General' ? 'Featured' : `${category} Tools`}</h3>
+          <div key={category} className="space-y-4 relative text-foreground">
+            <h3 className="font-medium mb-4 text-foreground">
+              {category === 'General' ? 'Featured' : `${category} Tools`}
+            </h3>
             <div className="space-y-3">
               {AI_TOOLS.filter(tool => tool.category === category).map(tool => (
                 <a
@@ -105,16 +105,16 @@ export const AITools: React.FC<AIToolsProps> = ({ isLight }) => {
                   href={tool.url}
                   // target="_blank"
                   rel="noopener noreferrer"
-                  className={`block p-4 rounded-lg transition-all duration-300 cursor-pointer relative z-20 bg-gradient-to-br ${tool.bgColor} ${isLight ? 'bg-white/50 hover:bg-white/80 shadow-sm hover:shadow-md' : 'bg-gray-800/50 hover:bg-gray-800/80 shadow-sm hover:shadow-md'} hover:scale-105`}>
+                  className={`block p-4 rounded-lg transition-all duration-300 cursor-pointer relative z-20 bg-gradient-to-br ${tool.bgColor} bg-card/50 hover:bg-card/80 shadow-sm hover:shadow-md hover:scale-105`}>
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm transition-transform duration-200 group-hover:scale-110">
                       {tool.icon}
                     </div>
                     <div>
-                      <h4 className="text-black font-medium transition-colors duration-200 hover:text-indigo-500">
+                      <h4 className="text-foreground font-medium transition-colors duration-200 hover:text-primary">
                         {tool.name}
                       </h4>
-                      <p className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-300'}`}>{tool.description}</p>
+                      <p className="text-sm text-muted-foreground">{tool.description}</p>
                     </div>
                   </div>
                 </a>

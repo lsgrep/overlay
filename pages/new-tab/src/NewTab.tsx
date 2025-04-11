@@ -162,12 +162,12 @@ const NewTab = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
           {/* Task Manager - Takes 2/3 of the width on large screens and above */}
           <div className="lg:col-span-2">
-            <TaskManager isLight={isLight} userPreferences={userPreferences} />
+            <TaskManager userPreferences={userPreferences} />
           </div>
 
           {/* Calendar View - Takes 1/3 of the width on large screens and above */}
           <div className="lg:col-span-1">
-            <CalendarView isLight={isLight} />
+            <CalendarView />
           </div>
 
           {/* Quote section - Full width below the columns */}
