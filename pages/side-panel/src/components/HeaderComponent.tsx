@@ -22,8 +22,8 @@ import {
   getCurrentUserFromStorage,
 } from '@extension/shared/lib/services/supabase';
 
-// Using Record<never, never> instead of empty interface
-type HeaderComponentProps = Record<never, never>;
+// Using Record<string, unknown> to allow for future props
+type HeaderComponentProps = Record<string, unknown>;
 
 export const HeaderComponent: FC<HeaderComponentProps> = () => {
   const supabase = createClient();

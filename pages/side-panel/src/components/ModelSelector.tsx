@@ -54,7 +54,7 @@ export const ModelSelector = ({
             id="model-selector"
             variant="outline"
             role="combobox"
-            className={`w-full justify-between ${isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}`}>
+            className="w-full justify-between bg-background border-border text-foreground">
             <div className="flex items-center gap-2">
               {selectedModel ? (
                 <>
@@ -89,13 +89,9 @@ export const ModelSelector = ({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className={`w-[400px] p-0 ${isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}`}>
-          <Command className={isLight ? 'bg-white' : 'bg-gray-900'}>
-            <CommandInput
-              placeholder={t('sidepanel_search_models')}
-              className={isLight ? 'border-gray-200' : 'border-gray-700 text-white'}
-            />
+        <PopoverContent className="w-[400px] p-0 bg-popover border-border text-popover-foreground">
+          <Command className="bg-popover">
+            <CommandInput placeholder={t('sidepanel_search_models')} className="border-input text-foreground" />
             <CommandEmpty>{t('sidepanel_no_model_found')}</CommandEmpty>
             <CommandList className="max-h-[300px]">
               {isLoadingModels ? (
@@ -106,12 +102,12 @@ export const ModelSelector = ({
                 <>
                   {/* OpenAI Models */}
                   {openaiModels.length > 0 && (
-                    <CommandGroup heading="OpenAI Models" className={!isLight ? 'text-gray-300' : ''}>
+                    <CommandGroup heading="OpenAI Models" className="text-foreground/70">
                       {openaiModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
-                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                          className="text-foreground hover:bg-accent"
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
@@ -130,12 +126,12 @@ export const ModelSelector = ({
 
                   {/* Gemini Models */}
                   {geminiModels.length > 0 && (
-                    <CommandGroup heading="Gemini Models" className={!isLight ? 'text-gray-300' : ''}>
+                    <CommandGroup heading="Gemini Models" className="text-foreground/70">
                       {geminiModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
-                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                          className="text-foreground hover:bg-accent"
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
@@ -154,12 +150,12 @@ export const ModelSelector = ({
 
                   {/* Anthropic Models */}
                   {anthropicModels.length > 0 && (
-                    <CommandGroup heading="Anthropic Models" className={!isLight ? 'text-gray-300' : ''}>
+                    <CommandGroup heading="Anthropic Models" className="text-foreground/70">
                       {anthropicModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
-                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                          className="text-foreground hover:bg-accent"
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);
@@ -178,12 +174,12 @@ export const ModelSelector = ({
 
                   {/* Ollama Models */}
                   {ollamaModels.length > 0 && (
-                    <CommandGroup heading="Ollama Models" className={!isLight ? 'text-gray-300' : ''}>
+                    <CommandGroup heading="Ollama Models" className="text-foreground/70">
                       {ollamaModels.map(model => (
                         <CommandItem
                           key={model.name}
                           value={model.name}
-                          className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                          className="text-foreground hover:bg-accent"
                           onSelect={() => {
                             setSelectedModel(model.name);
                             setOpen(false);

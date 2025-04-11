@@ -418,8 +418,7 @@ export const ChatInterface = forwardRef<
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}>
-      {/* @ts-expect-error - HeaderComponent props types will be fixed in a separate PR */}
-      <HeaderComponent fontFamily={fontFamily} fontSize={Number(fontSize)} />
+      <HeaderComponent />
 
       <MessageList
         messages={messages}

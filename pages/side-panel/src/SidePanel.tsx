@@ -377,6 +377,16 @@ const SidePanel = () => {
 
   // We're using Chrome's native notifications instead of a custom component
 
+  useEffect(() => {
+    // Apply theme class to the document element
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <header className="p-3 border-b border-border shadow-sm">
@@ -391,15 +401,11 @@ const SidePanel = () => {
               value={mode}
               onValueChange={(value: string) => value && setMode(value as 'conversational' | 'interactive')}
               className="flex-1">
-              <ToggleGroupItem
-                value="conversational"
-                className={`flex-1 rounded-md ${!isLight ? 'data-[state=on]:bg-gray-700 data-[state=on]:text-white' : ''}`}>
+              <ToggleGroupItem value="conversational" className="flex-1 rounded-md">
                 <MessageCircle className="mr-2 h-4 w-4" />
                 {t('sidepanel_conversational_mode')}
               </ToggleGroupItem>
-              <ToggleGroupItem
-                value="interactive"
-                className={`flex-1 rounded-md ${!isLight ? 'data-[state=on]:bg-gray-700 data-[state=on]:text-white' : ''}`}>
+              <ToggleGroupItem value="interactive" className="flex-1 rounded-md">
                 <Blocks className="mr-2 h-4 w-4" />
                 {t('sidepanel_interactive_mode')}
               </ToggleGroupItem>
