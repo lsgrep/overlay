@@ -84,13 +84,20 @@ export const GeneralTab = ({
               // Update the translation locale immediately
               t.devLocale = value as any;
             }}>
-            <SelectTrigger id="language">
+            <SelectTrigger
+              id="language"
+              className={isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}>
               <SelectValue placeholder={t('options_select_language')} />
             </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
+            <SelectContent className={isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}>
+              <SelectGroup className={!isLight ? 'text-gray-300' : ''}>
                 {availableLanguages.map(lang => (
-                  <SelectItem key={lang.code} value={lang.code}>
+                  <SelectItem
+                    key={lang.code}
+                    value={lang.code}
+                    className={
+                      !isLight ? 'text-white data-[highlighted]:bg-gray-800 data-[highlighted]:text-white' : ''
+                    }>
                     {lang.name}
                   </SelectItem>
                 ))}
@@ -250,6 +257,7 @@ export const GeneralTab = ({
               onCheckedChange={checked => {
                 proxyModeStorage.set(checked);
               }}
+              className={`${!isLight ? 'bg-gray-700 data-[state=checked]:bg-blue-500' : ''}`}
             />
           </div>
         </div>
