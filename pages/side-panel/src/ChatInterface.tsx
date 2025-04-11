@@ -11,6 +11,7 @@ import { HeaderComponent } from './components/HeaderComponent';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
+import { ModelSelector } from './components/ModelSelector';
 import type { PageContext } from './services/llm/prompts';
 import type { MessageImage } from './services/llm/types';
 
@@ -61,7 +62,6 @@ export const ChatInterface = forwardRef<
 >((props, ref) => {
   const {
     selectedModel,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     setSelectedModel,
     isLight,
     mode,
@@ -70,9 +70,8 @@ export const ChatInterface = forwardRef<
     geminiModels,
     ollamaModels,
     anthropicModels,
-    // Unused properties intentionally omitted:
-    // isLoadingModels,
-    // modelError
+    isLoadingModels,
+    modelError,
   } = props;
 
   const fontFamily = useStorage(fontFamilyStorage);
@@ -273,7 +272,7 @@ export const ChatInterface = forwardRef<
       setIsLoading(true);
       try {
         // Get tasks from API
-        const tasks: Task[] = await overlayApi.getTasks();
+        const tasks: Task[] = await overlayApi.getTasks(undefined);
 
         // Create a formatted tasks message using checkbox markdown syntax
         // This serves as fallback content for clients that don't support our enhanced UI
@@ -433,6 +432,19 @@ export const ChatInterface = forwardRef<
         fontFamily={fontFamily}
         fontSize={Number(fontSize)}
       />
+
+      <div className="px-3 py-2 border-t border-border">
+        <ModelSelector
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+          openaiModels={openaiModels}
+          geminiModels={geminiModels}
+          ollamaModels={ollamaModels}
+          anthropicModels={anthropicModels}
+          isLoadingModels={isLoadingModels}
+          modelError={modelError}
+        />
+      </div>
 
       <ChatInput
         input={input}

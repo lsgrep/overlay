@@ -46,7 +46,7 @@ export const ModelSelector = ({
       <Label htmlFor="model-selector" className="min-w-16">
         {t('sidepanel_model')}
       </Label>
-      <Popover open={open} onOpenChange={setOpen} className="flex-1">
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button id="model-selector" variant="outline" role="combobox" className="w-full justify-between">
             <div className="flex items-center gap-2">

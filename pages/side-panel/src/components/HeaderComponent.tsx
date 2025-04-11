@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@extension/ui';
-import { ChevronDown, LogOut } from 'lucide-react';
+import { ChevronDown, LogOut, Settings } from 'lucide-react';
 import { t } from '@extension/i18n';
 import icon from '../../../../chrome-extension/public/icon-128.png';
 import {
@@ -173,6 +173,14 @@ export const HeaderComponent: FC<HeaderComponentProps> = () => {
           <span>{t('sidepanel_sign_in')}</span>
         </Button>
       )}
+      <Button
+        size="icon"
+        variant="ghost"
+        className="h-8 w-8"
+        onClick={() => chrome.runtime.openOptionsPage()}
+        title="Settings">
+        <Settings className="h-4 w-4" />
+      </Button>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { overlayApi } from '@extension/shared/lib/services/api';
 import { saveNote, deleteNote } from '@extension/shared/lib/services/supabase';
 import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
-import { MessageCircle, Blocks } from 'lucide-react';
+import { MessageCircle, Blocks, Settings } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { t } from '@extension/i18n';
 
@@ -376,17 +376,6 @@ const SidePanel = () => {
     <div className="flex flex-col h-screen bg-background">
       <header className="p-4 border-b border-border">
         <div className="flex flex-col gap-4">
-          <ModelSelector
-            selectedModel={selectedModel}
-            setSelectedModel={setSelectedModel}
-            openaiModels={openaiModels}
-            geminiModels={geminiModels}
-            ollamaModels={ollamaModels}
-            anthropicModels={anthropicModels}
-            // @ts-expect-error - isLoading and error will be added to ModelSelectorProps in a future PR
-            isLoading={loading}
-            error={error}
-          />
           <div className="flex items-center gap-4">
             <Label htmlFor="mode-selector" className="min-w-16">
               {t('sidepanel_mode')}
