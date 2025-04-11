@@ -49,6 +49,16 @@ const SidePanel = () => {
     }
   }, [defaultLanguage]);
 
+  // Apply theme class to document element
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   // Function to show Chrome notifications
   const showNotification = (message: string, type: 'success' | 'error') => {
     // Create a unique ID for the notification

@@ -29,6 +29,16 @@ export const HeaderComponent: FC<HeaderComponentProps> = () => {
   const supabase = createClient();
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
+
+  // Apply theme class to document element
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
   const [user, setUser] = useState<{
     id: string;
     email?: string;

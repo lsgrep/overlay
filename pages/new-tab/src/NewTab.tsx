@@ -33,6 +33,16 @@ const NewTab = () => {
   const isLight = theme === 'light';
   const [randomQuote, setRandomQuote] = useState({ text: '', author: '', category: '' });
 
+  // Apply theme class to document element
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   // Initialize user preferences if null
   useEffect(() => {
     const initUserPreferences = async () => {
@@ -115,13 +125,9 @@ const NewTab = () => {
   }, []);
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 ${isLight ? 'bg-white text-black' : 'bg-black text-white'}`}>
+    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
       {/* Header with Overlay logo */}
-      <div
-        className={`w-full py-6 px-8 border-b sticky top-0 z-10 ${
-          isLight ? 'border-black/10 bg-white' : 'border-white/10 bg-black'
-        }`}>
+      <div className="w-full py-6 px-8 border-b border-border sticky top-0 z-10 bg-background">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <img src="/icon-128.png" alt="Overlay icon" className="h-8 w-8" />
@@ -130,9 +136,7 @@ const NewTab = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
-              className={`p-2 rounded-md transition-colors ${
-                isLight ? 'hover:bg-gray-100 text-gray-800' : 'hover:bg-gray-800 text-gray-200'
-              }`}
+              className="p-2 rounded-md transition-colors hover:bg-muted text-foreground"
               title={
                 isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')
               }>
@@ -150,9 +154,7 @@ const NewTab = () => {
 
       {/* Background pattern */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        <div
-          className={`absolute -inset-[10px] opacity-30 z-0 ${isLight ? 'bg-[radial-gradient(circle_at_center,_#4f46e520_1px,_transparent_1px)] [background-size:24px_24px]' : 'bg-[radial-gradient(circle_at_center,_#6366f120_1px,_transparent_1px)] [background-size:24px_24px]'}`}
-        />
+        <div className="absolute -inset-[10px] opacity-30 z-0 bg-[radial-gradient(circle_at_center,_hsl(var(--primary)/0.13)_1px,_transparent_1px)] [background-size:24px_24px]" />
       </div>
 
       {/* Main Content */}
@@ -170,19 +172,15 @@ const NewTab = () => {
 
           {/* Quote section - Full width below the columns */}
           <div className="col-span-1 lg:col-span-3 mt-8">
-            <div
-              className={`p-4 text-center relative rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+            <div className="p-4 text-center relative rounded-lg border border-border bg-card">
               <div className={`relative z-10`}>
                 <blockquote className="text-sm font-serif italic mb-2 leading-relaxed">
-                  <span className={`${isLight ? 'text-gray-700' : 'text-gray-300'}`}>"{randomQuote.text}"</span>
+                  <span className="text-foreground">"{randomQuote.text}"</span>
                 </blockquote>
                 <div className="flex justify-center items-center space-x-2">
-                  <p className={`text-xs italic ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-                    — {randomQuote.author}
-                  </p>
-                  <span className={`w-1 h-1 rounded-full ${isLight ? 'bg-gray-400' : 'bg-gray-500'}`} />
-                  <p
-                    className={`text-xs uppercase tracking-widest font-light ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
+                  <p className="text-xs italic text-muted-foreground">— {randomQuote.author}</p>
+                  <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
+                  <p className="text-xs uppercase tracking-widest font-light text-muted-foreground">
                     {randomQuote.category}
                   </p>
                 </div>

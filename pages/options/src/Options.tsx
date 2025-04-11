@@ -22,6 +22,16 @@ const Options = () => {
   const theme = useStorage(exampleThemeStorage);
   const isLight = theme === 'light';
 
+  // Apply theme class to document element
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   // API key states
   const geminiKey = useStorage(geminiKeyStorage);
   const anthropicKey = useStorage(anthropicKeyStorage);
@@ -92,15 +102,12 @@ const Options = () => {
   }, [fontSize]);
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 ${isLight ? 'bg-white text-black' : 'bg-black text-white'}`}>
+    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
       {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`w-full py-6 px-8 border-b sticky top-0 z-10 ${
-          isLight ? 'border-black/10 bg-white' : 'border-white/10 bg-black'
-        }`}>
+        className="w-full py-6 px-8 border-b border-border sticky top-0 z-10 bg-background">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <motion.img
@@ -114,9 +121,7 @@ const Options = () => {
           </div>
           <button
             onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
-            className={`p-2 rounded-full transition-colors ${
-              isLight ? 'bg-gray-100 hover:bg-gray-200 text-gray-800' : 'bg-gray-800 hover:bg-gray-700 text-gray-200'
-            }`}
+            className="p-2 rounded-full transition-colors bg-muted hover:bg-muted/80 text-muted-foreground"
             data-tooltip-id="theme-tooltip"
             data-tooltip-content={
               isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')
@@ -159,9 +164,7 @@ const Options = () => {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium flex items-center gap-3 ${
-                    activeTab === tab
-                      ? 'bg-blue-500 text-white'
-                      : `${isLight ? 'hover:bg-gray-100 text-gray-900' : 'hover:bg-gray-900 text-gray-100'}`
+                    activeTab === tab ? 'bg-primary text-primary-foreground' : 'hover:bg-accent text-foreground'
                   }`}>
                   {icon}
                   <span>{displayName}</span>
@@ -175,7 +178,7 @@ const Options = () => {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`space-y-8 p-8 rounded-lg border ${isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'}`}>
+              className="space-y-8 p-8 rounded-lg border border-border bg-card">
               {/* Tab Content */}
               {activeTab === 'General' && (
                 <GeneralTab

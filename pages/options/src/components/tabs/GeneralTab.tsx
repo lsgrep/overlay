@@ -84,20 +84,16 @@ export const GeneralTab = ({
               // Update the translation locale immediately
               t.devLocale = value as any;
             }}>
-            <SelectTrigger
-              id="language"
-              className={isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}>
+            <SelectTrigger id="language" className="bg-background border-border text-foreground">
               <SelectValue placeholder={t('options_select_language')} />
             </SelectTrigger>
-            <SelectContent className={isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'}>
-              <SelectGroup className={!isLight ? 'text-gray-300' : ''}>
+            <SelectContent className="bg-popover border-border text-popover-foreground">
+              <SelectGroup>
                 {availableLanguages.map(lang => (
                   <SelectItem
                     key={lang.code}
                     value={lang.code}
-                    className={
-                      !isLight ? 'text-white data-[highlighted]:bg-gray-800 data-[highlighted]:text-white' : ''
-                    }>
+                    className="text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground">
                     {lang.name}
                   </SelectItem>
                 ))}
@@ -113,9 +109,7 @@ export const GeneralTab = ({
               <Button
                 variant="outline"
                 role="combobox"
-                className={`w-full justify-between ${
-                  isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'
-                }`}>
+                className="w-full justify-between bg-background border-border text-foreground">
                 {defaultModel
                   ? [...openaiModels, ...googleModels, ...anthropicModels, ...ollamaModels].find(
                       model => model.name === defaultModel,
@@ -124,15 +118,9 @@ export const GeneralTab = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent
-              className={`w-[400px] p-0 ${
-                isLight ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-700 text-white'
-              }`}>
-              <Command className={isLight ? 'bg-white' : 'bg-gray-900'}>
-                <CommandInput
-                  placeholder={t('options_search_models')}
-                  className={isLight ? 'border-gray-200' : 'border-gray-700 text-white'}
-                />
+            <PopoverContent className="w-[400px] p-0 bg-popover border-border text-popover-foreground">
+              <Command className="bg-popover">
+                <CommandInput placeholder={t('options_search_models')} className="border-input text-foreground" />
                 <CommandEmpty>{t('options_no_model_found')}</CommandEmpty>
                 <CommandList className="max-h-[300px]">
                   {isLoadingModels ? (
@@ -143,12 +131,12 @@ export const GeneralTab = ({
                     <>
                       {/* OpenAI Models */}
                       {openaiModels.length > 0 && (
-                        <CommandGroup heading={t('options_openai_models')} className={!isLight ? 'text-gray-300' : ''}>
+                        <CommandGroup heading={t('options_openai_models')} className="text-foreground/70">
                           {openaiModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
-                              className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                              className="text-foreground hover:bg-accent"
                               onSelect={() => {
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
@@ -166,12 +154,12 @@ export const GeneralTab = ({
                       )}
                       {/* Google Models */}
                       {googleModels.length > 0 && (
-                        <CommandGroup heading={t('options_google_models')} className={!isLight ? 'text-gray-300' : ''}>
+                        <CommandGroup heading={t('options_google_models')} className="text-foreground/70">
                           {googleModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
-                              className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                              className="text-foreground hover:bg-accent"
                               onSelect={() => {
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
@@ -189,14 +177,12 @@ export const GeneralTab = ({
                       )}
                       {/* Anthropic Models */}
                       {anthropicModels.length > 0 && (
-                        <CommandGroup
-                          heading={t('options_anthropic_models')}
-                          className={!isLight ? 'text-gray-300' : ''}>
+                        <CommandGroup heading={t('options_anthropic_models')} className="text-foreground/70">
                           {anthropicModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
-                              className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                              className="text-foreground hover:bg-accent"
                               onSelect={() => {
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
@@ -214,12 +200,12 @@ export const GeneralTab = ({
                       )}
                       {/* Ollama Models */}
                       {ollamaModels.length > 0 && (
-                        <CommandGroup heading={t('options_ollama_models')} className={!isLight ? 'text-gray-300' : ''}>
+                        <CommandGroup heading={t('options_ollama_models')} className="text-foreground/70">
                           {ollamaModels.map(model => (
                             <CommandItem
                               key={model.name}
                               value={model.name}
-                              className={!isLight ? 'text-white hover:bg-gray-800' : ''}
+                              className="text-foreground hover:bg-accent"
                               onSelect={() => {
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
@@ -257,7 +243,7 @@ export const GeneralTab = ({
               onCheckedChange={checked => {
                 proxyModeStorage.set(checked);
               }}
-              className={`${!isLight ? 'bg-gray-700 data-[state=checked]:bg-blue-500' : ''}`}
+              className="bg-muted data-[state=checked]:bg-primary"
             />
           </div>
         </div>
