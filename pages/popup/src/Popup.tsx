@@ -7,6 +7,7 @@ import { t } from '@extension/i18n';
 import type { ComponentPropsWithoutRef } from 'react';
 import { createClient, getCurrentUserFromStorage, signOut } from '@extension/shared/lib/services/supabase';
 import { LoginPage } from './components/LoginPage';
+import { Settings } from 'lucide-react';
 
 const notificationOptions = {
   type: 'basic',
@@ -135,11 +136,19 @@ const Popup = () => {
       <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
         <div className="flex items-center justify-between w-full mb-4">
           <img src={chrome.runtime.getURL(logo)} className="h-8" alt="logo" />
-          <button
-            className="px-2 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-1"
-            onClick={handleSignOut}>
-            <span>Sign Out</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => chrome.runtime.openOptionsPage()}
+              className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
+              title="Settings">
+              <Settings className="h-4 w-4" />
+            </button>
+            <button
+              className="px-2 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-1"
+              onClick={handleSignOut}>
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
 
         <div className="text-center mb-4">

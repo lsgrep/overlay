@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
 import CalendarView from './components/CalendarView';
 import quotesData from './quotes.json';
-import { Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { Settings } from 'lucide-react';
 
 // Define interfaces for quotes data structure
 interface QuoteData {
@@ -130,9 +130,9 @@ const NewTab = () => {
           <div>
             <a
               href="/options/index.html"
-              className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-500 dark:hover:bg-blue-800 transition-colors"
-              title={t('options', 'Options')}>
-              <Cog6ToothIcon className="w-5 h-5 text-muted-foreground" />
+              className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
+              title="Settings">
+              <Settings className="h-4 w-4" />
             </a>
           </div>
         </div>
