@@ -1,0 +1,733 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Overlay"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "Overlay"
+  },
+  "toggleTheme": {
+    "message": "切换主题"
+  },
+  "loading": {
+    "message": "加载中..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "你好，我的名字是 $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "张伟"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "你好 $1"
+  },
+  "error": {
+    "message": "发生错误"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "通用设置"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "配置人工智能助手的默认选项"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "默认语言"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "选择语言"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "默认模型"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "选择模型..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "搜索模型..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "未找到模型。"
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "正在加载模型..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI 模型"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "谷歌模型"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic 模型"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama 模型"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "代理模式"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "启用代理模式以通过代理服务器路由 API 请求"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "谷歌设置"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "配置您的谷歌 API 密钥和 Gemini 模型偏好设置"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API 密钥"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "正在验证 API 密钥..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API 密钥有效（可用模型：$1）"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "可用模型"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI 设置"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "配置您的 OpenAI API 密钥和模型偏好设置"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic 设置"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "配置您的 Anthropic API 密钥以访问 Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "通用"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "谷歌"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "外观"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "个人资料"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "外观设置"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "自定义应用程序的视觉外观"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "字体家族"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "选择字体家族"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "编程字体"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "系统字体"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "系统默认"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "字体大小"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "选择字体大小"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "预览"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "敏捷的棕色狐狸跳过懒惰的狗。"
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "个人资料设置"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "配置您的个人信息以便在网页中使用"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "名字"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "输入您的名字"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "姓氏"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "输入您的姓氏"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "电子邮件"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "输入您的电子邮件地址"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "个人简介"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "写一段关于您自己的简短介绍"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "一段关于您自己的简短描述，可用于网站"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "简历"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "输入您的简历或专业经验"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "您的专业经验，可用于求职申请"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "保存个人资料"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "模式"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "模型"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "选择模型..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "搜索模型..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "未找到模型。"
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "正在加载模型..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "对话模式"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "交互模式"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "发送"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "思考中..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "错误"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "您"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "助手"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "输入您的消息...(按Enter键发送，按Shift + Enter插入新行)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "提取的数据 ($1 项)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "重试策略: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "最大重试次数: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "备选方案: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "执行所有步骤"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "执行中..."
+  },
+
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "登录 Overlay"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "登录以访问您的智能浏览助手"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "使用 Overlay 登录"
+  },
+  "popup_signing_in": {
+    "description": "Signing in progress text",
+    "message": "正在登录..."
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "需要身份验证才能访问 Overlay 的功能"
+  },
+
+  "calendar_title": {
+    "description": "Calendar section title",
+    "message": "日历"
+  },
+  "calendar_today": {
+    "description": "Label for today's events",
+    "message": "今天"
+  },
+  "calendar_tomorrow": {
+    "description": "Label for tomorrow's events",
+    "message": "明天"
+  },
+  "calendar_error_loading": {
+    "description": "Error message when calendar events fail to load",
+    "message": "日历事件加载失败。请重试。"
+  },
+  "calendar_loading": {
+    "description": "Loading message for calendar events",
+    "message": "正在加载日历事件..."
+  },
+  "calendar_no_events": {
+    "description": "Message when there are no upcoming events",
+    "message": "没有即将到来的事件"
+  },
+  "calendar_all_day": {
+    "description": "Label for all-day events",
+    "message": "全天"
+  },
+  "calendar_attendee": {
+    "description": "Singular label for one attendee",
+    "message": "参与者"
+  },
+  "calendar_attendees": {
+    "description": "Plural label for multiple attendees",
+    "message": "参与者"
+  },
+  "calendar_close": {
+    "description": "Close button text for dialogs",
+    "message": "关闭"
+  },
+  "calendar_date_time": {
+    "description": "Label for date and time section",
+    "message": "日期与时间"
+  },
+  "calendar_location": {
+    "description": "Label for event location",
+    "message": "地点"
+  },
+  "calendar_status_accepted": {
+    "description": "Label for accepted event status",
+    "message": "（已接受）"
+  },
+  "calendar_status_tentative": {
+    "description": "Label for tentative event status",
+    "message": "（暂定）"
+  },
+  "calendar_status_declined": {
+    "description": "Label for declined event status",
+    "message": "（已拒绝）"
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "操作: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "查询: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "选择器: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "值: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ 运行中..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ 完成"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ 失败"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "等待中"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "重试: $1/$2"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "登录 Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "用户"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "已登录为"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "点击登出"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "扩展程序"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "书签"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "新页面"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "欢迎使用 Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "您的人工智能浏览器助手已准备好为您提供帮助。请随时询问关于当前页面的问题或任何一般性问题。"
+  },
+
+  "task_title": {
+    "description": "Task section title",
+    "message": "您的任务"
+  },
+  "task_error_loading_tasks": {
+    "description": "Error message when tasks fail to load",
+    "message": "加载任务失败。请重试。"
+  },
+  "task_error_loading_lists": {
+    "description": "Error message when task lists fail to load",
+    "message": "加载任务列表失败。请重试。"
+  },
+  "task_error_creating": {
+    "description": "Error message when task creation fails",
+    "message": "创建任务失败。请重试。"
+  },
+  "task_error_updating_status": {
+    "description": "Error message when task status update fails",
+    "message": "更新任务状态失败。请重试。"
+  },
+  "task_error_deleting": {
+    "description": "Error message when task deletion fails",
+    "message": "删除任务失败。请重试。"
+  },
+  "task_error_saving_changes": {
+    "description": "Error message when task changes fail to save",
+    "message": "保存任务更改失败。请重试。"
+  },
+  "task_invalid_date": {
+    "description": "Fallback message for invalid date format",
+    "message": "无效日期"
+  },
+  "task_loading_lists": {
+    "description": "Loading message for task lists",
+    "message": "正在加载任务列表..."
+  },
+  "task_loading_tasks": {
+    "description": "Loading message for tasks",
+    "message": "正在加载任务..."
+  },
+  "task_processing_update": {
+    "description": "Message for single task update in progress",
+    "message": "正在处理更新..."
+  },
+  "task_processing_updates": {
+    "description": "Message for multiple task updates in progress",
+    "message": "正在处理多个更新..."
+  },
+  "task_dismiss": {
+    "description": "Dismiss button text for error messages",
+    "message": "关闭"
+  },
+  "task_no_lists_found": {
+    "description": "Message when no task lists are found",
+    "message": "未找到任务列表。请在Google Tasks中创建。"
+  },
+  "task_loading_lists_short": {
+    "description": "Short loading message for task lists",
+    "message": "加载任务列表"
+  },
+  "task_loading_tasks_short": {
+    "description": "Short loading message for tasks",
+    "message": "加载任务"
+  },
+  "task_no_tasks_found": {
+    "description": "Message when no tasks are found in a list",
+    "message": "此列表中没有任务。请在上方添加！"
+  },
+  "task_add_new_placeholder": {
+    "description": "Placeholder text for adding a new task",
+    "message": "添加新任务并按Enter键或Cmd+Enter..."
+  },
+  "task_due_date": {
+    "description": "Label for task due date",
+    "message": "截止日期"
+  },
+  "task_cancel": {
+    "description": "Cancel button text",
+    "message": "取消"
+  },
+  "task_save": {
+    "description": "Save button text",
+    "message": "保存"
+  },
+  "task_overdue": {
+    "description": "Label for overdue tasks",
+    "message": "(过期)"
+  },
+  "task_create": {
+    "description": "Create button text",
+    "message": "创建"
+  },
+  "task_new_list": {
+    "description": "Button text for creating a new list",
+    "message": "新列表"
+  },
+  "task_set_as_default": {
+    "description": "Button text for setting a list as default",
+    "message": "设为默认"
+  },
+  "task_delete_list": {
+    "description": "Button text for deleting a list",
+    "message": "删除列表"
+  },
+  "task_delete_list_confirmation": {
+    "description": "Title for delete list confirmation dialog",
+    "message": "删除任务列表"
+  },
+  "task_delete_list_description": {
+    "description": "Description text for delete list confirmation dialog",
+    "message": "您确定要删除这个任务列表吗？这将删除此列表中的所有任务，并且无法撤消。"
+  },
+  "task_delete": {
+    "description": "Delete button text",
+    "message": "删除"
+  },
+  "task_error_creating_list": {
+    "description": "Error message when creating a task list fails",
+    "message": "创建任务列表时出错"
+  },
+  "task_default_list_set_success": {
+    "description": "Success message when setting a default list",
+    "message": "默认列表设置成功"
+  },
+  "task_default_list_set_error": {
+    "description": "Error message when setting a default list fails",
+    "message": "设置默认列表时出错"
+  },
+  "task_create_first_list": {
+    "description": "Button text for creating the first task list",
+    "message": "创建您的第一个任务列表"
+  },
+  "task_create_new_list": {
+    "description": "Title for create new list dialog",
+    "message": "创建新列表"
+  },
+  "task_create_new_list_description": {
+    "description": "Description text for create new list dialog",
+    "message": "输入您新任务列表的名称。"
+  },
+  "task_list_name": {
+    "description": "Label for the list name input field",
+    "message": "列表名称"
+  },
+  "task_list_name_placeholder": {
+    "description": "Placeholder text for the list name input field",
+    "message": "我的任务"
+  },
+
+  "ollama_description": {
+    "description": "Description of Ollama functionality",
+    "message": "Ollama可让您在本地计算机上运行开源大型语言模型。配置Ollama以与Overlay一起使用。"
+  },
+  "ollama_installation_title": {
+    "description": "Title for Ollama installation section",
+    "message": "安装Ollama"
+  },
+  "ollama_installation_description": {
+    "description": "Description for Ollama installation section",
+    "message": "首先，在您的计算机上安装Ollama"
+  },
+  "ollama_installation_instructions": {
+    "description": "Instructions for installing Ollama",
+    "message": "访问Ollama官方网站并按照您的操作系统的安装说明进行操作："
+  },
+  "ollama_pulling_models_title": {
+    "description": "Title for Ollama model pulling section",
+    "message": "下载模型"
+  },
+  "ollama_pulling_models_description": {
+    "description": "Description for Ollama model pulling section",
+    "message": "下载您想要使用的模型"
+  },
+  "ollama_pulling_models_instructions": {
+    "description": "Instructions for pulling Ollama models",
+    "message": "使用以下命令下载模型。例如，要下载Llama 3，请输入："
+  },
+  "ollama_other_models": {
+    "description": "Information about other available Ollama models",
+    "message": "其他热门模型包括：mistral, gemma, mixtral, phi, orca-mini等等。"
+  },
+  "ollama_view_model_library": {
+    "description": "Label for link to view Ollama model library",
+    "message": "查看完整模型库"
+  },
+  "ollama_serve_title": {
+    "description": "Title for Ollama serving section",
+    "message": "使用Chrome扩展支持运行Ollama"
+  },
+  "ollama_serve_description": {
+    "description": "Description for Ollama serving section",
+    "message": "关键步骤：使用特殊标志运行Ollama以允许扩展连接"
+  },
+  "ollama_important_note": {
+    "description": "Important note about Ollama configuration",
+    "message": "重要：您必须使用OLLAMA_ORIGINS环境变量运行Ollama才能支持Chrome扩展！"
+  },
+  "ollama_serve_instructions": {
+    "description": "Instructions for serving Ollama",
+    "message": "使用此命令启动支持扩展的Ollama："
+  },
+  "ollama_serve_info": {
+    "description": "Information about the Ollama serve command",
+    "message": "此命令允许扩展连接到您的本地Ollama服务器。使用Ollama与Overlay时请保持此终端窗口打开。"
+  },
+  "ollama_further_help": {
+    "description": "Text for getting further help with Ollama",
+    "message": "获取更多帮助，请访问Ollama文档："
+  },
+  "ollama_available_models": {
+    "description": "Title for available Ollama models section",
+    "message": "可用模型"
+  },
+  "ollama_models_description": {
+    "description": "Description for Ollama models section",
+    "message": "从您的Ollama服务器检测到的模型"
+  },
+  "loading_models": {
+    "description": "Message shown while loading models",
+    "message": "正在加载模型..."
+  },
+  "no_ollama_models": {
+    "description": "Message shown when no Ollama models are detected",
+    "message": "未检测到Ollama模型。请确保Ollama正在使用正确的标志运行。"
+  }
+}

@@ -1,0 +1,665 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "오버레이"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "오버레이"
+  },
+  "toggleTheme": {
+    "message": "테마 전환"
+  },
+  "loading": {
+    "message": "로딩 중..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "안녕하세요, 제 이름은 $NAME$입니다",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "김철수"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "안녕하세요 $1"
+  },
+  "error": {
+    "message": "오류가 발생했습니다"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "일반 설정"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "AI 어시스턴트에 대한 기본 환경설정을 구성합니다"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "기본 언어"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "언어 선택"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "기본 모델"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "모델 선택..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "모델 검색..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "모델을 찾을 수 없습니다."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "모델 로딩 중..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI 모델"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "구글 모델"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic 모델"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama 모델"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "프록시 모드"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "프록시 서버를 통해 API 요청을 라우팅하는 프록시 모드 활성화"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "구글 설정"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "구글 API 키와 Gemini 모델 설정을 구성합니다"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API 키"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "API 키 검증 중..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "유효한 API 키 ($1 모델 사용 가능)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "사용 가능한 모델"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI 설정"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "OpenAI API 키와 모델 설정을 구성합니다"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic 설정"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Claude에 액세스하기 위한 Anthropic API 키를 구성합니다"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "일반"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "구글"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "외관"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "프로필"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "외관 설정"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "애플리케이션의 시각적 외관을 사용자 정의합니다"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "글꼴 패밀리"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "글꼴 패밀리 선택"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "프로그래밍 글꼴"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "시스템 글꼴"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "시스템 기본값"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "글꼴 크기"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "글꼴 크기 선택"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "미리보기"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "날카로운 갈색 여우가 게으른 개를 뛰어넘습니다."
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "프로필 설정"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "웹 페이지에서 사용할 개인 정보를 구성하세요"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "이름"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "이름을 입력하세요"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "성"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "성을 입력하세요"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "이메일"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "이메일 주소를 입력하세요"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "자기소개"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "자신에 대한 간단한 소개를 작성하세요"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "웹사이트에서 사용할 수 있는 자신에 대한 간단한 설명"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "이력서"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "이력서 또는 직업 경험을 입력하세요"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "구직 신청에 사용할 수 있는 직업 경험"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "프로필 저장"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "모드"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "모델"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "모델 선택..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "모델 검색..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "모델을 찾을 수 없습니다."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "모델 로딩 중..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "대화형"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "상호작용형"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "보내기"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "생각 중..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "오류"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "당신"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "어시스턴트"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "메시지를 입력하세요... (Enter를 누르면 전송, Shift + Enter를 누르면 줄바꿈)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "추출된 데이터 ($1 항목)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "재시도 전략: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "최대 재시도 횟수: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "대체 방안: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "모든 단계 실행"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "실행 중..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "동작: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "쿼리: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "셀렉터: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "값: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "실행 중..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "완료"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "실패"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "대기 중"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "재시도: $1/$2"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "사용자"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "로그인 계정"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "로그아웃하려면 클릭하세요"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Overlay에 로그인"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "확장 프로그램"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "북마크"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "새 페이지"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Overlay에 오신 것을 환영합니다"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "AI 기반 브라우저 어시스턴트가 도와드릴 준비가 되었습니다. 현재 페이지에 관한 질문이나 일반적인 질문을 자유롭게 해보세요."
+  },
+
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "Overlay에 로그인"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "지능형 브라우징 어시스턴트에 액세스하려면 로그인하세요"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "Overlay로 로그인"
+  },
+  "popup_signing_in": {
+    "description": "Signing in progress text",
+    "message": "로그인 중..."
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "Overlay 기능에 액세스하려면 인증이 필요합니다"
+  },
+
+  "calendar_title": {
+    "description": "Calendar section title",
+    "message": "일정"
+  },
+  "calendar_today": {
+    "description": "Label for today's events",
+    "message": "오늘"
+  },
+  "calendar_tomorrow": {
+    "description": "Label for tomorrow's events",
+    "message": "내일"
+  },
+  "calendar_error_loading": {
+    "description": "Error message when calendar events fail to load",
+    "message": "일정을 불러오지 못했습니다. 다시 시도해 주세요."
+  },
+  "calendar_loading": {
+    "description": "Loading message for calendar events",
+    "message": "일정을 불러오는 중..."
+  },
+  "calendar_no_events": {
+    "description": "Message when there are no upcoming events",
+    "message": "예정된 일정이 없습니다"
+  },
+  "calendar_all_day": {
+    "description": "Label for all-day events",
+    "message": "하루 종일"
+  },
+  "calendar_attendee": {
+    "description": "Singular label for one attendee",
+    "message": "참석자"
+  },
+  "calendar_attendees": {
+    "description": "Plural label for multiple attendees",
+    "message": "참석자"
+  },
+  "calendar_close": {
+    "description": "Close button text for dialogs",
+    "message": "닫기"
+  },
+  "calendar_date_time": {
+    "description": "Label for date and time section",
+    "message": "날짜 및 시간"
+  },
+  "calendar_location": {
+    "description": "Label for event location",
+    "message": "위치"
+  },
+  "calendar_status_accepted": {
+    "description": "Label for accepted event status",
+    "message": "(승락됨)"
+  },
+  "calendar_status_tentative": {
+    "description": "Label for tentative event status",
+    "message": "(임시)"
+  },
+  "calendar_status_declined": {
+    "description": "Label for declined event status",
+    "message": "(거절됨)"
+  },
+
+  "ollama_description": {
+    "description": "Description of Ollama functionality",
+    "message": "Ollama를 사용하면 오픈소스 대규모 언어 모델을 가지고 개인 기기에서 로컬로 실행할 수 있습니다. Overlay와 함께 사용하기 위한 Ollama를 구성하세요."
+  },
+  "ollama_installation_title": {
+    "description": "Title for Ollama installation section",
+    "message": "Ollama 설치하기"
+  },
+  "ollama_installation_description": {
+    "description": "Description for Ollama installation section",
+    "message": "먼저 컴퓨터에 Ollama를 설치하세요"
+  },
+  "ollama_installation_instructions": {
+    "description": "Instructions for installing Ollama",
+    "message": "Ollama 공식 웹사이트를 방문하여 사용중인 운영체제에 맞는 설치 지침을 따르세요:"
+  },
+  "ollama_pulling_models_title": {
+    "description": "Title for Ollama model pulling section",
+    "message": "모델 다운로드"
+  },
+  "ollama_pulling_models_description": {
+    "description": "Description for Ollama model pulling section",
+    "message": "사용하고 싶은 모델을 다운로드하세요"
+  },
+  "ollama_pulling_models_instructions": {
+    "description": "Instructions for pulling Ollama models",
+    "message": "다음 명령어를 사용하여 모델을 다운로드하세요. 예를 들어 Llama 3를 다운로드하려면:"
+  },
+  "ollama_other_models": {
+    "description": "Information about other available Ollama models",
+    "message": "다른 인기있는 모델에는 mistral, gemma, mixtral, phi, orca-mini 등이 있습니다."
+  },
+  "ollama_view_model_library": {
+    "description": "Label for link to view Ollama model library",
+    "message": "전체 모델 라이브러리 보기"
+  },
+  "ollama_serve_title": {
+    "description": "Title for Ollama serving section",
+    "message": "Chrome 확장 프로그램 지원으로 Ollama 실행하기"
+  },
+  "ollama_serve_description": {
+    "description": "Description for Ollama serving section",
+    "message": "중요 단계: 확장 프로그램이 연결할 수 있도록 특별한 플래그로 Ollama를 실행하세요"
+  },
+  "ollama_important_note": {
+    "description": "Important note about Ollama configuration",
+    "message": "중요: Chrome 확장 프로그램 지원을 위해 OLLAMA_ORIGINS 환경 변수를 사용하여 Ollama를 실행해야 합니다!"
+  },
+  "ollama_serve_instructions": {
+    "description": "Instructions for serving Ollama",
+    "message": "확장 프로그램 지원으로 Ollama를 시작하려면 이 명령어를 사용하세요:"
+  },
+  "ollama_serve_info": {
+    "description": "Information about the Ollama serve command",
+    "message": "이 명령어는 확장 프로그램이 로컬 Ollama 서버에 연결할 수 있도록 합니다. Ollama를 Overlay와 함께 사용하는 동안 이 터미널 창을 열어두세요."
+  },
+  "ollama_further_help": {
+    "description": "Text for getting further help with Ollama",
+    "message": "더 많은 도움말은 다음 위치의 Ollama 문서를 참조하세요"
+  },
+  "ollama_available_models": {
+    "description": "Title for available Ollama models section",
+    "message": "사용 가능한 모델"
+  },
+  "ollama_models_description": {
+    "description": "Description for Ollama models section",
+    "message": "Ollama 서버에서 감지된 모델"
+  },
+  "loading_models": {
+    "description": "Message shown while loading models",
+    "message": "모델 로딩 중..."
+  },
+  "no_ollama_models": {
+    "description": "Message shown when no Ollama models are detected",
+    "message": "Ollama 모델이 감지되지 않았습니다. Ollama가 올바른 플래그로 실행 중인지 확인하세요."
+  },
+
+  "task_title": {
+    "description": "Title for task section",
+    "message": "작업"
+  },
+  "task_dismiss": {
+    "description": "Dismiss button text",
+    "message": "닫기"
+  },
+  "task_cancel": {
+    "description": "Cancel button text",
+    "message": "취소"
+  },
+  "task_save": {
+    "description": "Save button text",
+    "message": "저장"
+  },
+  "task_create": {
+    "description": "Create button text",
+    "message": "생성"
+  },
+  "task_new_list": {
+    "description": "Button text for creating a new list",
+    "message": "새 목록"
+  },
+  "task_set_as_default": {
+    "description": "Button text for setting a list as default",
+    "message": "기본으로 설정"
+  },
+  "task_delete_list": {
+    "description": "Button text for deleting a list",
+    "message": "목록 삭제"
+  },
+  "task_delete_list_confirmation": {
+    "description": "Title for delete list confirmation dialog",
+    "message": "작업 목록 삭제"
+  },
+  "task_delete_list_description": {
+    "description": "Description text for delete list confirmation dialog",
+    "message": "이 작업 목록을 삭제하시겠습니까? 이 목록의 모든 작업이 삭제되며 이 작업은 취소할 수 없습니다."
+  },
+  "task_delete": {
+    "description": "Delete button text",
+    "message": "삭제"
+  },
+  "task_error_creating_list": {
+    "description": "Error message when creating a task list fails",
+    "message": "작업 목록 생성 오류"
+  },
+  "task_default_list_set_success": {
+    "description": "Success message when setting a default list",
+    "message": "기본 목록이 성공적으로 설정되었습니다"
+  },
+  "task_default_list_set_error": {
+    "description": "Error message when setting a default list fails",
+    "message": "기본 목록 설정 오류"
+  },
+  "task_create_first_list": {
+    "description": "Button text for creating the first task list",
+    "message": "첫 번째 작업 목록 생성"
+  },
+  "task_overdue": {
+    "description": "Label for overdue tasks",
+    "message": "(기한 지남)"
+  },
+  "task_create_new_list": {
+    "description": "Title for create new list dialog",
+    "message": "새 목록 생성"
+  },
+  "task_create_new_list_description": {
+    "description": "Description text for create new list dialog",
+    "message": "새 작업 목록의 이름을 입력하세요."
+  },
+  "task_list_name": {
+    "description": "Label for the list name input field",
+    "message": "목록 이름"
+  },
+  "task_list_name_placeholder": {
+    "description": "Placeholder text for the list name input field",
+    "message": "내 작업"
+  }
+}

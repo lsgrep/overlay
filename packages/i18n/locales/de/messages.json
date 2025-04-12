@@ -1,0 +1,668 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Overlay"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "Overlay"
+  },
+  "toggleTheme": {
+    "message": "Thema umschalten"
+  },
+  "loading": {
+    "message": "Wird geladen..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "Hallo, mein Name ist $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Hans Müller"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "Hallo $1"
+  },
+  "error": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "Allgemeine Einstellungen"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Konfigurieren Sie Ihre Standardeinstellungen für den KI-Assistenten"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Standardsprache"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Sprache auswählen"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Standardmodell"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Modell auswählen..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Modelle suchen..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "Kein Modell gefunden."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Modelle werden geladen..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI-Modelle"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Google-Modelle"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic-Modelle"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama-Modelle"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Proxy-Modus"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Aktivieren Sie den Proxy-Modus, um API-Anfragen über einen Proxy-Server zu leiten"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Google-Einstellungen"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Konfigurieren Sie Ihren Google-API-Schlüssel und Gemini-Modelleinstellungen"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API-Schlüssel"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "API-Schlüssel wird überprüft..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API-Schlüssel ist gültig ($1 Modelle verfügbar)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Verfügbare Modelle"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI-Einstellungen"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Konfigurieren Sie Ihren OpenAI-API-Schlüssel und Modelleinstellungen"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic-Einstellungen"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Konfigurieren Sie Ihren Anthropic-API-Schlüssel für den Zugriff auf Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "Allgemein"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Erscheinungsbild"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Erscheinungsbild-Einstellungen"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Passen Sie das visuelle Erscheinungsbild der Anwendung an"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Schriftfamilie"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Schriftfamilie auswählen"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Programmier-Schriftarten"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "System-Schriftarten"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "System-Standard"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Schriftgröße"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Schriftgröße auswählen"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Vorschau"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "Der schnelle braune Fuchs springt über den faulen Hund."
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Modus"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Modell"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Wähle ein Modell..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Modelle suchen..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "Kein Modell gefunden."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Modelle werden geladen..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Konversationell"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Interaktiv"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Senden"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Denken..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Fehler"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "Du"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Assistent"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Gib deine Nachricht ein... (Drücke Enter zum Senden, Umschalt + Enter für eine neue Zeile)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Extrahierte Daten ($1 Elemente)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Wiederholungsstrategie: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Maximale Wiederholungen: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Ausweichlösung: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Alle Schritte ausführen"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Wird ausgeführt..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Aktion: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Abfrage: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Selektor: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Wert: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ Läuft..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Abgeschlossen"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Fehlgeschlagen"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "Ausstehend"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Wiederholungen: $1/$2"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "Benutzer"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Angemeldet als"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Klicken Sie, um sich abzumelden"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Bei Overlay anmelden"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Erweiterungen"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Lesezeichen"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "Neue Seite"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Willkommen bei Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "Ihr KI-gesteuerter Browser-Assistent ist bereit zu helfen. Stellen Sie mir Fragen zur aktuellen Seite oder allgemeine Fragen."
+  },
+
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "Bei Overlay anmelden"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "Melden Sie sich an, um auf Ihren intelligenten Browser-Assistenten zuzugreifen"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "Mit Overlay anmelden"
+  },
+  "popup_signing_in": {
+    "description": "Signing in progress text",
+    "message": "Anmeldung läuft..."
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "Authentifizierung ist erforderlich, um auf die Funktionen von Overlay zuzugreifen"
+  },
+
+  "calendar_title": {
+    "description": "Calendar section title",
+    "message": "Kalender"
+  },
+  "calendar_today": {
+    "description": "Label for today's events",
+    "message": "Heute"
+  },
+  "calendar_tomorrow": {
+    "description": "Label for tomorrow's events",
+    "message": "Morgen"
+  },
+  "calendar_error_loading": {
+    "description": "Error message when calendar events fail to load",
+    "message": "Kalenderereignisse konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+  },
+  "calendar_loading": {
+    "description": "Loading message for calendar events",
+    "message": "Kalenderereignisse werden geladen..."
+  },
+  "calendar_no_events": {
+    "description": "Message when there are no upcoming events",
+    "message": "Keine bevorstehenden Ereignisse"
+  },
+  "calendar_all_day": {
+    "description": "Label for all-day events",
+    "message": "Ganztägig"
+  },
+  "calendar_attendee": {
+    "description": "Singular label for one attendee",
+    "message": "Teilnehmer"
+  },
+  "calendar_attendees": {
+    "description": "Plural label for multiple attendees",
+    "message": "Teilnehmer"
+  },
+  "calendar_close": {
+    "description": "Close button text for dialogs",
+    "message": "Schließen"
+  },
+  "calendar_date_time": {
+    "description": "Label for date and time section",
+    "message": "Datum & Uhrzeit"
+  },
+  "calendar_location": {
+    "description": "Label for event location",
+    "message": "Ort"
+  },
+  "calendar_status_accepted": {
+    "description": "Label for accepted event status",
+    "message": "(Angenommen)"
+  },
+  "calendar_status_tentative": {
+    "description": "Label for tentative event status",
+    "message": "(Vorläufig)"
+  },
+  "calendar_status_declined": {
+    "description": "Label for declined event status",
+    "message": "(Abgelehnt)"
+  },
+
+  "task_title": {
+    "description": "Task section title",
+    "message": "Ihre Aufgaben"
+  },
+  "task_error_loading_tasks": {
+    "description": "Error message when tasks fail to load",
+    "message": "Aufgaben konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+  },
+  "task_error_loading_lists": {
+    "description": "Error message when task lists fail to load",
+    "message": "Aufgabenlisten konnten nicht geladen werden. Bitte versuchen Sie es erneut."
+  },
+  "task_error_creating": {
+    "description": "Error message when task creation fails",
+    "message": "Aufgabe konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+  },
+  "task_error_updating_status": {
+    "description": "Error message when task status update fails",
+    "message": "Aufgabenstatus konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+  },
+  "task_error_deleting": {
+    "description": "Error message when task deletion fails",
+    "message": "Aufgabe konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+  },
+  "task_error_saving_changes": {
+    "description": "Error message when task changes fail to save",
+    "message": "Änderungen an der Aufgabe konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
+  },
+  "task_invalid_date": {
+    "description": "Fallback message for invalid date format",
+    "message": "Ungültiges Datum"
+  },
+  "task_loading_lists": {
+    "description": "Loading message for task lists",
+    "message": "Aufgabenlisten werden geladen..."
+  },
+  "task_loading_tasks": {
+    "description": "Loading message for tasks",
+    "message": "Aufgaben werden geladen..."
+  },
+  "task_processing_update": {
+    "description": "Message for single task update in progress",
+    "message": "Aktualisierung wird verarbeitet..."
+  },
+  "task_processing_updates": {
+    "description": "Message for multiple task updates in progress",
+    "message": "Aktualisierungen werden verarbeitet..."
+  },
+  "task_dismiss": {
+    "description": "Dismiss button text for error messages",
+    "message": "Schließen"
+  },
+  "task_no_lists_found": {
+    "description": "Message when no task lists are found",
+    "message": "Keine Aufgabenlisten gefunden. Erstellen Sie eine in Google Tasks."
+  },
+  "task_loading_lists_short": {
+    "description": "Short loading message for task lists",
+    "message": "Aufgabenlisten laden"
+  },
+  "task_loading_tasks_short": {
+    "description": "Short loading message for tasks",
+    "message": "Aufgaben laden"
+  },
+  "task_no_tasks_found": {
+    "description": "Message when no tasks are found in a list",
+    "message": "Keine Aufgaben in dieser Liste. Fügen Sie oben eine hinzu!"
+  },
+  "task_add_new_placeholder": {
+    "description": "Placeholder text for adding a new task",
+    "message": "Neue Aufgabe hinzufügen und Enter oder Cmd+Enter drücken..."
+  },
+  "task_due_date": {
+    "description": "Label for task due date",
+    "message": "Fälligkeitsdatum"
+  },
+  "task_cancel": {
+    "description": "Cancel button text",
+    "message": "Abbrechen"
+  },
+  "task_save": {
+    "description": "Save button text",
+    "message": "Speichern"
+  },
+  "task_overdue": {
+    "description": "Label for overdue tasks",
+    "message": "(Überfällig)"
+  },
+  "task_create_new_list": {
+    "description": "Title for create new list dialog",
+    "message": "Neue Liste erstellen"
+  },
+  "task_create_new_list_description": {
+    "description": "Description text for create new list dialog",
+    "message": "Geben Sie einen Namen für Ihre neue Aufgabenliste ein."
+  },
+  "task_list_name": {
+    "description": "Label for the list name input field",
+    "message": "Listenname"
+  },
+  "task_list_name_placeholder": {
+    "description": "Placeholder text for the list name input field",
+    "message": "Meine Aufgaben"
+  },
+  "task_create": {
+    "description": "Create button text",
+    "message": "Erstellen"
+  },
+  "task_new_list": {
+    "description": "Button text for creating a new list",
+    "message": "Neue Liste"
+  },
+  "task_set_as_default": {
+    "description": "Button text for setting a list as default",
+    "message": "Als Standard festlegen"
+  },
+  "task_delete_list": {
+    "description": "Button text for deleting a list",
+    "message": "Liste löschen"
+  },
+  "task_delete_list_confirmation": {
+    "description": "Title for delete list confirmation dialog",
+    "message": "Aufgabenliste löschen"
+  },
+  "task_delete_list_description": {
+    "description": "Description text for delete list confirmation dialog",
+    "message": "Sind Sie sicher, dass Sie diese Aufgabenliste löschen möchten? Dadurch werden alle Aufgaben in dieser Liste gelöscht, und der Vorgang kann nicht rückgängig gemacht werden."
+  },
+  "task_delete": {
+    "description": "Delete button text",
+    "message": "Löschen"
+  },
+  "task_error_creating_list": {
+    "description": "Error message when creating a task list fails",
+    "message": "Fehler beim Erstellen der Aufgabenliste"
+  },
+  "task_default_list_set_success": {
+    "description": "Success message when setting a default list",
+    "message": "Standardliste erfolgreich festgelegt"
+  },
+  "task_default_list_set_error": {
+    "description": "Error message when setting a default list fails",
+    "message": "Fehler beim Festlegen der Standardliste"
+  },
+  "task_create_first_list": {
+    "description": "Button text for creating the first task list",
+    "message": "Erstellen Sie Ihre erste Aufgabenliste"
+  },
+
+  "ollama_description": {
+    "description": "Description of Ollama functionality",
+    "message": "Ollama ermöglicht die lokale Ausführung von Open-Source-Sprachmodellen auf Ihrem Computer. Konfigurieren Sie Ollama zur Verwendung mit Overlay."
+  },
+  "ollama_installation_title": {
+    "description": "Title for Ollama installation section",
+    "message": "Ollama installieren"
+  },
+  "ollama_installation_description": {
+    "description": "Description for Ollama installation section",
+    "message": "Installieren Sie zunächst Ollama auf Ihrem Computer"
+  },
+  "ollama_installation_instructions": {
+    "description": "Instructions for installing Ollama",
+    "message": "Besuchen Sie die offizielle Ollama-Website und folgen Sie den Installationsanweisungen für Ihr Betriebssystem:"
+  },
+  "ollama_pulling_models_title": {
+    "description": "Title for Ollama model pulling section",
+    "message": "Modelle herunterladen"
+  },
+  "ollama_pulling_models_description": {
+    "description": "Description for Ollama model pulling section",
+    "message": "Laden Sie die Modelle herunter, die Sie verwenden möchten"
+  },
+  "ollama_pulling_models_instructions": {
+    "description": "Instructions for pulling Ollama models",
+    "message": "Verwenden Sie den folgenden Befehl, um ein Modell herunterzuladen. Um beispielsweise Llama 3 herunterzuladen:"
+  },
+  "ollama_other_models": {
+    "description": "Information about other available Ollama models",
+    "message": "Weitere beliebte Modelle sind: mistral, gemma, mixtral, phi, orca-mini und viele mehr."
+  },
+  "ollama_view_model_library": {
+    "description": "Label for link to view Ollama model library",
+    "message": "Vollständige Modellbibliothek anzeigen"
+  },
+  "ollama_serve_title": {
+    "description": "Title for Ollama serving section",
+    "message": "Ollama mit Chrome-Erweiterungsunterstützung ausführen"
+  },
+  "ollama_serve_description": {
+    "description": "Description for Ollama serving section",
+    "message": "Kritischer Schritt: Führen Sie Ollama mit speziellen Flags aus, um die Verbindung mit der Erweiterung zu ermöglichen"
+  },
+  "ollama_important_note": {
+    "description": "Important note about Ollama configuration",
+    "message": "WICHTIG: Sie müssen Ollama mit der Umgebungsvariable OLLAMA_ORIGINS für die Unterstützung der Chrome-Erweiterung ausführen!"
+  },
+  "ollama_serve_instructions": {
+    "description": "Instructions for serving Ollama",
+    "message": "Verwenden Sie diesen Befehl, um Ollama mit Erweiterungsunterstützung zu starten:"
+  },
+  "ollama_serve_info": {
+    "description": "Information about the Ollama serve command",
+    "message": "Dieser Befehl ermöglicht der Erweiterung die Verbindung zu Ihrem lokalen Ollama-Server. Halten Sie dieses Terminalfenster offen, während Sie Ollama mit Overlay verwenden."
+  },
+  "ollama_further_help": {
+    "description": "Text for getting further help with Ollama",
+    "message": "Weitere Hilfe finden Sie in der Ollama-Dokumentation unter"
+  },
+  "ollama_available_models": {
+    "description": "Title for available Ollama models section",
+    "message": "Verfügbare Modelle"
+  },
+  "ollama_models_description": {
+    "description": "Description for Ollama models section",
+    "message": "Von Ihrem Ollama-Server erkannte Modelle"
+  },
+  "loading_models": {
+    "description": "Message shown while loading models",
+    "message": "Modelle werden geladen..."
+  },
+  "no_ollama_models": {
+    "description": "Message shown when no Ollama models are detected",
+    "message": "Keine Ollama-Modelle erkannt. Stellen Sie sicher, dass Ollama mit den richtigen Flags ausgeführt wird."
+  }
+}

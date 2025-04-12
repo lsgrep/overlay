@@ -22,3 +22,4 @@ eslint.config.js
 # compiled
 chrome-extension/public/manifest.json
 **/tailwind-output.css
+supabase/*

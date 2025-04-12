@@ -1,11 +1,11 @@
 {
   "name": "Overlay",
-  "version": "0.3.6",
+  "version": "0.4.1",
   "description": "Overlay",
-  "license": "MIT",
+  "license": "Commercial",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite.git"
+    "url": "https://github.com/lsgrep/overlay"
   },
   "type": "module",
   "scripts": {
@@ -32,8 +32,22 @@
     "update-version": "bash update_version.sh"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.1.20",
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@dotenvx/dotenvx": "^1.33.0",
+    "@heroicons/react": "^2.2.0",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.49.1",
+    "ai": "^4.1.54",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.4.1",
+    "lucide-react": "^0.475.0",
     "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "react-tooltip": "^5.28.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
@@ -70,6 +84,7 @@
     "turbo": "^2.3.3",
     "typescript": "5.5.4",
     "typescript-eslint": "^8.20.0",
+    "typescript-json-schema": "^0.65.1",
     "vite": "6.0.5"
   },
   "lint-staged": {

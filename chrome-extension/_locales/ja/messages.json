@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "オーバーレイ",
+    "description": "The name of the extension."
+  },
+  "extensionDescription": {
+    "message": "オーバーレイ - AIを搭載したブラウザアシスタント",
+    "description": "The description of the extension."
+  }
+}

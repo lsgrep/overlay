@@ -19,16 +19,26 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@extension/i18n": "workspace:*",
     "@extension/shared": "workspace:*",
     "@extension/storage": "workspace:*",
+    "@extension/ui": "workspace:*",
+    "@google/generative-ai": "^0.24.0",
+    "@radix-ui/react-popover": "^1.1.6",
+    "cmdk": "^1.0.0",
+    "lucide-react": "^0.475.0",
     "react-markdown": "^9.0.3"
   },
   "devDependencies": {
     "@extension/tailwindcss-config": "workspace:*",
     "@extension/tsconfig": "workspace:*",
     "@extension/vite-config": "workspace:*",
+    "@types/jest": "^29.5.14",
     "cross-env": "^7.0.3",
-    "postcss-load-config": "^6.0.1"
+    "dotenv": "^16.4.7",
+    "jest-mock": "^29.7.0",
+    "postcss-load-config": "^6.0.1",
+    "vitest": "^3.0.8"
   },
   "postcss": {
     "plugins": {

@@ -1,21 +1,54 @@
-The MIT License (MIT)
+OVERLAY COMMERCIAL LICENSE AGREEMENT
 
-Copyright (c) 2024 Yusup
+Copyright (c) 2024 Yusup. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. DEFINITIONS
+   - "Software" refers to the Overlay Chrome extension and all associated code, documentation, and assets.
+   - "Licensor" refers to Yusup, the copyright holder and owner of the Software.
+   - "Licensee" refers to the individual or entity that has purchased a license to use the Software.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+2. LICENSE GRANT
+   Subject to the terms of this Agreement and payment of applicable license fees, Licensor grants Licensee a non-exclusive, non-transferable license to use the Software for personal or business purposes.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. SUBSCRIPTION MODELS AND PRICING
+   - Free Tier: Limited features available at no cost
+   - Premium Tier: Full feature access for individual users at a monthly or annual subscription fee
+   - Business Tier: Extended features for business use with volume licensing options
+   
+   Current pricing information is available on the official Overlay website.
+
+4. RESTRICTIONS
+   Licensee shall not:
+   - Modify, adapt, translate, reverse engineer, decompile, or disassemble the Software
+   - Create derivative works based on the Software
+   - Remove or alter any copyright, trademark or proprietary notices
+   - Redistribute, sell, lease, license, or sublicense the Software
+   - Use the Software for any illegal purpose
+
+5. OWNERSHIP
+   The Software is licensed, not sold. Licensor retains all rights, title, and interest in the Software.
+
+6. PRIVACY AND DATA COLLECTION
+   Data collection and usage are governed by the Overlay Privacy Policy, which is incorporated by reference.
+
+7. UPDATES AND MAINTENANCE
+   Licensor may provide updates to the Software at its discretion. Premium and Business tier subscribers are entitled to updates for the duration of their subscription.
+
+8. TERM AND TERMINATION
+   - This license is effective until terminated
+   - Subscription licenses terminate automatically upon expiration unless renewed
+   - Licensor may terminate this license if Licensee breaches any term
+   - Upon termination, Licensee must cease all use of the Software
+
+9. DISCLAIMER OF WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. LICENSOR DISCLAIMS ALL WARRANTIES, EITHER EXPRESS OR IMPLIED, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+10. LIMITATION OF LIABILITY
+    IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT OR CONSEQUENTIAL DAMAGES, OR FOR ANY ECONOMIC LOSS, LOSS OF DATA, LOSS OF PROFITS, BUSINESS INTERRUPTION OR LOSS OF BUSINESS INFORMATION.
+
+11. GENERAL PROVISIONS
+    - This Agreement constitutes the entire agreement between the parties
+    - This Agreement is governed by the laws of [Your Jurisdiction]
+    - Any disputes shall be resolved in the courts of [Your Jurisdiction]
+
+By using the Software, Licensee acknowledges that they have read this Agreement, understand it, and agree to be bound by its terms and conditions.

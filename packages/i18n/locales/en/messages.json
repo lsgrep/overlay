@@ -26,5 +26,743 @@
   "hello": {
     "description": "Placeholder example",
     "message": "Hello $1"
+  },
+  "error": {
+    "message": "An error occurred"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "General Settings"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Configure your default preferences for the AI assistant"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Default Language"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Select a language"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Default Model"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Select a model..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Search models..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "No model found."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Loading models..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAI Models"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Google Models"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropic Models"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollama Models"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Proxy Mode"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Enable proxy mode to route API requests through a proxy server"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Google Settings"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Configure your Google API key and Gemini model preferences"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API Key"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "Validating API key..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API key is valid ($1 models available)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Available Models"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI Settings"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Configure your OpenAI API key and model preferences"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic Settings"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Configure your Anthropic API key for Claude access"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "General"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Appearance"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "Profile"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Appearance Settings"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Customize the visual appearance of the application"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Font Family"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Select a font family"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Programming Fonts"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "System Fonts"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "System Default"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Font Size"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Select a font size"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Preview"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "The quick brown fox jumps over the lazy dog."
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "Profile Settings"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "Configure your personal information for use with web pages"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "First Name"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "Enter your first name"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "Last Name"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "Enter your last name"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "Email"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "Enter your email address"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "Bio"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "Write a short bio about yourself"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "A brief description about yourself that can be used on websites"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "Resume"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "Enter your resume or professional experience"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "Your professional experience that can be used for job applications"
+  },
+  "options_profile_resume_file": {
+    "description": "Resume file upload label",
+    "message": "Resume PDF"
+  },
+  "options_profile_resume_file_upload": {
+    "description": "Resume file upload button text",
+    "message": "Upload PDF Resume (max 5MB)"
+  },
+  "options_profile_resume_file_description": {
+    "description": "Resume file upload description",
+    "message": "Upload your resume as a PDF file for easier sharing with potential employers"
+  },
+  "options_profile_resume_file_remove": {
+    "description": "Resume file remove button tooltip",
+    "message": "Remove resume file"
+  },
+  "options_profile_resume_file_type_error": {
+    "description": "Resume file type error message",
+    "message": "Only PDF files are supported"
+  },
+  "options_profile_resume_file_size_error": {
+    "description": "Resume file size error message",
+    "message": "File size must be less than 5MB"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "Save Profile"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Mode"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Model"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Select a model..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Search models..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "No model found."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Loading models..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Conversational"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Interactive"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Send"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Thinking..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Error"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "You"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Assistant"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Type your message... (Press Enter to send, Shift + Enter for new line)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Extracted Data ($1 items)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Retry Strategy: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Max Retries: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Fallback: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Execute All Steps"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Executing..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Action: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Query: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Selector: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Value: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ Running..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Complete"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Failed"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "Pending"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Retries: $1/$2"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Sign in to Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default user label when no name is available",
+    "message": "User"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Signed in as"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Click to sign out"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Extensions"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Bookmarks"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "New Page"
+  },
+  "popup_sign_in_description": {
+    "description": "Description text for sign in popup",
+    "message": "Sign in to access all features"
+  },
+  "popup_sign_in_with_google": {
+    "description": "Button text for Google sign in",
+    "message": "Sign in with Google"
+  },
+  "popup_sign_in_with_github": {
+    "description": "Button text for GitHub sign in",
+    "message": "Sign in with GitHub"
+  },
+  "popup_signing_in": {
+    "description": "Loading text when signing in",
+    "message": "Signing in..."
+  },
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "Sign in to Overlay"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "Sign in to access your intelligent browsing assistant"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "Sign in with Overlay"
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "Authentication is required to access Overlay's features"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Welcome to Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "Your AI-powered browser assistant is ready to help. Ask me anything about the current page or any general questions."
+  },
+
+  "calendar_title": {
+    "description": "Calendar section title",
+    "message": "Calendar"
+  },
+  "calendar_today": {
+    "description": "Label for today's events",
+    "message": "Today"
+  },
+  "calendar_tomorrow": {
+    "description": "Label for tomorrow's events",
+    "message": "Tomorrow"
+  },
+  "calendar_error_loading": {
+    "description": "Error message when calendar events fail to load",
+    "message": "Failed to load calendar events. Please try again."
+  },
+  "calendar_loading": {
+    "description": "Loading message for calendar events",
+    "message": "Loading calendar events..."
+  },
+  "calendar_no_events": {
+    "description": "Message when there are no upcoming events",
+    "message": "No upcoming events"
+  },
+  "calendar_all_day": {
+    "description": "Label for all-day events",
+    "message": "All day"
+  },
+  "calendar_attendee": {
+    "description": "Singular label for one attendee",
+    "message": "attendee"
+  },
+  "calendar_attendees": {
+    "description": "Plural label for multiple attendees",
+    "message": "attendees"
+  },
+  "calendar_close": {
+    "description": "Close button text for dialogs",
+    "message": "Close"
+  },
+  "calendar_date_time": {
+    "description": "Label for date and time section",
+    "message": "Date & Time"
+  },
+  "calendar_location": {
+    "description": "Label for event location",
+    "message": "Location"
+  },
+  "calendar_status_accepted": {
+    "description": "Label for accepted event status",
+    "message": "(Accepted)"
+  },
+  "calendar_status_tentative": {
+    "description": "Label for tentative event status",
+    "message": "(Tentative)"
+  },
+  "calendar_status_declined": {
+    "description": "Label for declined event status",
+    "message": "(Declined)"
+  },
+
+  "task_title": {
+    "description": "Task section title",
+    "message": "Your Tasks"
+  },
+  "task_error_loading_tasks": {
+    "description": "Error message when tasks fail to load",
+    "message": "Failed to load tasks. Please try again."
+  },
+  "task_error_loading_lists": {
+    "description": "Error message when task lists fail to load",
+    "message": "Failed to load task lists. Please try again."
+  },
+  "task_error_creating": {
+    "description": "Error message when task creation fails",
+    "message": "Failed to create task. Please try again."
+  },
+  "task_error_updating_status": {
+    "description": "Error message when task status update fails",
+    "message": "Failed to update task status. Please try again."
+  },
+  "task_error_deleting": {
+    "description": "Error message when task deletion fails",
+    "message": "Failed to delete task. Please try again."
+  },
+  "task_error_saving_changes": {
+    "description": "Error message when task changes fail to save",
+    "message": "Failed to save task changes. Please try again."
+  },
+  "task_invalid_date": {
+    "description": "Fallback message for invalid date format",
+    "message": "Invalid Date"
+  },
+  "task_loading_lists": {
+    "description": "Loading message for task lists",
+    "message": "Loading task lists..."
+  },
+  "task_loading_tasks": {
+    "description": "Loading message for tasks",
+    "message": "Loading tasks..."
+  },
+  "task_processing_update": {
+    "description": "Message for single task update in progress",
+    "message": "Processing update..."
+  },
+  "task_processing_updates": {
+    "description": "Message for multiple task updates in progress",
+    "message": "Processing updates..."
+  },
+  "task_dismiss": {
+    "description": "Dismiss button text for error messages",
+    "message": "Dismiss"
+  },
+  "task_no_lists_found": {
+    "description": "Message when no task lists are found",
+    "message": "No task lists found. Create one in Google Tasks."
+  },
+  "task_loading_lists_short": {
+    "description": "Short loading message for task lists",
+    "message": "Loading task lists"
+  },
+  "task_loading_tasks_short": {
+    "description": "Short loading message for tasks",
+    "message": "Loading tasks"
+  },
+  "task_no_tasks_found": {
+    "description": "Message when no tasks are found in a list",
+    "message": "No tasks in this list. Add one above!"
+  },
+  "task_add_new_placeholder": {
+    "description": "Placeholder text for adding a new task",
+    "message": "Add a new task and press Enter or Cmd+Enter..."
+  },
+  "task_due_date": {
+    "description": "Label for task due date",
+    "message": "Due Date"
+  },
+  "task_cancel": {
+    "description": "Cancel button text",
+    "message": "Cancel"
+  },
+  "task_save": {
+    "description": "Save button text",
+    "message": "Save"
+  },
+  "task_overdue": {
+    "description": "Label for overdue tasks",
+    "message": "(Overdue)"
+  },
+  "task_create_new_list": {
+    "description": "Title for create new list dialog",
+    "message": "Create New List"
+  },
+  "task_create_new_list_description": {
+    "description": "Description text for create new list dialog",
+    "message": "Enter a name for your new task list."
+  },
+  "task_list_name": {
+    "description": "Label for the list name input field",
+    "message": "List Name"
+  },
+  "task_list_name_placeholder": {
+    "description": "Placeholder text for the list name input field",
+    "message": "My Tasks"
+  },
+  "task_create": {
+    "description": "Create button text",
+    "message": "Create"
+  },
+  "task_new_list": {
+    "description": "Button text for creating a new list",
+    "message": "New List"
+  },
+  "task_set_as_default": {
+    "description": "Button text for setting a list as default",
+    "message": "Set as default"
+  },
+  "task_delete_list": {
+    "description": "Button text for deleting a list",
+    "message": "Delete list"
+  },
+  "task_delete_list_confirmation": {
+    "description": "Title for delete list confirmation dialog",
+    "message": "Delete Task List"
+  },
+  "task_delete_list_description": {
+    "description": "Description text for delete list confirmation dialog",
+    "message": "Are you sure you want to delete this task list? This will delete all tasks in this list and cannot be undone."
+  },
+  "task_delete": {
+    "description": "Delete button text",
+    "message": "Delete"
+  },
+  "task_error_creating_list": {
+    "description": "Error message when creating a task list fails",
+    "message": "Error creating task list"
+  },
+  "task_default_list_set_success": {
+    "description": "Success message when setting a default list",
+    "message": "Default list set successfully"
+  },
+  "task_default_list_set_error": {
+    "description": "Error message when setting a default list fails",
+    "message": "Error setting default list"
+  },
+  "task_create_first_list": {
+    "description": "Button text for creating the first task list",
+    "message": "Create Your First Task List"
+  },
+
+  "ollama_description": {
+    "description": "Description of Ollama functionality",
+    "message": "Ollama lets you run open-source large language models locally on your machine. Configure Ollama to use it with Overlay."
+  },
+  "ollama_installation_title": {
+    "description": "Title for Ollama installation section",
+    "message": "Installing Ollama"
+  },
+  "ollama_installation_description": {
+    "description": "Description for Ollama installation section",
+    "message": "First, install Ollama on your computer"
+  },
+  "ollama_installation_instructions": {
+    "description": "Instructions for installing Ollama",
+    "message": "Visit the official Ollama website and follow the installation instructions for your operating system:"
+  },
+  "ollama_pulling_models_title": {
+    "description": "Title for Ollama model pulling section",
+    "message": "Pulling Models"
+  },
+  "ollama_pulling_models_description": {
+    "description": "Description for Ollama model pulling section",
+    "message": "Download models you want to use"
+  },
+  "ollama_pulling_models_instructions": {
+    "description": "Instructions for pulling Ollama models",
+    "message": "Use the following command to download a model. For example, to download Llama 3:"
+  },
+  "ollama_other_models": {
+    "description": "Information about other available Ollama models",
+    "message": "Other popular models include: mistral, gemma, mixtral, phi, orca-mini, and many more."
+  },
+  "ollama_view_model_library": {
+    "description": "Label for link to view Ollama model library",
+    "message": "View the full model library"
+  },
+  "ollama_serve_title": {
+    "description": "Title for Ollama serving section",
+    "message": "Running Ollama with Chrome Extension Support"
+  },
+  "ollama_serve_description": {
+    "description": "Description for Ollama serving section",
+    "message": "Critical step: Run Ollama with special flags to allow the extension to connect"
+  },
+  "ollama_important_note": {
+    "description": "Important note about Ollama configuration",
+    "message": "IMPORTANT: You must run Ollama with the OLLAMA_ORIGINS environment variable for Chrome extension support!"
+  },
+  "ollama_serve_instructions": {
+    "description": "Instructions for serving Ollama",
+    "message": "Use this command to start Ollama with extension support:"
+  },
+  "ollama_serve_info": {
+    "description": "Information about the Ollama serve command",
+    "message": "This command allows the extension to connect to your local Ollama server. Keep this terminal window open while using Ollama with Overlay."
+  },
+  "ollama_further_help": {
+    "description": "Text for getting further help with Ollama",
+    "message": "For more help, visit the Ollama documentation at"
+  },
+  "ollama_available_models": {
+    "description": "Title for available Ollama models section",
+    "message": "Available Models"
+  },
+  "ollama_models_description": {
+    "description": "Description for Ollama models section",
+    "message": "Models detected from your Ollama server"
+  },
+  "loading_models": {
+    "description": "Message shown while loading models",
+    "message": "Loading models..."
+  },
+  "no_ollama_models": {
+    "description": "Message shown when no Ollama models are detected",
+    "message": "No Ollama models detected. Make sure Ollama is running with the correct flags."
   }
 }

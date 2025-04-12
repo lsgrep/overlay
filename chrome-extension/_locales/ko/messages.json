@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "오버레이",
+    "description": "확장 프로그램 이름."
+  },
+  "extensionDescription": {
+    "message": "오버레이 - AI 기반 브라우저 어시스턴트",
+    "description": "확장 프로그램 설명."
+  }
+}

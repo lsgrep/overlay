@@ -1,0 +1,733 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "Оверлей"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "Оверлей"
+  },
+  "toggleTheme": {
+    "message": "Переключить тему"
+  },
+  "loading": {
+    "message": "Загрузка..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "Привет, меня зовут $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "Иван Петров"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "Привет $1"
+  },
+  "error": {
+    "message": "Произошла ошибка"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "Общие настройки"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "Настройте параметры по умолчанию для ИИ-ассистента"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "Язык по умолчанию"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "Выберите язык"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "Модель по умолчанию"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Выберите модель..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "Поиск моделей..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "Модели не найдены."
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "Загрузка моделей..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "Модели OpenAI"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "Модели Google"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Модели Anthropic"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Модели Ollama"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "Режим прокси"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "Включите режим прокси для маршрутизации API-запросов через прокси-сервер"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "Настройки Google"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "Настройте ваш API-ключ Google и предпочтения для моделей Gemini"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "API-ключ"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "Проверка API-ключа..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "✓ API-ключ действителен (доступно моделей: $1)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "Доступные модели"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "Настройки OpenAI"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "Настройте свой API-ключ OpenAI и предпочтения моделей"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Настройки Anthropic"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "Настройте свой API-ключ Anthropic для доступа к Claude"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "Общие"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "Google"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "Внешний вид"
+  },
+  "options_tab_profile": {
+    "description": "Profile tab name",
+    "message": "Профиль"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "Настройки внешнего вида"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "Настройте визуальный вид приложения"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "Семейство шрифтов"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "Выберите семейство шрифтов"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "Шрифты для программирования"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "Системные шрифты"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "Системный по умолчанию"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "Размер шрифта"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "Выберите размер шрифта"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "Предпросмотр"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "Быстрая коричневая лиса прыгает через ленивую собаку."
+  },
+
+  "options_profile_settings": {
+    "description": "Profile settings tab title",
+    "message": "Настройки профиля"
+  },
+  "options_profile_description": {
+    "description": "Profile settings tab description",
+    "message": "Настройте вашу личную информацию для использования на веб-страницах"
+  },
+  "options_profile_first_name": {
+    "description": "First name field label",
+    "message": "Имя"
+  },
+  "options_profile_first_name_placeholder": {
+    "description": "First name field placeholder",
+    "message": "Введите ваше имя"
+  },
+  "options_profile_last_name": {
+    "description": "Last name field label",
+    "message": "Фамилия"
+  },
+  "options_profile_last_name_placeholder": {
+    "description": "Last name field placeholder",
+    "message": "Введите вашу фамилию"
+  },
+  "options_profile_email": {
+    "description": "Email field label",
+    "message": "Электронная почта"
+  },
+  "options_profile_email_placeholder": {
+    "description": "Email field placeholder",
+    "message": "Введите ваш адрес электронной почты"
+  },
+  "options_profile_bio": {
+    "description": "Bio field label",
+    "message": "Биография"
+  },
+  "options_profile_bio_placeholder": {
+    "description": "Bio field placeholder",
+    "message": "Напишите краткую биографию о себе"
+  },
+  "options_profile_bio_description": {
+    "description": "Bio field description",
+    "message": "Краткое описание о вас, которое может использоваться на веб-сайтах"
+  },
+  "options_profile_resume": {
+    "description": "Resume field label",
+    "message": "Резюме"
+  },
+  "options_profile_resume_placeholder": {
+    "description": "Resume field placeholder",
+    "message": "Введите ваше резюме или профессиональный опыт"
+  },
+  "options_profile_resume_description": {
+    "description": "Resume field description",
+    "message": "Ваш профессиональный опыт, который может использоваться для заявлений о приеме на работу"
+  },
+  "options_profile_save": {
+    "description": "Save profile button text",
+    "message": "Сохранить профиль"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "Режим"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "Модель"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "Выберите модель..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "Поиск моделей..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "Модель не найдена."
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "Загрузка моделей..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "Разговорный"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "Интерактивный"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "Отправить"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "Думаю..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "Ошибка"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "Вы"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "Ассистент"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "Введите ваше сообщение... (Нажмите Enter для отправки, Shift + Enter для новой строки)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "Извлеченные данные ($1 элементов)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "Стратегия повторных попыток: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "Максимум повторных попыток: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "Резервный вариант: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "Выполнить все шаги"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "Выполнение..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "Действие: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "Запрос: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "Селектор: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "Значение: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "⏳ Выполняется..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "✓ Завершено"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "✗ Ошибка"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "Ожидание"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "Попытки: $1/$2"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Войти в Overlay"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "Пользователь"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "Вы вошли как"
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "Нажмите, чтобы выйти"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "Расширения"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "Закладки"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "Новая страница"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Добро пожаловать в Overlay"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "Ваш ИИ-помощник для браузера готов помочь. Спросите меня о текущей странице или задайте любой общий вопрос."
+  },
+
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "Войти в Overlay"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "Войдите, чтобы получить доступ к интеллектуальному помощнику для браузера"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "Войти с Overlay"
+  },
+  "popup_signing_in": {
+    "description": "Signing in progress text",
+    "message": "Вход в систему..."
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "Для доступа к функциям Overlay требуется авторизация"
+  },
+
+  "calendar_title": {
+    "description": "Calendar section title",
+    "message": "Календарь"
+  },
+  "calendar_today": {
+    "description": "Label for today's events",
+    "message": "Сегодня"
+  },
+  "calendar_tomorrow": {
+    "description": "Label for tomorrow's events",
+    "message": "Завтра"
+  },
+  "calendar_error_loading": {
+    "description": "Error message when calendar events fail to load",
+    "message": "Не удалось загрузить события календаря. Пожалуйста, попробуйте еще раз."
+  },
+  "calendar_loading": {
+    "description": "Loading message for calendar events",
+    "message": "Загрузка событий календаря..."
+  },
+  "calendar_no_events": {
+    "description": "Message when there are no upcoming events",
+    "message": "Нет предстоящих событий"
+  },
+  "calendar_all_day": {
+    "description": "Label for all-day events",
+    "message": "Весь день"
+  },
+  "calendar_attendee": {
+    "description": "Singular label for one attendee",
+    "message": "участник"
+  },
+  "calendar_attendees": {
+    "description": "Plural label for multiple attendees",
+    "message": "участники"
+  },
+  "calendar_close": {
+    "description": "Close button text for dialogs",
+    "message": "Закрыть"
+  },
+  "calendar_date_time": {
+    "description": "Label for date and time section",
+    "message": "Дата и время"
+  },
+  "calendar_location": {
+    "description": "Label for event location",
+    "message": "Место"
+  },
+  "calendar_status_accepted": {
+    "description": "Label for accepted event status",
+    "message": "(Принято)"
+  },
+  "calendar_status_tentative": {
+    "description": "Label for tentative event status",
+    "message": "(Предварительно)"
+  },
+  "calendar_status_declined": {
+    "description": "Label for declined event status",
+    "message": "(Отклонено)"
+  },
+
+  "task_title": {
+    "description": "Task section title",
+    "message": "Ваши задачи"
+  },
+  "task_error_loading_tasks": {
+    "description": "Error message when tasks fail to load",
+    "message": "Не удалось загрузить задачи. Пожалуйста, попробуйте еще раз."
+  },
+  "task_error_loading_lists": {
+    "description": "Error message when task lists fail to load",
+    "message": "Не удалось загрузить списки задач. Пожалуйста, попробуйте еще раз."
+  },
+  "task_error_creating": {
+    "description": "Error message when task creation fails",
+    "message": "Не удалось создать задачу. Пожалуйста, попробуйте еще раз."
+  },
+  "task_error_updating_status": {
+    "description": "Error message when task status update fails",
+    "message": "Не удалось обновить статус задачи. Пожалуйста, попробуйте еще раз."
+  },
+  "task_error_deleting": {
+    "description": "Error message when task deletion fails",
+    "message": "Не удалось удалить задачу. Пожалуйста, попробуйте еще раз."
+  },
+  "task_error_saving_changes": {
+    "description": "Error message when task changes fail to save",
+    "message": "Не удалось сохранить изменения задачи. Пожалуйста, попробуйте еще раз."
+  },
+  "task_invalid_date": {
+    "description": "Fallback message for invalid date format",
+    "message": "Недействительная дата"
+  },
+  "task_loading_lists": {
+    "description": "Loading message for task lists",
+    "message": "Загрузка списков задач..."
+  },
+  "task_loading_tasks": {
+    "description": "Loading message for tasks",
+    "message": "Загрузка задач..."
+  },
+  "task_processing_update": {
+    "description": "Message for single task update in progress",
+    "message": "Обработка обновления..."
+  },
+  "task_processing_updates": {
+    "description": "Message for multiple task updates in progress",
+    "message": "Обработка обновлений..."
+  },
+  "task_dismiss": {
+    "description": "Dismiss button text for error messages",
+    "message": "Закрыть"
+  },
+  "task_no_lists_found": {
+    "description": "Message when no task lists are found",
+    "message": "Списки задач не найдены. Создайте их в Google Tasks."
+  },
+  "task_loading_lists_short": {
+    "description": "Short loading message for task lists",
+    "message": "Загрузка списков задач"
+  },
+  "task_loading_tasks_short": {
+    "description": "Short loading message for tasks",
+    "message": "Загрузка задач"
+  },
+  "task_no_tasks_found": {
+    "description": "Message when no tasks are found in a list",
+    "message": "В этом списке нет задач. Добавьте новую выше!"
+  },
+  "task_add_new_placeholder": {
+    "description": "Placeholder text for adding a new task",
+    "message": "Добавить новую задачу и нажать Enter или Cmd+Enter..."
+  },
+  "task_due_date": {
+    "description": "Label for task due date",
+    "message": "Срок выполнения"
+  },
+  "task_cancel": {
+    "description": "Cancel button text",
+    "message": "Отмена"
+  },
+  "task_save": {
+    "description": "Save button text",
+    "message": "Сохранить"
+  },
+  "task_overdue": {
+    "description": "Label for overdue tasks",
+    "message": "(Просрочено)"
+  },
+  "task_create": {
+    "description": "Create button text",
+    "message": "Создать"
+  },
+  "task_new_list": {
+    "description": "Button text for creating a new list",
+    "message": "Новый список"
+  },
+  "task_set_as_default": {
+    "description": "Button text for setting a list as default",
+    "message": "Установить по умолчанию"
+  },
+  "task_delete_list": {
+    "description": "Button text for deleting a list",
+    "message": "Удалить список"
+  },
+  "task_delete_list_confirmation": {
+    "description": "Title for delete list confirmation dialog",
+    "message": "Удалить список задач"
+  },
+  "task_delete_list_description": {
+    "description": "Description text for delete list confirmation dialog",
+    "message": "Вы уверены, что хотите удалить этот список задач? Это удалит все задачи в этом списке, и это действие нельзя будет отменить."
+  },
+  "task_delete": {
+    "description": "Delete button text",
+    "message": "Удалить"
+  },
+  "task_error_creating_list": {
+    "description": "Error message when creating a task list fails",
+    "message": "Ошибка при создании списка задач"
+  },
+  "task_default_list_set_success": {
+    "description": "Success message when setting a default list",
+    "message": "Список по умолчанию успешно установлен"
+  },
+  "task_default_list_set_error": {
+    "description": "Error message when setting a default list fails",
+    "message": "Ошибка при установке списка по умолчанию"
+  },
+  "task_create_first_list": {
+    "description": "Button text for creating the first task list",
+    "message": "Создать первый список задач"
+  },
+  "task_create_new_list": {
+    "description": "Title for create new list dialog",
+    "message": "Создать новый список"
+  },
+  "task_create_new_list_description": {
+    "description": "Description text for create new list dialog",
+    "message": "Введите название для вашего нового списка задач."
+  },
+  "task_list_name": {
+    "description": "Label for the list name input field",
+    "message": "Название списка"
+  },
+  "task_list_name_placeholder": {
+    "description": "Placeholder text for the list name input field",
+    "message": "Мои задачи"
+  },
+
+  "ollama_description": {
+    "description": "Description of Ollama functionality",
+    "message": "Ollama позволяет запускать модели языка с открытым исходным кодом локально на вашем компьютере. Настройте Ollama для использования с Overlay."
+  },
+  "ollama_installation_title": {
+    "description": "Title for Ollama installation section",
+    "message": "Установка Ollama"
+  },
+  "ollama_installation_description": {
+    "description": "Description for Ollama installation section",
+    "message": "Сначала установите Ollama на ваш компьютер"
+  },
+  "ollama_installation_instructions": {
+    "description": "Instructions for installing Ollama",
+    "message": "Посетите официальный сайт Ollama и следуйте инструкциям по установке для вашей операционной системы:"
+  },
+  "ollama_pulling_models_title": {
+    "description": "Title for Ollama model pulling section",
+    "message": "Загрузка моделей"
+  },
+  "ollama_pulling_models_description": {
+    "description": "Description for Ollama model pulling section",
+    "message": "Загрузите модели, которые вы хотите использовать"
+  },
+  "ollama_pulling_models_instructions": {
+    "description": "Instructions for pulling Ollama models",
+    "message": "Используйте следующую команду для загрузки модели. Например, для загрузки Llama 3:"
+  },
+  "ollama_other_models": {
+    "description": "Information about other available Ollama models",
+    "message": "Другие популярные модели включают: mistral, gemma, mixtral, phi, orca-mini и многие другие."
+  },
+  "ollama_view_model_library": {
+    "description": "Label for link to view Ollama model library",
+    "message": "Просмотреть полную библиотеку моделей"
+  },
+  "ollama_serve_title": {
+    "description": "Title for Ollama serving section",
+    "message": "Запуск Ollama с поддержкой расширения Chrome"
+  },
+  "ollama_serve_description": {
+    "description": "Description for Ollama serving section",
+    "message": "Важный шаг: Запустите Ollama со специальными флагами, чтобы расширение могло подключиться"
+  },
+  "ollama_important_note": {
+    "description": "Important note about Ollama configuration",
+    "message": "ВАЖНО: Вы должны запустить Ollama с переменной окружения OLLAMA_ORIGINS для поддержки расширения Chrome!"
+  },
+  "ollama_serve_instructions": {
+    "description": "Instructions for serving Ollama",
+    "message": "Используйте эту команду для запуска Ollama с поддержкой расширения:"
+  },
+  "ollama_serve_info": {
+    "description": "Information about the Ollama serve command",
+    "message": "Эта команда позволяет расширению подключаться к вашему локальному серверу Ollama. Оставьте это окно терминала открытым во время использования Ollama с Overlay."
+  },
+  "ollama_further_help": {
+    "description": "Text for getting further help with Ollama",
+    "message": "Для получения дополнительной помощи посетите документацию Ollama по адресу"
+  },
+  "ollama_available_models": {
+    "description": "Title for available Ollama models section",
+    "message": "Доступные модели"
+  },
+  "ollama_models_description": {
+    "description": "Description for Ollama models section",
+    "message": "Модели, обнаруженные на вашем сервере Ollama"
+  },
+  "loading_models": {
+    "description": "Message shown while loading models",
+    "message": "Загрузка моделей..."
+  },
+  "no_ollama_models": {
+    "description": "Message shown when no Ollama models are detected",
+    "message": "Модели Ollama не обнаружены. Убедитесь, что Ollama запущена с правильными флагами."
+  }
+}

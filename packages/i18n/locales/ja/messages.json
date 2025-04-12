@@ -1,0 +1,600 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "オーバーレイ"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "オーバーレイ"
+  },
+  "toggleTheme": {
+    "message": "テーマを切り替える"
+  },
+  "loading": {
+    "message": "読み込み中..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "こんにちは、私の名前は $NAME$ です",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "山田太郎"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "こんにちは $1"
+  },
+  "error": {
+    "message": "エラーが発生しました"
+  },
+
+  "options_general_settings": {
+    "description": "General settings tab title",
+    "message": "一般設定"
+  },
+  "options_general_description": {
+    "description": "General settings tab description",
+    "message": "AIアシスタントのデフォルト設定を構成します"
+  },
+  "options_default_language": {
+    "description": "Default language setting label",
+    "message": "デフォルト言語"
+  },
+  "options_select_language": {
+    "description": "Language selection placeholder",
+    "message": "言語を選択"
+  },
+  "options_default_model": {
+    "description": "Default model setting label",
+    "message": "デフォルトモデル"
+  },
+  "options_select_model": {
+    "description": "Model selection placeholder",
+    "message": "モデルを選択..."
+  },
+  "options_search_models": {
+    "description": "Search models placeholder",
+    "message": "モデルを検索..."
+  },
+  "options_no_model_found": {
+    "description": "No model found message",
+    "message": "モデルが見つかりません。"
+  },
+  "options_loading_models": {
+    "description": "Loading models message",
+    "message": "モデルを読み込み中..."
+  },
+  "options_openai_models": {
+    "description": "OpenAI models group heading",
+    "message": "OpenAIモデル"
+  },
+  "options_google_models": {
+    "description": "Google models group heading",
+    "message": "グーグルモデル"
+  },
+  "options_anthropic_models": {
+    "description": "Anthropic models group heading",
+    "message": "Anthropicモデル"
+  },
+  "options_ollama_models": {
+    "description": "Ollama models group heading",
+    "message": "Ollamaモデル"
+  },
+  "options_proxy_mode": {
+    "description": "Proxy mode setting label",
+    "message": "プロキシモード"
+  },
+  "options_proxy_mode_description": {
+    "description": "Proxy mode setting description",
+    "message": "プロキシサーバー経由でAPIリクエストをルーティングするプロキシモードを有効にします"
+  },
+
+  "options_google_settings": {
+    "description": "Google settings tab title",
+    "message": "グーグル設定"
+  },
+  "options_google_description": {
+    "description": "Google settings tab description",
+    "message": "グーグルAPIキーとGeminiモデルの設定を構成します"
+  },
+  "options_api_key": {
+    "description": "API key label",
+    "message": "APIキー"
+  },
+  "options_validating_key": {
+    "description": "Validating API key message",
+    "message": "APIキーを検証中..."
+  },
+  "options_key_valid": {
+    "description": "API key valid message",
+    "message": "APIキーが有効です ($1 モデル利用可能)"
+  },
+  "options_available_models": {
+    "description": "Available models heading",
+    "message": "利用可能なモデル"
+  },
+
+  "options_openai_settings": {
+    "description": "OpenAI settings tab title",
+    "message": "OpenAI設定"
+  },
+  "options_openai_description": {
+    "description": "OpenAI settings tab description",
+    "message": "OpenAI APIキーとモデル設定を構成します"
+  },
+
+  "options_anthropic_settings": {
+    "description": "Anthropic settings tab title",
+    "message": "Anthropic設定"
+  },
+  "options_anthropic_description": {
+    "description": "Anthropic settings tab description",
+    "message": "ClaudeにアクセスするためのAnthropic APIキーを設定します"
+  },
+
+  "options_tab_general": {
+    "description": "General tab name",
+    "message": "一般"
+  },
+  "options_tab_openai": {
+    "description": "OpenAI tab name",
+    "message": "OpenAI"
+  },
+  "options_tab_google": {
+    "description": "Google tab name",
+    "message": "グーグル"
+  },
+  "options_tab_anthropic": {
+    "description": "Anthropic tab name",
+    "message": "Anthropic"
+  },
+  "options_tab_appearance": {
+    "description": "Appearance tab name",
+    "message": "外観"
+  },
+
+  "options_appearance_settings": {
+    "description": "Appearance settings tab title",
+    "message": "外観設定"
+  },
+  "options_appearance_description": {
+    "description": "Appearance settings tab description",
+    "message": "アプリケーションの視覚的な外観をカスタマイズします"
+  },
+  "options_font_family": {
+    "description": "Font family setting label",
+    "message": "フォントファミリー"
+  },
+  "options_select_font_family": {
+    "description": "Font family selection placeholder",
+    "message": "フォントファミリーを選択"
+  },
+  "options_programming_fonts": {
+    "description": "Programming fonts group label",
+    "message": "プログラミングフォント"
+  },
+  "options_system_fonts": {
+    "description": "System fonts group label",
+    "message": "システムフォント"
+  },
+  "options_system_default": {
+    "description": "System default font option",
+    "message": "システムデフォルト"
+  },
+  "options_font_size": {
+    "description": "Font size setting label",
+    "message": "フォントサイズ"
+  },
+  "options_select_font_size": {
+    "description": "Font size selection placeholder",
+    "message": "フォントサイズを選択"
+  },
+  "options_preview": {
+    "description": "Preview section heading",
+    "message": "プレビュー"
+  },
+  "options_preview_text": {
+    "description": "Text used in the font preview",
+    "message": "素早い茶色の狐が怠けた犬を飛び越えます。"
+  },
+
+  "sidepanel_mode": {
+    "description": "Mode selector label",
+    "message": "モード"
+  },
+  "sidepanel_model": {
+    "description": "Model selector label",
+    "message": "モデル"
+  },
+  "sidepanel_select_model": {
+    "description": "Model selection placeholder",
+    "message": "モデルを選択..."
+  },
+  "sidepanel_search_models": {
+    "description": "Search models placeholder",
+    "message": "モデルを検索..."
+  },
+  "sidepanel_no_model_found": {
+    "description": "No model found message",
+    "message": "モデルが見つかりません。"
+  },
+  "sidepanel_loading_models": {
+    "description": "Loading models message",
+    "message": "モデルを読み込み中..."
+  },
+  "sidepanel_conversational_mode": {
+    "description": "Conversational mode option",
+    "message": "会話モード"
+  },
+  "sidepanel_interactive_mode": {
+    "description": "Interactive mode option",
+    "message": "対話モード"
+  },
+  "sidepanel_send": {
+    "description": "Send button text",
+    "message": "送信"
+  },
+  "sidepanel_thinking": {
+    "description": "Thinking indicator text",
+    "message": "考え中..."
+  },
+  "sidepanel_error": {
+    "description": "Error message label",
+    "message": "エラー"
+  },
+  "sidepanel_you": {
+    "description": "User message label",
+    "message": "あなた"
+  },
+  "sidepanel_assistant": {
+    "description": "Assistant message label",
+    "message": "アシスタント"
+  },
+  "sidepanel_message_placeholder": {
+    "description": "Message input placeholder",
+    "message": "メッセージを入力...(送信は Enter、改行は Shift + Enter)"
+  },
+  "sidepanel_extracted_data": {
+    "description": "Extracted data label",
+    "message": "抽出されたデータ ($1 項目)"
+  },
+  "sidepanel_retry_strategy": {
+    "description": "Retry strategy label",
+    "message": "再試行戦略: $1"
+  },
+  "sidepanel_max_retries": {
+    "description": "Max retries label",
+    "message": "最大再試行回数: $1"
+  },
+  "sidepanel_fallback": {
+    "description": "Fallback label",
+    "message": "フォールバック: $1"
+  },
+  "sidepanel_execute_all": {
+    "description": "Execute all steps button",
+    "message": "すべてのステップを実行"
+  },
+  "sidepanel_executing": {
+    "description": "Executing indicator text",
+    "message": "実行中..."
+  },
+  "sidepanel_action": {
+    "description": "Action label",
+    "message": "アクション: $1"
+  },
+  "sidepanel_query": {
+    "description": "Query label",
+    "message": "クエリ: $1"
+  },
+  "sidepanel_url": {
+    "description": "URL label",
+    "message": "URL: $1"
+  },
+  "sidepanel_selector": {
+    "description": "Selector label",
+    "message": "セレクタ: $1"
+  },
+  "sidepanel_value": {
+    "description": "Value label",
+    "message": "値: $1"
+  },
+  "sidepanel_running": {
+    "description": "Running status",
+    "message": "実行中..."
+  },
+  "sidepanel_complete": {
+    "description": "Complete status",
+    "message": "完了"
+  },
+  "sidepanel_failed": {
+    "description": "Failed status",
+    "message": "失敗"
+  },
+  "sidepanel_pending": {
+    "description": "Pending status",
+    "message": "保留中"
+  },
+  "sidepanel_retries": {
+    "description": "Retries counter",
+    "message": "リトライ: $1/$2"
+  },
+  "sidepanel_user": {
+    "description": "Default text for user name when not available",
+    "message": "ユーザー"
+  },
+  "sidepanel_signed_in_as": {
+    "description": "Text showing which account is signed in",
+    "message": "ログイン中："
+  },
+  "sidepanel_click_to_sign_out": {
+    "description": "Tooltip text for sign out button",
+    "message": "クリックしてログアウト"
+  },
+  "sidepanel_sign_in": {
+    "description": "Sign in to Overlay button text",
+    "message": "Overlayにサインイン"
+  },
+  "extensions": {
+    "description": "Link text for Chrome Extensions page",
+    "message": "拡張機能"
+  },
+  "bookmarks": {
+    "description": "Link text for Chrome Bookmarks page",
+    "message": "ブックマーク"
+  },
+  "new_page": {
+    "description": "Title for the new tab page",
+    "message": "新しいページ"
+  },
+  "sidepanel_welcome_title": {
+    "description": "Welcome title in side panel",
+    "message": "Overlayへようこそ"
+  },
+  "sidepanel_welcome_message": {
+    "description": "Welcome message in side panel",
+    "message": "AIを搭載したブラウザアシスタントがお手伝いする準備ができています。現在のページについて、または一般的な質問をお気軽にどうぞ。"
+  },
+
+  "login_required": {
+    "description": "Title shown on login screen",
+    "message": "Overlayにログイン"
+  },
+  "login_description": {
+    "description": "Description on login screen",
+    "message": "ログインしてインテリジェントブラウジングアシスタントにアクセス"
+  },
+  "login_button": {
+    "description": "Text on login button",
+    "message": "Overlayでログイン"
+  },
+  "popup_signing_in": {
+    "description": "Signing in progress text",
+    "message": "ログイン中..."
+  },
+  "auth_required_message": {
+    "description": "Message explaining why authentication is needed",
+    "message": "Overlayの機能にアクセスするには認証が必要です"
+  },
+
+  "calendar_title": {
+    "description": "Calendar section title",
+    "message": "カレンダー"
+  },
+  "calendar_today": {
+    "description": "Label for today's events",
+    "message": "今日"
+  },
+  "calendar_tomorrow": {
+    "description": "Label for tomorrow's events",
+    "message": "明日"
+  },
+  "calendar_error_loading": {
+    "description": "Error message when calendar events fail to load",
+    "message": "カレンダーイベントの読み込みに失敗しました。もう一度お試しください。"
+  },
+  "calendar_loading": {
+    "description": "Loading message for calendar events",
+    "message": "カレンダーイベントを読み込み中..."
+  },
+  "calendar_no_events": {
+    "description": "Message when there are no upcoming events",
+    "message": "予定はありません"
+  },
+  "calendar_all_day": {
+    "description": "Label for all-day events",
+    "message": "終日"
+  },
+  "calendar_attendee": {
+    "description": "Singular label for one attendee",
+    "message": "参加者"
+  },
+  "calendar_attendees": {
+    "description": "Plural label for multiple attendees",
+    "message": "参加者"
+  },
+  "calendar_close": {
+    "description": "Close button text for dialogs",
+    "message": "閉じる"
+  },
+  "calendar_date_time": {
+    "description": "Label for date and time section",
+    "message": "日付と時間"
+  },
+  "calendar_location": {
+    "description": "Label for event location",
+    "message": "場所"
+  },
+  "calendar_status_accepted": {
+    "description": "Label for accepted event status",
+    "message": "（承認済み）"
+  },
+  "calendar_status_tentative": {
+    "description": "Label for tentative event status",
+    "message": "（仮承認）"
+  },
+  "calendar_status_declined": {
+    "description": "Label for declined event status",
+    "message": "（辞退済み）"
+  },
+
+  "ollama_description": {
+    "description": "Description of Ollama functionality",
+    "message": "Ollamaを使用すると、オープンソースの大規模言語モデルをローカルで実行できます。Overlayで使用するためにOllamaを設定します。"
+  },
+  "ollama_installation_title": {
+    "description": "Title for Ollama installation section",
+    "message": "Ollamaのインストール"
+  },
+  "ollama_installation_description": {
+    "description": "Description for Ollama installation section",
+    "message": "まず、コンピューターにOllamaをインストールします"
+  },
+  "ollama_installation_instructions": {
+    "description": "Instructions for installing Ollama",
+    "message": "Ollamaの公式ウェブサイトにアクセスし、お使いのOSに合わせたインストール手順に従ってください："
+  },
+  "ollama_pulling_models_title": {
+    "description": "Title for Ollama model pulling section",
+    "message": "モデルのダウンロード"
+  },
+  "ollama_pulling_models_description": {
+    "description": "Description for Ollama model pulling section",
+    "message": "使用したいモデルをダウンロードします"
+  },
+  "ollama_pulling_models_instructions": {
+    "description": "Instructions for pulling Ollama models",
+    "message": "次のコマンドを使用してモデルをダウンロードします。例えば、Llama 3をダウンロードするには："
+  },
+  "ollama_other_models": {
+    "description": "Information about other available Ollama models",
+    "message": "他の人気のモデルには、mistral、gemma、mixtral、phi、orca-miniなどがあります。"
+  },
+  "ollama_view_model_library": {
+    "description": "Label for link to view Ollama model library",
+    "message": "モデルライブラリ全体を表示"
+  },
+  "ollama_serve_title": {
+    "description": "Title for Ollama serving section",
+    "message": "Chrome拡張機能サポート付きでOllamaを実行する"
+  },
+  "ollama_serve_description": {
+    "description": "Description for Ollama serving section",
+    "message": "重要なステップ：拡張機能との接続を許可するための特別なフラグでOllamaを実行します"
+  },
+  "ollama_important_note": {
+    "description": "Important note about Ollama configuration",
+    "message": "重要：Chrome拡張機能のサポートにはOLLAMA_ORIGINS環境変数を使用してOllamaを実行する必要があります！"
+  },
+  "ollama_serve_instructions": {
+    "description": "Instructions for serving Ollama",
+    "message": "拡張機能サポート付きでOllamaを起動するには、このコマンドを使用します："
+  },
+  "ollama_serve_info": {
+    "description": "Information about the Ollama serve command",
+    "message": "このコマンドにより、拡張機能がローカルのOllamaサーバーに接続できるようになります。OllamaをOverlayで使用する間は、このターミナルウィンドウを開いたままにしておいてください。"
+  },
+  "ollama_further_help": {
+    "description": "Text for getting further help with Ollama",
+    "message": "詳細なヘルプについては、Ollamaのドキュメントを参照してください："
+  },
+  "ollama_available_models": {
+    "description": "Title for available Ollama models section",
+    "message": "利用可能なモデル"
+  },
+  "ollama_models_description": {
+    "description": "Description for Ollama models section",
+    "message": "Ollamaサーバーから検出されたモデル"
+  },
+  "loading_models": {
+    "description": "Message shown while loading models",
+    "message": "モデルを読み込み中..."
+  },
+  "no_ollama_models": {
+    "description": "Message shown when no Ollama models are detected",
+    "message": "Ollamaモデルが検出されませんでした。Ollamaが正しいフラグで実行されていることを確認してください。"
+  },
+
+  "task_title": {
+    "description": "Title for task section",
+    "message": "タスク"
+  },
+  "task_dismiss": {
+    "description": "Dismiss button text",
+    "message": "閉じる"
+  },
+  "task_cancel": {
+    "description": "Cancel button text",
+    "message": "キャンセル"
+  },
+  "task_save": {
+    "description": "Save button text",
+    "message": "保存"
+  },
+  "task_create": {
+    "description": "Create button text",
+    "message": "作成"
+  },
+  "task_new_list": {
+    "description": "Button text for creating a new list",
+    "message": "新しいリスト"
+  },
+  "task_set_as_default": {
+    "description": "Button text for setting a list as default",
+    "message": "デフォルトに設定"
+  },
+  "task_delete_list": {
+    "description": "Button text for deleting a list",
+    "message": "リストを削除"
+  },
+  "task_delete_list_confirmation": {
+    "description": "Title for delete list confirmation dialog",
+    "message": "タスクリストを削除"
+  },
+  "task_delete_list_description": {
+    "description": "Description text for delete list confirmation dialog",
+    "message": "このタスクリストを削除してもよろしいですか？このリストのすべてのタスクが削除され、元に戻すことはできません。"
+  },
+  "task_delete": {
+    "description": "Delete button text",
+    "message": "削除"
+  },
+  "task_error_creating_list": {
+    "description": "Error message when creating a task list fails",
+    "message": "タスクリストの作成中にエラーが発生しました"
+  },
+  "task_default_list_set_success": {
+    "description": "Success message when setting a default list",
+    "message": "デフォルトリストが正常に設定されました"
+  },
+  "task_default_list_set_error": {
+    "description": "Error message when setting a default list fails",
+    "message": "デフォルトリストの設定中にエラーが発生しました"
+  },
+  "task_create_first_list": {
+    "description": "Button text for creating the first task list",
+    "message": "最初のタスクリストを作成"
+  },
+  "task_overdue": {
+    "description": "Label for overdue tasks",
+    "message": "(期限切れ)"
+  },
+  "task_create_new_list": {
+    "description": "Title for create new list dialog",
+    "message": "新しいリストを作成"
+  },
+  "task_create_new_list_description": {
+    "description": "Description text for create new list dialog",
+    "message": "新しいタスクリストの名前を入力してください。"
+  },
+  "task_list_name": {
+    "description": "Label for the list name input field",
+    "message": "リスト名"
+  },
+  "task_list_name_placeholder": {
+    "description": "Placeholder text for the list name input field",
+    "message": "マイタスク"
+  }
+}

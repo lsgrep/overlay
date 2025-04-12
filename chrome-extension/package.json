@@ -1,7 +1,8 @@
 {
   "name": "chrome-extension",
-  "version": "0.3.6",
-  "description": "chrome extension - core settings",
+  "version": "0.4.1",
+  "description": "Chrome extension - core settings",
+  "license": "Commercial",
   "type": "module",
   "scripts": {
     "clean:node_modules": "pnpx rimraf node_modules",
@@ -18,7 +19,8 @@
   "dependencies": {
     "webextension-polyfill": "^0.12.0",
     "@extension/shared": "workspace:*",
-    "@extension/storage": "workspace:*"
+    "@extension/storage": "workspace:*",
+    "@extension/i18n": "workspace:*"
   },
   "devDependencies": {
     "@extension/dev-utils": "workspace:*",
