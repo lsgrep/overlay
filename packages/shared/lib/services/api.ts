@@ -71,6 +71,25 @@ export interface UpdateTaskData {
   due?: string;
 }
 
+export interface ConferenceEntryPoint {
+  entryPointType?: 'video' | 'phone' | 'sip' | 'more';
+  uri?: string;
+  label?: string;
+  pin?: string;
+  accessCode?: string;
+  meetingCode?: string;
+  passcode?: string;
+  password?: string;
+}
+
+export interface ConferenceSolution {
+  key?: {
+    type?: string;
+  };
+  name?: string;
+  iconUri?: string;
+}
+
 export interface CalendarEvent {
   id: string;
   summary: string;
@@ -89,6 +108,12 @@ export interface CalendarEvent {
     displayName?: string;
     responseStatus?: 'accepted' | 'tentative' | 'declined' | 'needsAction';
   }>;
+  conferenceData?: {
+    entryPoints?: ConferenceEntryPoint[];
+    conferenceSolution?: ConferenceSolution;
+    conferenceId?: string;
+  };
+  hangoutLink?: string;
 }
 
 /**

@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { t } from '@extension/i18n';
 import { overlayApi, type CalendarEvent } from '@extension/shared/lib/services/api';
-import { CalendarIcon, ClockIcon, MapPinIcon, UsersIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import {
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
+  UsersIcon,
+  VideoCameraIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { ArrowPathIcon } from '@heroicons/react/24/solid';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@extension/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose, ZoomIcon } from '@extension/ui';
 
 // We no longer need props as we use design tokens
 type CalendarViewProps = Record<string, never>;
@@ -12,13 +19,18 @@ type CalendarViewProps = Record<string, never>;
 const formatEventDescription = (text: string): string => {
   if (!text) return '';
 
+  // Remove non-alphabetical characters from the beginning
+  const cleanedText = text.replace(/^[^a-zA-Z]+/, '');
+
   // For calendar events from Google, we want to preserve the HTML formatting
   // but add some additional styling for better presentation
   return (
-    text
+    cleanedText
       // Make sure all URLs are properly linked
       .replace(/(?<!(href="|src="))https?:\/\/[^\s<>]+/g, url => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">${url}</a>`;
+        // Truncate displayed URL if too long while preserving the full link
+        const displayUrl = url.length > 40 ? url.substring(0, 37) + '...' : url;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline break-all inline-block max-w-full overflow-hidden" style="word-break: break-word; overflow-wrap: break-word;" title="${url}">${displayUrl}</a>`;
       })
 
       // Add consistent styling to existing HTML elements
@@ -28,13 +40,18 @@ const formatEventDescription = (text: string): string => {
       .replace(/<i>(.*?)<\/i>/g, '<i class="italic">$1</i>')
 
       // Make sure all anchor tags have styling
-      .replace(/<a(?!.*class=)/g, '<a class="text-primary hover:underline" ')
+      .replace(/<a(?!.*class=)/g, '<a class="text-indigo-600 dark:text-indigo-400 hover:underline" ')
 
       // Add a bit of spacing after paragraphs
       .replace(/<\/p>/g, '</p><div class="h-2"></div>')
 
       // Add some spacing after line breaks for readability
       .replace(/<br\s*\/?>/g, '<br class="mb-2" />')
+      // Add special styles for links to ensure they break properly
+      .replace(
+        /<a /g,
+        '<a style="word-break: break-word; overflow-wrap: break-word; display: inline-block; max-width: 100%;" ',
+      )
   );
 };
 
@@ -194,10 +211,102 @@ export const CalendarView: React.FC<CalendarViewProps> = () => {
                           <div className="mt-1 space-y-1">
                             {event.location && (
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <MapPinIcon className="w-3 h-3" />
-                                <span className="truncate">{event.location}</span>
+                                {event.location.includes('zoom.us') ? (
+                                  <a
+                                    href={event.location}
+                                    onClick={e => e.stopPropagation()}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium hover:underline max-w-full overflow-hidden">
+                                    <ZoomIcon className="w-3 h-3 flex-shrink-0 text-indigo-600 dark:text-indigo-400" />
+                                    <span className="truncate">Zoom Meeting</span>
+                                  </a>
+                                ) : (
+                                  <>
+                                    <MapPinIcon className="w-3 h-3" />
+                                    <span className="truncate">{event.location}</span>
+                                  </>
+                                )}
                               </div>
                             )}
+
+                            {/* Display conference links with proper grouping */}
+                            {(() => {
+                              // Only show one type of conference link - prioritize conferenceData
+                              if (event.conferenceData?.entryPoints && event.conferenceData.entryPoints.length > 0) {
+                                // Group entry points by type
+                                const meetEntryPoint = event.conferenceData.entryPoints.find(entry =>
+                                  entry.uri?.includes('meet.google.com'),
+                                );
+                                const zoomEntryPoint = event.conferenceData.entryPoints.find(entry =>
+                                  entry.uri?.includes('zoom'),
+                                );
+                                const otherEntryPoint =
+                                  !meetEntryPoint && !zoomEntryPoint ? event.conferenceData.entryPoints[0] : null;
+
+                                return (
+                                  <div className="flex flex-col gap-1 text-xs mt-1">
+                                    {meetEntryPoint && (
+                                      <a
+                                        href={meetEntryPoint.uri}
+                                        onClick={e => e.stopPropagation()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium hover:underline inline-flex items-center max-w-full overflow-hidden">
+                                        <VideoCameraIcon className="inline-block w-3 h-3 mr-1 flex-shrink-0 text-blue-500" />
+                                        <span className="truncate">Google Meet</span>
+                                      </a>
+                                    )}
+                                    {zoomEntryPoint && (
+                                      <a
+                                        href={zoomEntryPoint.uri}
+                                        onClick={e => e.stopPropagation()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium hover:underline inline-flex items-center max-w-full overflow-hidden">
+                                        <ZoomIcon className="inline-block w-3 h-3 mr-1 flex-shrink-0 text-indigo-600 dark:text-indigo-400" />
+                                        <span className="truncate">Zoom Meeting</span>
+                                      </a>
+                                    )}
+                                    {otherEntryPoint && (
+                                      <a
+                                        href={otherEntryPoint.uri}
+                                        onClick={e => e.stopPropagation()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium hover:underline inline-flex items-center max-w-full overflow-hidden">
+                                        <VideoCameraIcon className="inline-block w-3 h-3 mr-1 flex-shrink-0" />
+                                        <span className="truncate">Conference</span>
+                                      </a>
+                                    )}
+                                  </div>
+                                );
+                              } else if (
+                                event.description?.includes('zoom.us') ||
+                                event.location?.includes('zoom.us')
+                              ) {
+                                // Handle Zoom links from description or location as fallback
+                                return (
+                                  <div className="flex items-center gap-2 text-xs mt-1">
+                                    <a
+                                      href={
+                                        event.location?.includes('zoom.us')
+                                          ? event.location
+                                          : event.description?.match(/https:\/\/[^\s<>]*zoom.us[^\s<>]*/)?.[0]
+                                      }
+                                      onClick={e => e.stopPropagation()}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium hover:underline inline-flex items-center">
+                                      <ZoomIcon className="w-3 h-3 mr-1 text-indigo-600 dark:text-indigo-400" />
+                                      <span>Zoom Meeting</span>
+                                    </a>
+                                  </div>
+                                );
+                              }
+
+                              return null;
+                            })()}
 
                             {event.attendees && event.attendees.length > 0 && (
                               <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -210,14 +319,20 @@ export const CalendarView: React.FC<CalendarViewProps> = () => {
                               </div>
                             )}
 
-                            {event.description && (
-                              <p
-                                className="text-xs mt-1 truncate text-muted-foreground"
-                                title={event.description.replace(/<[^>]*>?/gm, '')}>
-                                {event.description.replace(/<[^>]*>?/gm, '').substring(0, 50)}
-                                {event.description.replace(/<[^>]*>?/gm, '').length > 50 ? '...' : ''}
-                              </p>
-                            )}
+                            {/* Only show description if it doesn't just contain meeting info */}
+                            {event.description &&
+                              !event.description.includes('is inviting you to a scheduled Zoom meeting') &&
+                              !event.description.includes('Join Zoom Meeting') && (
+                                <p
+                                  className="text-xs mt-1 truncate text-muted-foreground"
+                                  title={event.description.replace(/<[^>]*>?/gm, '')}>
+                                  {event.description
+                                    .replace(/<[^>]*>?/gm, '')
+                                    .replace(/^[^a-zA-Z]+/, '')
+                                    .substring(0, 50)}
+                                  {event.description.replace(/<[^>]*>?/gm, '').length > 50 ? '...' : ''}
+                                </p>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -316,11 +431,63 @@ export const CalendarView: React.FC<CalendarViewProps> = () => {
               {selectedEvent.location && (
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-full bg-primary/10">
-                    <MapPinIcon className="h-4 w-4 text-primary" />
+                    {selectedEvent.location.includes('zoom.us') ? (
+                      <ZoomIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                    ) : (
+                      <MapPinIcon className="h-4 w-4 text-primary" />
+                    )}
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-foreground">{t('calendar_location')}</h4>
-                    <p className="mt-1 text-sm break-words text-foreground">{selectedEvent.location}</p>
+                    <h4 className="text-sm font-medium text-foreground">
+                      {selectedEvent.location.includes('zoom.us') ? 'Zoom Meeting' : t('calendar_location')}
+                    </h4>
+                    <p className="mt-1 text-sm break-words text-foreground">
+                      {selectedEvent.location.startsWith('http') ? (
+                        <a
+                          href={selectedEvent.location}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 hover:underline break-all inline-block max-w-full">
+                          {selectedEvent.location.includes('zoom.us') ? (
+                            'Join Zoom Meeting'
+                          ) : (
+                            <span className="truncate inline-block max-w-full">{selectedEvent.location}</span>
+                          )}
+                        </a>
+                      ) : (
+                        selectedEvent.location
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Conference Links */}
+              {selectedEvent.conferenceData?.entryPoints && selectedEvent.conferenceData.entryPoints.length > 0 && (
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30">
+                    <VideoCameraIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-foreground">
+                      {selectedEvent.conferenceData.conferenceSolution?.name || 'Conference'}
+                    </h4>
+                    <div className="mt-1 text-sm space-y-2">
+                      {selectedEvent.conferenceData.entryPoints.map((entry, idx) => (
+                        <div key={idx}>
+                          <a
+                            href={entry.uri}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 hover:underline font-medium">
+                            {entry.label || 'Join ' + (entry.entryPointType || 'meeting')}
+                          </a>
+                          {entry.entryPointType === 'phone' && entry.pin && (
+                            <span className="ml-2 text-xs text-muted-foreground">PIN: {entry.pin}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -366,7 +533,8 @@ export const CalendarView: React.FC<CalendarViewProps> = () => {
                     <div className="mt-1 max-h-60 overflow-y-auto">
                       {/* Format and render description with enhanced formatting */}
                       <div
-                        className="event-description text-sm leading-relaxed text-foreground"
+                        className="event-description text-sm leading-relaxed text-foreground break-words"
+                        style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                         dangerouslySetInnerHTML={{
                           __html: formatEventDescription(selectedEvent.description),
                         }}
