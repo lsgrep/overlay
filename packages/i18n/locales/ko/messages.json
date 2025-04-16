@@ -30,7 +30,6 @@
   "error": {
     "message": "오류가 발생했습니다"
   },
-
   "options_general_settings": {
     "description": "General settings tab title",
     "message": "일반 설정"
@@ -91,7 +90,6 @@
     "description": "Proxy mode setting description",
     "message": "프록시 서버를 통해 API 요청을 라우팅하는 프록시 모드 활성화"
   },
-
   "options_google_settings": {
     "description": "Google settings tab title",
     "message": "구글 설정"
@@ -116,7 +114,6 @@
     "description": "Available models heading",
     "message": "사용 가능한 모델"
   },
-
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
     "message": "OpenAI 설정"
@@ -125,7 +122,6 @@
     "description": "OpenAI settings tab description",
     "message": "OpenAI API 키와 모델 설정을 구성합니다"
   },
-
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
     "message": "Anthropic 설정"
@@ -134,7 +130,6 @@
     "description": "Anthropic settings tab description",
     "message": "Claude에 액세스하기 위한 Anthropic API 키를 구성합니다"
   },
-
   "options_tab_general": {
     "description": "General tab name",
     "message": "일반"
@@ -159,7 +154,6 @@
     "description": "Profile tab name",
     "message": "프로필"
   },
-
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
     "message": "외관 설정"
@@ -204,7 +198,6 @@
     "description": "Text used in the font preview",
     "message": "날카로운 갈색 여우가 게으른 개를 뛰어넘습니다."
   },
-
   "options_profile_settings": {
     "description": "Profile settings tab title",
     "message": "프로필 설정"
@@ -265,7 +258,6 @@
     "description": "Save profile button text",
     "message": "프로필 저장"
   },
-
   "sidepanel_mode": {
     "description": "Mode selector label",
     "message": "모드"
@@ -422,7 +414,6 @@
     "description": "Welcome message in side panel",
     "message": "AI 기반 브라우저 어시스턴트가 도와드릴 준비가 되었습니다. 현재 페이지에 관한 질문이나 일반적인 질문을 자유롭게 해보세요."
   },
-
   "login_required": {
     "description": "Title shown on login screen",
     "message": "Overlay에 로그인"
@@ -443,7 +434,6 @@
     "description": "Message explaining why authentication is needed",
     "message": "Overlay 기능에 액세스하려면 인증이 필요합니다"
   },
-
   "calendar_title": {
     "description": "Calendar section title",
     "message": "일정"
@@ -504,7 +494,6 @@
     "description": "Label for declined event status",
     "message": "(거절됨)"
   },
-
   "ollama_description": {
     "description": "Description of Ollama functionality",
     "message": "Ollama를 사용하면 오픈소스 대규모 언어 모델을 가지고 개인 기기에서 로컬로 실행할 수 있습니다. Overlay와 함께 사용하기 위한 Ollama를 구성하세요."
@@ -581,7 +570,6 @@
     "description": "Message shown when no Ollama models are detected",
     "message": "Ollama 모델이 감지되지 않았습니다. Ollama가 올바른 플래그로 실행 중인지 확인하세요."
   },
-
   "task_title": {
     "description": "Title for task section",
     "message": "작업"
@@ -661,5 +649,17 @@
   "task_list_name_placeholder": {
     "description": "Placeholder text for the list name input field",
     "message": "내 작업"
+  },
+  "options_llm_response_language": {
+    "description": "Label for LLM response language preference",
+    "message": "AI 응답 언어"
+  },
+  "options_llm_language_description": {
+    "description": "Description for LLM response language preference",
+    "message": "AI가 응답할 언어를 설정합니다"
+  },
+  "options_ui_language_description": {
+    "description": "Description for UI language preference",
+    "message": "Set the language for the user interface"
   }
 }

@@ -13,6 +13,7 @@ export interface PromptOptions {
   includeMetadata?: boolean;
   maxContentLength?: number;
   enhancedMode?: boolean;
+  preferredLanguage?: string;
 }
 
 export class PromptManager {
@@ -111,6 +112,11 @@ export class PromptManager {
       }
     } else {
       context += '\n\n' + promptGenerator.generateConversationalPrompt();
+    }
+
+    // Add preferred language instruction if specified
+    if (options.preferredLanguage && options.preferredLanguage !== 'en') {
+      context += `\n\n## Language Preference\nPlease respond in ${options.preferredLanguage} language unless the user explicitly asks for a different language.`;
     }
     return context;
   }

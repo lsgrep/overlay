@@ -30,7 +30,6 @@
   "error": {
     "message": "Se ha producido un error"
   },
-
   "options_general_settings": {
     "description": "General settings tab title",
     "message": "Configuración general"
@@ -91,7 +90,6 @@
     "description": "Proxy mode setting description",
     "message": "Habilitar el modo proxy para enrutar las solicitudes de API a través de un servidor proxy"
   },
-
   "options_google_settings": {
     "description": "Google settings tab title",
     "message": "Configuración de Google"
@@ -116,7 +114,6 @@
     "description": "Available models heading",
     "message": "Modelos disponibles"
   },
-
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
     "message": "Configuración de OpenAI"
@@ -125,7 +122,6 @@
     "description": "OpenAI settings tab description",
     "message": "Configure su clave API de OpenAI y preferencias de modelos"
   },
-
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
     "message": "Configuración de Anthropic"
@@ -134,7 +130,6 @@
     "description": "Anthropic settings tab description",
     "message": "Configure su clave API de Anthropic para acceder a Claude"
   },
-
   "options_tab_general": {
     "description": "General tab name",
     "message": "General"
@@ -159,7 +154,6 @@
     "description": "Profile tab name",
     "message": "Perfil"
   },
-
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
     "message": "Configuración de apariencia"
@@ -204,7 +198,6 @@
     "description": "Text used in the font preview",
     "message": "El zorro marrón rápido salta sobre el perro perezoso."
   },
-
   "options_profile_settings": {
     "description": "Profile settings tab title",
     "message": "Configuración de Perfil"
@@ -289,7 +282,6 @@
     "description": "Save profile button text",
     "message": "Guardar Perfil"
   },
-
   "sidepanel_mode": {
     "description": "Mode selector label",
     "message": "Modo"
@@ -446,7 +438,6 @@
     "description": "Welcome message in side panel",
     "message": "Tu asistente de navegador con IA está listo para ayudarte. Pregúntame cualquier cosa sobre la página actual o cualquier consulta general."
   },
-
   "login_required": {
     "description": "Title shown on login screen",
     "message": "Iniciar sesión en Overlay"
@@ -467,7 +458,6 @@
     "description": "Message explaining why authentication is needed",
     "message": "Se requiere autenticación para acceder a las funciones de Overlay"
   },
-
   "calendar_title": {
     "description": "Calendar section title",
     "message": "Calendario"
@@ -528,7 +518,6 @@
     "description": "Label for declined event status",
     "message": "(Rechazado)"
   },
-
   "task_title": {
     "description": "Task section title",
     "message": "Tus Tareas"
@@ -677,7 +666,6 @@
     "description": "Button text for creating the first task list",
     "message": "Crea tu primera lista de tareas"
   },
-
   "ollama_description": {
     "description": "Description of Ollama functionality",
     "message": "Ollama te permite ejecutar modelos de lenguaje de código abierto localmente en tu máquina. Configura Ollama para usarlo con Overlay."
@@ -753,5 +741,17 @@
   "no_ollama_models": {
     "description": "Message shown when no Ollama models are detected",
     "message": "No se detectaron modelos de Ollama. Asegúrate de que Ollama esté ejecutándose con las banderas correctas."
+  },
+  "options_llm_response_language": {
+    "description": "Label for LLM response language preference",
+    "message": "Idioma de respuesta de IA"
+  },
+  "options_llm_language_description": {
+    "description": "Description for LLM response language preference",
+    "message": "Establece el idioma en el que quieres recibir las respuestas de la IA"
+  },
+  "options_ui_language_description": {
+    "description": "Description for UI language preference",
+    "message": "Set the language for the user interface"
   }
 }

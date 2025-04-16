@@ -30,7 +30,6 @@
   "error": {
     "message": "エラーが発生しました"
   },
-
   "options_general_settings": {
     "description": "General settings tab title",
     "message": "一般設定"
@@ -91,7 +90,6 @@
     "description": "Proxy mode setting description",
     "message": "プロキシサーバー経由でAPIリクエストをルーティングするプロキシモードを有効にします"
   },
-
   "options_google_settings": {
     "description": "Google settings tab title",
     "message": "グーグル設定"
@@ -116,7 +114,6 @@
     "description": "Available models heading",
     "message": "利用可能なモデル"
   },
-
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
     "message": "OpenAI設定"
@@ -125,7 +122,6 @@
     "description": "OpenAI settings tab description",
     "message": "OpenAI APIキーとモデル設定を構成します"
   },
-
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
     "message": "Anthropic設定"
@@ -134,7 +130,6 @@
     "description": "Anthropic settings tab description",
     "message": "ClaudeにアクセスするためのAnthropic APIキーを設定します"
   },
-
   "options_tab_general": {
     "description": "General tab name",
     "message": "一般"
@@ -155,7 +150,6 @@
     "description": "Appearance tab name",
     "message": "外観"
   },
-
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
     "message": "外観設定"
@@ -200,7 +194,6 @@
     "description": "Text used in the font preview",
     "message": "素早い茶色の狐が怠けた犬を飛び越えます。"
   },
-
   "sidepanel_mode": {
     "description": "Mode selector label",
     "message": "モード"
@@ -357,7 +350,6 @@
     "description": "Welcome message in side panel",
     "message": "AIを搭載したブラウザアシスタントがお手伝いする準備ができています。現在のページについて、または一般的な質問をお気軽にどうぞ。"
   },
-
   "login_required": {
     "description": "Title shown on login screen",
     "message": "Overlayにログイン"
@@ -378,7 +370,6 @@
     "description": "Message explaining why authentication is needed",
     "message": "Overlayの機能にアクセスするには認証が必要です"
   },
-
   "calendar_title": {
     "description": "Calendar section title",
     "message": "カレンダー"
@@ -439,7 +430,6 @@
     "description": "Label for declined event status",
     "message": "（辞退済み）"
   },
-
   "ollama_description": {
     "description": "Description of Ollama functionality",
     "message": "Ollamaを使用すると、オープンソースの大規模言語モデルをローカルで実行できます。Overlayで使用するためにOllamaを設定します。"
@@ -516,7 +506,6 @@
     "description": "Message shown when no Ollama models are detected",
     "message": "Ollamaモデルが検出されませんでした。Ollamaが正しいフラグで実行されていることを確認してください。"
   },
-
   "task_title": {
     "description": "Title for task section",
     "message": "タスク"
@@ -596,5 +585,17 @@
   "task_list_name_placeholder": {
     "description": "Placeholder text for the list name input field",
     "message": "マイタスク"
+  },
+  "options_llm_response_language": {
+    "description": "Label for LLM response language preference",
+    "message": "AI応答言語"
+  },
+  "options_llm_language_description": {
+    "description": "Description for LLM response language preference",
+    "message": "AIからの応答を受け取りたい言語を設定します"
+  },
+  "options_ui_language_description": {
+    "description": "Description for UI language preference",
+    "message": "Set the language for the user interface"
   }
 }

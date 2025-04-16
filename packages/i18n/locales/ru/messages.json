@@ -30,7 +30,6 @@
   "error": {
     "message": "Произошла ошибка"
   },
-
   "options_general_settings": {
     "description": "General settings tab title",
     "message": "Общие настройки"
@@ -91,7 +90,6 @@
     "description": "Proxy mode setting description",
     "message": "Включите режим прокси для маршрутизации API-запросов через прокси-сервер"
   },
-
   "options_google_settings": {
     "description": "Google settings tab title",
     "message": "Настройки Google"
@@ -116,7 +114,6 @@
     "description": "Available models heading",
     "message": "Доступные модели"
   },
-
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
     "message": "Настройки OpenAI"
@@ -125,7 +122,6 @@
     "description": "OpenAI settings tab description",
     "message": "Настройте свой API-ключ OpenAI и предпочтения моделей"
   },
-
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
     "message": "Настройки Anthropic"
@@ -134,7 +130,6 @@
     "description": "Anthropic settings tab description",
     "message": "Настройте свой API-ключ Anthropic для доступа к Claude"
   },
-
   "options_tab_general": {
     "description": "General tab name",
     "message": "Общие"
@@ -159,7 +154,6 @@
     "description": "Profile tab name",
     "message": "Профиль"
   },
-
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
     "message": "Настройки внешнего вида"
@@ -204,7 +198,6 @@
     "description": "Text used in the font preview",
     "message": "Быстрая коричневая лиса прыгает через ленивую собаку."
   },
-
   "options_profile_settings": {
     "description": "Profile settings tab title",
     "message": "Настройки профиля"
@@ -265,7 +258,6 @@
     "description": "Save profile button text",
     "message": "Сохранить профиль"
   },
-
   "sidepanel_mode": {
     "description": "Mode selector label",
     "message": "Режим"
@@ -422,7 +414,6 @@
     "description": "Welcome message in side panel",
     "message": "Ваш ИИ-помощник для браузера готов помочь. Спросите меня о текущей странице или задайте любой общий вопрос."
   },
-
   "login_required": {
     "description": "Title shown on login screen",
     "message": "Войти в Overlay"
@@ -443,7 +434,6 @@
     "description": "Message explaining why authentication is needed",
     "message": "Для доступа к функциям Overlay требуется авторизация"
   },
-
   "calendar_title": {
     "description": "Calendar section title",
     "message": "Календарь"
@@ -504,7 +494,6 @@
     "description": "Label for declined event status",
     "message": "(Отклонено)"
   },
-
   "task_title": {
     "description": "Task section title",
     "message": "Ваши задачи"
@@ -653,7 +642,6 @@
     "description": "Placeholder text for the list name input field",
     "message": "Мои задачи"
   },
-
   "ollama_description": {
     "description": "Description of Ollama functionality",
     "message": "Ollama позволяет запускать модели языка с открытым исходным кодом локально на вашем компьютере. Настройте Ollama для использования с Overlay."
@@ -729,5 +717,17 @@
   "no_ollama_models": {
     "description": "Message shown when no Ollama models are detected",
     "message": "Модели Ollama не обнаружены. Убедитесь, что Ollama запущена с правильными флагами."
+  },
+  "options_llm_response_language": {
+    "description": "Label for LLM response language preference",
+    "message": "Язык ответов ИИ"
+  },
+  "options_llm_language_description": {
+    "description": "Description for LLM response language preference",
+    "message": "Установите язык, на котором вы хотите получать ответы от ИИ"
+  },
+  "options_ui_language_description": {
+    "description": "Description for UI language preference",
+    "message": "Set the language for the user interface"
   }
 }

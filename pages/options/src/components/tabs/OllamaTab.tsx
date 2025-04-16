@@ -8,9 +8,16 @@ interface OllamaTabProps {
   isLoadingModels?: boolean;
   modelError?: string | null;
   ollamaModels: Array<{ name: string; displayName?: string; provider: string }>;
+  hideTitle?: boolean;
 }
 
-export const OllamaTab = ({ isLight, isLoadingModels, modelError, ollamaModels }: OllamaTabProps) => {
+export const OllamaTab = ({
+  isLight,
+  isLoadingModels,
+  modelError,
+  ollamaModels,
+  hideTitle = false,
+}: OllamaTabProps) => {
   const animateIn = {
     opacity: 1,
     y: 0,
@@ -18,14 +25,18 @@ export const OllamaTab = ({ isLight, isLoadingModels, modelError, ollamaModels }
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Ollama</h2>
-      <p className="text-muted-foreground mb-6">
-        {t(
-          'ollama_description',
-          'Ollama lets you run open-source large language models locally on your machine. Configure Ollama to use it with Overlay.',
-        )}
-      </p>
+    <div className="w-full min-w-[300px]">
+      {!hideTitle && (
+        <>
+          <h2 className="text-2xl font-bold mb-4">Ollama</h2>
+          <p className="text-muted-foreground mb-6">
+            {t(
+              'ollama_description',
+              'Ollama lets you run open-source large language models locally on your machine. Configure Ollama to use it with Overlay.',
+            )}
+          </p>
+        </>
+      )}
 
       <div className="space-y-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={animateIn}>

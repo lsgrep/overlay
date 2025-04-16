@@ -34,13 +34,13 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
   }, [language]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">{t('options_appearance_settings')}</h2>
-        <p className="text-sm text-muted-foreground">{t('options_appearance_description')}</p>
+    <div className="w-full">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">{t('options_appearance_settings')}</h2>
+        <p className="text-muted-foreground">{t('options_appearance_description')}</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 w-full min-w-[300px]">
         <div className="space-y-2">
           <Label
             htmlFor="font-family"
@@ -185,6 +185,6 @@ export const AppearanceTab = ({ isLight }: AppearanceTabProps) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

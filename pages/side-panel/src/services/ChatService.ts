@@ -5,6 +5,7 @@ import { GeminiService } from './llm/gemini';
 import { OpenAIService } from './llm/openai';
 import { OllamaService } from './llm/ollama';
 import type { LLMService, MessageImage } from './llm/types';
+import { llmResponseLanguageStorage } from '@extension/storage';
 interface Message {
   role: string;
   content: string;
@@ -153,6 +154,9 @@ export class ChatService {
       },
     };
 
+    // Get the preferred language from storage (default to provided defaultLanguage if not set)
+    const preferredLanguage = (await llmResponseLanguageStorage.get()) || defaultLanguage;
+
     // Generate prompt using PromptManager with enhanced options
     const promptOptions = {
       goal: input,
@@ -161,6 +165,7 @@ export class ChatService {
       includeMetadata: true,
       maxContentLength: 10000,
       enhancedMode: true,
+      preferredLanguage,
     };
 
     // Generate prompt using PromptManager

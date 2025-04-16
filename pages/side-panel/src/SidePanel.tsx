@@ -13,7 +13,6 @@ import { motion } from 'framer-motion';
 import { CONTEXT_MENU_ACTIONS } from './types/chat';
 import { ChatInterface } from './ChatInterface';
 import type { Message as ChatMessage } from './ChatInterface';
-import { ModelSelector } from './components/ModelSelector';
 import { Toaster } from '@extension/ui/lib/ui/sonner';
 import type { SystemMessageType } from './components/SystemMessageView';
 
@@ -417,26 +416,66 @@ const SidePanel = () => {
     return () => chrome.runtime.onMessage.removeListener(listener);
   }, [selectedModel]);
 
-  useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        setLoading(true);
-        setError('');
+  // Define a reusable function for fetching models
+  const fetchModels = async () => {
+    try {
+      setLoading(true);
+      setError('');
 
-        const { anthropic, ollama, gemini, openai } = await ModelService.fetchAllModels();
-        setAnthropicModels(anthropic);
-        setOllamaModels(ollama);
-        setGeminiModels(gemini);
-        setOpenAIModels(openai);
-      } catch (err) {
-        console.error('Error fetching models:', err);
-        setError('Failed to fetch models: ' + (err as Error).message);
-      } finally {
-        setLoading(false);
+      const { anthropic, ollama, gemini, openai } = await ModelService.fetchAllModels();
+      setAnthropicModels(anthropic);
+      setOllamaModels(ollama);
+      setGeminiModels(gemini);
+      setOpenAIModels(openai);
+      console.log('Models refreshed');
+    } catch (err) {
+      console.error('Error fetching models:', err);
+      setError('Failed to fetch models: ' + (err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch models on initial mount
+  useEffect(() => {
+    fetchModels();
+  }, []);
+
+  // Listen for API key changes to refresh models
+  useEffect(() => {
+    // Function to handle storage changes
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
+      // Only care about changes in local storage where API keys are stored
+      if (areaName !== 'local') return;
+
+      // Log all changes to debug the issue
+      console.log('Storage changes detected:', changes, 'in area:', areaName);
+
+      // Storage keys to watch for API keys
+      const apiKeyStorageNames = ['openai-api-key', 'gemini-api-key', 'anthropic-api-key'];
+
+      // Check if any API key storage was changed
+      const hasKeyChanges = Object.keys(changes).some(changeKey => {
+        return apiKeyStorageNames.includes(changeKey);
+      });
+
+      if (hasKeyChanges) {
+        console.log('API key changes detected, refreshing models...');
+        // Use a short timeout to ensure the storage is fully updated
+        setTimeout(() => {
+          fetchModels();
+        }, 100);
       }
     };
 
-    fetchModels();
+    // Add listener for storage changes
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    console.log('Storage change listener registered for API keys');
+
+    // Clean up listener on unmount
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
   }, []);
 
   // We're using Chrome's native notifications instead of a custom component

@@ -764,5 +764,17 @@
   "no_ollama_models": {
     "description": "Message shown when no Ollama models are detected",
     "message": "No Ollama models detected. Make sure Ollama is running with the correct flags."
+  },
+  "options_llm_response_language": {
+    "description": "Label for LLM response language preference",
+    "message": "AI Response Language"
+  },
+  "options_llm_language_description": {
+    "description": "Description for LLM response language preference",
+    "message": "Set the language you want AI responses to be provided in"
+  },
+  "options_ui_language_description": {
+    "description": "Description for UI language preference",
+    "message": "Set the language for the user interface"
   }
 }
