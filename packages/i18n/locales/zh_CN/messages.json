@@ -30,7 +30,6 @@
   "error": {
     "message": "发生错误"
   },
-
   "options_general_settings": {
     "description": "General settings tab title",
     "message": "通用设置"
@@ -91,7 +90,6 @@
     "description": "Proxy mode setting description",
     "message": "启用代理模式以通过代理服务器路由 API 请求"
   },
-
   "options_google_settings": {
     "description": "Google settings tab title",
     "message": "谷歌设置"
@@ -116,7 +114,6 @@
     "description": "Available models heading",
     "message": "可用模型"
   },
-
   "options_openai_settings": {
     "description": "OpenAI settings tab title",
     "message": "OpenAI 设置"
@@ -125,7 +122,6 @@
     "description": "OpenAI settings tab description",
     "message": "配置您的 OpenAI API 密钥和模型偏好设置"
   },
-
   "options_anthropic_settings": {
     "description": "Anthropic settings tab title",
     "message": "Anthropic 设置"
@@ -134,7 +130,6 @@
     "description": "Anthropic settings tab description",
     "message": "配置您的 Anthropic API 密钥以访问 Claude"
   },
-
   "options_tab_general": {
     "description": "General tab name",
     "message": "通用"
@@ -159,7 +154,6 @@
     "description": "Profile tab name",
     "message": "个人资料"
   },
-
   "options_appearance_settings": {
     "description": "Appearance settings tab title",
     "message": "外观设置"
@@ -204,7 +198,6 @@
     "description": "Text used in the font preview",
     "message": "敏捷的棕色狐狸跳过懒惰的狗。"
   },
-
   "options_profile_settings": {
     "description": "Profile settings tab title",
     "message": "个人资料设置"
@@ -265,7 +258,6 @@
     "description": "Save profile button text",
     "message": "保存个人资料"
   },
-
   "sidepanel_mode": {
     "description": "Mode selector label",
     "message": "模式"
@@ -346,7 +338,6 @@
     "description": "Executing indicator text",
     "message": "执行中..."
   },
-
   "login_required": {
     "description": "Title shown on login screen",
     "message": "登录 Overlay"
@@ -367,7 +358,6 @@
     "description": "Message explaining why authentication is needed",
     "message": "需要身份验证才能访问 Overlay 的功能"
   },
-
   "calendar_title": {
     "description": "Calendar section title",
     "message": "日历"
@@ -504,7 +494,6 @@
     "description": "Welcome message in side panel",
     "message": "您的人工智能浏览器助手已准备好为您提供帮助。请随时询问关于当前页面的问题或任何一般性问题。"
   },
-
   "task_title": {
     "description": "Task section title",
     "message": "您的任务"
@@ -653,7 +642,6 @@
     "description": "Placeholder text for the list name input field",
     "message": "我的任务"
   },
-
   "ollama_description": {
     "description": "Description of Ollama functionality",
     "message": "Ollama可让您在本地计算机上运行开源大型语言模型。配置Ollama以与Overlay一起使用。"
@@ -729,5 +717,17 @@
   "no_ollama_models": {
     "description": "Message shown when no Ollama models are detected",
     "message": "未检测到Ollama模型。请确保Ollama正在使用正确的标志运行。"
+  },
+  "options_llm_response_language": {
+    "description": "Label for LLM response language preference",
+    "message": "AI响应语言"
+  },
+  "options_llm_language_description": {
+    "description": "Description for LLM response language preference",
+    "message": "设置AI响应提供的语言"
+  },
+  "options_ui_language_description": {
+    "description": "Description for UI language preference",
+    "message": "Set the language for the user interface"
   }
 }

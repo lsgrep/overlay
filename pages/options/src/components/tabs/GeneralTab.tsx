@@ -1,5 +1,10 @@
 import { useStorage } from '@extension/shared';
-import { defaultLanguageStorage, defaultModelStorage, proxyModeStorage } from '@extension/storage';
+import {
+  defaultLanguageStorage,
+  llmResponseLanguageStorage,
+  defaultModelStorage,
+  proxyModeStorage,
+} from '@extension/storage';
 import type { DevLocale } from '@extension/i18n';
 import { availableLanguages as i18nAvailableLanguages, t } from '@extension/i18n';
 import { motion } from 'framer-motion';
@@ -51,6 +56,7 @@ export const GeneralTab = ({
 }: GeneralTabProps) => {
   // Use storage hooks for language and model
   const defaultLanguage = useStorage(defaultLanguageStorage);
+  const llmResponseLanguage = useStorage(llmResponseLanguageStorage);
   const defaultModel = useStorage(defaultModelStorage);
   const proxyMode = useStorage(proxyModeStorage);
   const [open, setOpen] = useState(false);
@@ -67,13 +73,46 @@ export const GeneralTab = ({
   return (
     <div className="w-full">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-2">{t('options_general_settings')}</h2>
-        <p className="text-muted-foreground">{t('options_general_description')}</p>
+        <h2 className="text-2xl font-bold mb-2">{t('options_general_settings', 'General Settings')}</h2>
+        <p className="text-muted-foreground">
+          {t('options_general_description', 'Configure general settings for Overlay')}
+        </p>
       </div>
 
       <div className="space-y-6 w-full min-w-[300px]">
         <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="default-model">{t('options_default_model')}</Label>
+          <Label
+            htmlFor="llm-language"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            {t('options_llm_response_language', 'LLM Response Language')}
+          </Label>
+          <Select
+            value={llmResponseLanguage}
+            onValueChange={value => {
+              llmResponseLanguageStorage.set(value);
+            }}>
+            <SelectTrigger id="llm-language" className="bg-background border-border text-foreground">
+              <SelectValue placeholder={t('options_select_language', 'Select language')} />
+            </SelectTrigger>
+            <SelectContent className="bg-popover border-border text-popover-foreground">
+              <SelectGroup>
+                {availableLanguages.map(lang => (
+                  <SelectItem
+                    key={lang.code}
+                    value={lang.code}
+                    className="text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground">
+                    {lang.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground mt-1">
+            {t('options_llm_language_description', 'Set the preferred language for AI responses')}
+          </p>
+        </div>
+        <div className="grid w-full items-center gap-1.5">
+          <Label htmlFor="default-model">{t('options_default_model', 'Default AI Model')}</Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -106,25 +145,30 @@ export const GeneralTab = ({
                     )?.displayName || defaultModel}
                   </div>
                 ) : (
-                  t('options_select_model')
+                  t('options_select_model', 'Select a model')
                 )}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0 max-w-[400px] bg-popover border-border text-popover-foreground">
               <Command className="bg-popover">
-                <CommandInput placeholder={t('options_search_models')} className="border-input text-foreground" />
-                <CommandEmpty>{t('options_no_model_found')}</CommandEmpty>
+                <CommandInput
+                  placeholder={t('options_search_models', 'Search models...')}
+                  className="border-input text-foreground"
+                />
+                <CommandEmpty>{t('options_no_model_found', 'No model found')}</CommandEmpty>
                 <CommandList className="max-h-[300px]">
                   {isLoadingModels ? (
-                    <div className="py-6 text-center text-sm">{t('options_loading_models')}</div>
+                    <div className="py-6 text-center text-sm">{t('options_loading_models', 'Loading models...')}</div>
                   ) : modelError ? (
                     <div className="py-6 text-center text-sm text-red-500">{modelError}</div>
                   ) : (
                     <>
                       {/* OpenAI Models */}
                       {openaiModels.length > 0 && (
-                        <CommandGroup heading={t('options_openai_models')} className="text-foreground/70">
+                        <CommandGroup
+                          heading={t('options_openai_models', 'OpenAI Models')}
+                          className="text-foreground/70">
                           {openaiModels.map(model => (
                             <CommandItem
                               key={model.name}
@@ -150,7 +194,9 @@ export const GeneralTab = ({
                       )}
                       {/* Google Models */}
                       {googleModels.length > 0 && (
-                        <CommandGroup heading={t('options_google_models')} className="text-foreground/70">
+                        <CommandGroup
+                          heading={t('options_google_models', 'Google Models')}
+                          className="text-foreground/70">
                           {googleModels.map(model => (
                             <CommandItem
                               key={model.name}
@@ -176,7 +222,9 @@ export const GeneralTab = ({
                       )}
                       {/* Anthropic Models */}
                       {anthropicModels.length > 0 && (
-                        <CommandGroup heading={t('options_anthropic_models')} className="text-foreground/70">
+                        <CommandGroup
+                          heading={t('options_anthropic_models', 'Anthropic Models')}
+                          className="text-foreground/70">
                           {anthropicModels.map(model => (
                             <CommandItem
                               key={model.name}
@@ -202,7 +250,9 @@ export const GeneralTab = ({
                       )}
                       {/* Ollama Models */}
                       {ollamaModels.length > 0 && (
-                        <CommandGroup heading={t('options_ollama_models')} className="text-foreground/70">
+                        <CommandGroup
+                          heading={t('options_ollama_models', 'Ollama Models')}
+                          className="text-foreground/70">
                           {ollamaModels.map(model => (
                             <CommandItem
                               key={model.name}
@@ -238,9 +288,14 @@ export const GeneralTab = ({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="proxy-mode" className="text-sm font-medium leading-none">
-                {t('options_proxy_mode')}
+                {t('options_proxy_mode', 'Proxy Mode')}
               </Label>
-              <p className="text-xs text-muted-foreground">{t('options_proxy_mode_description')}</p>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'options_proxy_mode_description',
+                  'Use a proxy for API requests to enhance privacy and bypass region restrictions',
+                )}
+              </p>
             </div>
             <Switch
               id="proxy-mode"
