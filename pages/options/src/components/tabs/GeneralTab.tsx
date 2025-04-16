@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@extension/ui/lib/utils';
+import { OpenAIIcon, GeminiIcon, AnthropicIcon, OllamaIcon } from '@extension/ui';
 import {
   Select,
   SelectContent,
@@ -72,37 +73,6 @@ export const GeneralTab = ({
 
       <div className="space-y-6 w-full min-w-[300px]">
         <div className="grid w-full items-center gap-1.5">
-          <Label
-            htmlFor="language"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            {t('options_default_language')}
-          </Label>
-          <Select
-            value={defaultLanguage}
-            onValueChange={value => {
-              defaultLanguageStorage.set(value);
-              // Update the translation locale immediately
-              t.devLocale = value as any;
-            }}>
-            <SelectTrigger id="language" className="bg-background border-border text-foreground">
-              <SelectValue placeholder={t('options_select_language')} />
-            </SelectTrigger>
-            <SelectContent className="bg-popover border-border text-popover-foreground">
-              <SelectGroup>
-                {availableLanguages.map(lang => (
-                  <SelectItem
-                    key={lang.code}
-                    value={lang.code}
-                    className="text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground">
-                    {lang.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="default-model">{t('options_default_model')}</Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -110,11 +80,34 @@ export const GeneralTab = ({
                 variant="outline"
                 role="combobox"
                 className="w-full justify-between bg-background border-border text-foreground">
-                {defaultModel
-                  ? [...openaiModels, ...googleModels, ...anthropicModels, ...ollamaModels].find(
+                {defaultModel ? (
+                  <div className="flex items-center">
+                    {(() => {
+                      const model = [...openaiModels, ...googleModels, ...anthropicModels, ...ollamaModels].find(
+                        m => m.name === defaultModel,
+                      );
+
+                      // Display appropriate icon based on provider
+                      if (model) {
+                        if (openaiModels.some(m => m.name === model.name)) {
+                          return <OpenAIIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />;
+                        } else if (googleModels.some(m => m.name === model.name)) {
+                          return <GeminiIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />;
+                        } else if (anthropicModels.some(m => m.name === model.name)) {
+                          return <AnthropicIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />;
+                        } else if (ollamaModels.some(m => m.name === model.name)) {
+                          return <OllamaIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />;
+                        }
+                      }
+                      return null;
+                    })()}
+                    {[...openaiModels, ...googleModels, ...anthropicModels, ...ollamaModels].find(
                       model => model.name === defaultModel,
-                    )?.displayName || defaultModel
-                  : t('options_select_model')}
+                    )?.displayName || defaultModel}
+                  </div>
+                ) : (
+                  t('options_select_model')
+                )}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -141,13 +134,16 @@ export const GeneralTab = ({
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
-                                )}
-                              />
-                              {model.displayName || model.name}
+                              <div className="flex items-center">
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    defaultModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  )}
+                                />
+                                <OpenAIIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />
+                                {model.displayName || model.name}
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -164,13 +160,16 @@ export const GeneralTab = ({
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
-                                )}
-                              />
-                              {model.displayName || model.name}
+                              <div className="flex items-center">
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    defaultModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  )}
+                                />
+                                <GeminiIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />
+                                {model.displayName || model.name}
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -187,13 +186,16 @@ export const GeneralTab = ({
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
-                                )}
-                              />
-                              {model.displayName || model.name}
+                              <div className="flex items-center">
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    defaultModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  )}
+                                />
+                                <AnthropicIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />
+                                {model.displayName || model.name}
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -210,13 +212,16 @@ export const GeneralTab = ({
                                 defaultModelStorage.set(model.name);
                                 setOpen(false);
                               }}>
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  defaultModel === model.name ? 'opacity-100' : 'opacity-0',
-                                )}
-                              />
-                              {model.displayName || model.name}
+                              <div className="flex items-center">
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    defaultModel === model.name ? 'opacity-100' : 'opacity-0',
+                                  )}
+                                />
+                                <OllamaIcon className="h-4 w-4 mr-2 text-foreground opacity-70" />
+                                {model.displayName || model.name}
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>

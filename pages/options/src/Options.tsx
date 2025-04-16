@@ -2,9 +2,21 @@ import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { Cog6ToothIcon, PaintBrushIcon, SunIcon, MoonIcon } from '@heroicons/react/24/solid';
 import { UserIcon } from '@heroicons/react/24/outline';
-import { OpenAIIcon, GeminiIcon, AnthropicIcon, OllamaIcon } from '@extension/ui';
-import { Cpu } from 'lucide-react';
-import { t } from '@extension/i18n';
+import {
+  OpenAIIcon,
+  GeminiIcon,
+  AnthropicIcon,
+  OllamaIcon,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@extension/ui';
+import { Cpu, Globe } from 'lucide-react';
+import { availableLanguages as i18nAvailableLanguages, t } from '@extension/i18n';
+import type { DevLocale } from '@extension/i18n';
 import {
   exampleThemeStorage,
   geminiKeyStorage,
@@ -254,7 +266,7 @@ const Options = () => {
         animate={{ y: 0, opacity: 1 }}
         className="w-full py-6 px-8 border-b border-border sticky top-0 z-10 bg-background">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <motion.img
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
@@ -266,15 +278,40 @@ const Options = () => {
             />
             <h1 className="text-xl font-semibold bg-gradient-text bg-clip-text">Overlay</h1>
           </div>
-          <button
-            onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
-            className="p-2 rounded-full transition-colors bg-muted hover:bg-muted/80 text-muted-foreground"
-            data-tooltip-id="theme-tooltip"
-            data-tooltip-content={
-              isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')
-            }>
-            {isLight ? <MoonIcon className="w-4 h-4" /> : <SunIcon className="w-4 h-4" />}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
+              className="p-2 rounded-full transition-colors bg-muted hover:bg-muted/80 text-muted-foreground"
+              data-tooltip-id="theme-tooltip"
+              data-tooltip-content={
+                isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')
+              }>
+              {isLight ? <MoonIcon className="w-4 h-4" /> : <SunIcon className="w-4 h-4" />}
+            </button>
+            <Select
+              value={language}
+              onValueChange={value => {
+                defaultLanguageStorage.set(value);
+                t.devLocale = value as DevLocale;
+              }}>
+              <SelectTrigger id="header-language" className="w-32">
+                <Globe className="h-4 w-4 mr-2" />
+                <SelectValue placeholder={t('options_select_language')} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border text-popover-foreground">
+                <SelectGroup>
+                  {i18nAvailableLanguages.map(lang => (
+                    <SelectItem
+                      key={lang.code}
+                      value={lang.code}
+                      className="text-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground">
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </motion.div>
 
