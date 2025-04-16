@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { Cog6ToothIcon, PaintBrushIcon, SunIcon, MoonIcon } from '@heroicons/react/24/solid';
 import { UserIcon } from '@heroicons/react/24/outline';
-import { Terminal } from 'lucide-react';
 import { OpenAIIcon, GeminiIcon, AnthropicIcon, OllamaIcon } from '@extension/ui';
+import { Cpu } from 'lucide-react';
 import { t } from '@extension/i18n';
 import {
   exampleThemeStorage,
@@ -26,6 +26,18 @@ import {
   AppearanceTab,
   ProfileTab,
 } from './components/tabs';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from '@extension/ui/lib/ui/sidebar';
+import { cn } from '@extension/ui/lib/utils';
 
 const Options = () => {
   const theme = useStorage(exampleThemeStorage);
@@ -65,6 +77,8 @@ const Options = () => {
 
   // State for tab navigation
   const [activeTab, setActiveTab] = useState('General');
+  // State for nested LLM tab navigation
+  const [activeLLMTab, setActiveLLMTab] = useState('OpenAI');
 
   // Update the translation locale when language changes
   useEffect(() => {
@@ -110,14 +124,136 @@ const Options = () => {
     }
   }, [fontSize]);
 
+  // Render LLM provider tab content based on active provider tab
+  const renderLLMTabContent = () => {
+    switch (activeLLMTab) {
+      case 'OpenAI':
+        return (
+          <OpenAITab
+            isLight={isLight}
+            showOpenAIKey={showOpenAIKey}
+            setShowOpenAIKey={setShowOpenAIKey}
+            isLoadingModels={isLoadingModels}
+            modelError={modelError}
+            openaiModels={openaiModels}
+          />
+        );
+      case 'Google':
+        return (
+          <GoogleTab
+            isLight={isLight}
+            showGeminiKey={showGeminiKey}
+            setShowGeminiKey={setShowGeminiKey}
+            isLoadingModels={isLoadingModels}
+            modelError={modelError}
+            googleModels={googleModels}
+          />
+        );
+      case 'Anthropic':
+        return (
+          <AnthropicTab
+            isLight={isLight}
+            showAnthropicKey={showAnthropicKey}
+            setShowAnthropicKey={setShowAnthropicKey}
+            isLoadingModels={isLoadingModels}
+            modelError={modelError}
+            anthropicModels={anthropicModels}
+          />
+        );
+      case 'Ollama':
+        return (
+          <OllamaTab
+            isLight={isLight}
+            isLoadingModels={isLoadingModels}
+            modelError={modelError}
+            ollamaModels={ollamaModels}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Render tab content based on active main tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'General':
+        return (
+          <GeneralTab
+            openaiModels={openaiModels}
+            googleModels={googleModels}
+            ollamaModels={ollamaModels}
+            anthropicModels={anthropicModels}
+            isLoadingModels={isLoadingModels}
+            modelError={modelError}
+            isLight={isLight}
+          />
+        );
+      case 'LLM':
+        // Directly render the LLM provider content based on active selection
+        switch (activeLLMTab) {
+          case 'OpenAI':
+            return (
+              <OpenAITab
+                isLight={isLight}
+                showOpenAIKey={showOpenAIKey}
+                setShowOpenAIKey={setShowOpenAIKey}
+                isLoadingModels={isLoadingModels}
+                modelError={modelError}
+                openaiModels={openaiModels}
+              />
+            );
+          case 'Google':
+            return (
+              <GoogleTab
+                isLight={isLight}
+                showGeminiKey={showGeminiKey}
+                setShowGeminiKey={setShowGeminiKey}
+                isLoadingModels={isLoadingModels}
+                modelError={modelError}
+                googleModels={googleModels}
+              />
+            );
+          case 'Anthropic':
+            return (
+              <AnthropicTab
+                isLight={isLight}
+                showAnthropicKey={showAnthropicKey}
+                setShowAnthropicKey={setShowAnthropicKey}
+                isLoadingModels={isLoadingModels}
+                modelError={modelError}
+                anthropicModels={anthropicModels}
+              />
+            );
+          case 'Ollama':
+            return (
+              <OllamaTab
+                isLight={isLight}
+                isLoadingModels={isLoadingModels}
+                modelError={modelError}
+                ollamaModels={ollamaModels}
+              />
+            );
+          default:
+            return null;
+        }
+      case 'Profile':
+        return <ProfileTab isLight={isLight} />;
+      case 'Appearance':
+        return <AppearanceTab isLight={isLight} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground">
+    <div className="min-h-screen transition-colors duration-300 bg-background text-foreground min-w-[1100px] overflow-auto">
       {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         className="w-full py-6 px-8 border-b border-border sticky top-0 z-10 bg-background">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <motion.img
               whileHover={{ rotate: 360 }}
@@ -142,121 +278,109 @@ const Options = () => {
         </div>
       </motion.div>
 
-      {/* Main Content with Tabs */}
-      <div className="max-w-7xl mx-auto p-8">
-        <div className="flex gap-8">
-          {/* Vertical Tab Navigation */}
-          <div className="w-64 shrink-0">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-2 sticky top-24">
-              {[
-                { name: 'General', displayName: t('options_tab_general'), icon: <Cog6ToothIcon className="w-5 h-5" /> },
-                { name: 'OpenAI', displayName: t('options_tab_openai'), icon: <OpenAIIcon className="w-5 h-5" /> },
-                { name: 'Google', displayName: t('options_tab_google'), icon: <GeminiIcon className="w-5 h-5" /> },
-                {
-                  name: 'Anthropic',
-                  displayName: t('options_tab_anthropic'),
-                  icon: <AnthropicIcon className="w-5 h-5" />,
-                },
-                {
-                  name: 'Ollama',
-                  displayName: 'Ollama',
-                  icon: <OllamaIcon className="w-5 h-5" />,
-                },
-                {
-                  name: 'Profile',
-                  displayName: t('options_tab_profile'),
-                  icon: <UserIcon className="w-5 h-5" />,
-                },
-                {
-                  name: 'Appearance',
-                  displayName: t('options_tab_appearance'),
-                  icon: <PaintBrushIcon className="w-5 h-5" />,
-                },
-              ].map(({ name: tab, displayName, icon }) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`w-full text-left px-6 py-3 rounded-lg transition-all duration-200 font-medium flex items-center gap-3 ${
-                    activeTab === tab ? 'bg-primary text-primary-foreground' : 'hover:bg-accent text-foreground'
-                  }`}>
-                  {icon}
-                  <span>{displayName}</span>
-                </button>
-              ))}
-            </motion.div>
-          </div>
+      {/* Main Content with shadcn Sidebar */}
+      <SidebarProvider defaultOpen={true}>
+        <div className="max-w-7xl mx-auto flex min-w-[1000px]">
+          <Sidebar variant="sidebar" collapsible="none" className="h-[calc(100vh-72px)] border-r border-border">
+            <SidebarContent>
+              <SidebarGroup>
+                <SidebarGroupLabel>General</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton onClick={() => setActiveTab('General')} isActive={activeTab === 'General'}>
+                        <Cog6ToothIcon className="w-5 h-5" />
+                        <span>{t('options_tab_general')}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-          {/* Tab Content */}
-          <div className="flex-1 max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-8 p-8 rounded-lg border border-border bg-card">
-              {/* Tab Content */}
-              {activeTab === 'General' && (
-                <GeneralTab
-                  openaiModels={openaiModels}
-                  googleModels={googleModels}
-                  ollamaModels={ollamaModels}
-                  anthropicModels={anthropicModels}
-                  isLoadingModels={isLoadingModels}
-                  modelError={modelError}
-                  isLight={isLight}
-                />
-              )}
+              <SidebarGroup>
+                <SidebarGroupLabel>Language Models</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => {
+                          setActiveTab('LLM');
+                          setActiveLLMTab('OpenAI');
+                        }}
+                        isActive={activeTab === 'LLM' && activeLLMTab === 'OpenAI'}>
+                        <OpenAIIcon className="w-5 h-5" />
+                        <span>OpenAI</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => {
+                          setActiveTab('LLM');
+                          setActiveLLMTab('Google');
+                        }}
+                        isActive={activeTab === 'LLM' && activeLLMTab === 'Google'}>
+                        <GeminiIcon className="w-5 h-5" />
+                        <span>Google AI</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => {
+                          setActiveTab('LLM');
+                          setActiveLLMTab('Anthropic');
+                        }}
+                        isActive={activeTab === 'LLM' && activeLLMTab === 'Anthropic'}>
+                        <AnthropicIcon className="w-5 h-5" />
+                        <span>Anthropic</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => {
+                          setActiveTab('LLM');
+                          setActiveLLMTab('Ollama');
+                        }}
+                        isActive={activeTab === 'LLM' && activeLLMTab === 'Ollama'}>
+                        <OllamaIcon className="w-5 h-5" />
+                        <span>Ollama</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
 
-              {activeTab === 'OpenAI' && (
-                <OpenAITab
-                  isLight={isLight}
-                  showOpenAIKey={showOpenAIKey}
-                  setShowOpenAIKey={setShowOpenAIKey}
-                  isLoadingModels={isLoadingModels}
-                  modelError={modelError}
-                  openaiModels={openaiModels}
-                />
-              )}
+              <SidebarGroup>
+                <SidebarGroupLabel>User</SidebarGroupLabel>
+                <SidebarGroupContent>
+                  <SidebarMenu>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton onClick={() => setActiveTab('Profile')} isActive={activeTab === 'Profile'}>
+                        <UserIcon className="w-5 h-5" />
+                        <span>{t('options_tab_profile')}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        onClick={() => setActiveTab('Appearance')}
+                        isActive={activeTab === 'Appearance'}>
+                        <PaintBrushIcon className="w-5 h-5" />
+                        <span>{t('options_tab_appearance')}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              </SidebarGroup>
+            </SidebarContent>
+          </Sidebar>
 
-              {activeTab === 'Google' && (
-                <GoogleTab
-                  isLight={isLight}
-                  showGeminiKey={showGeminiKey}
-                  setShowGeminiKey={setShowGeminiKey}
-                  isLoadingModels={isLoadingModels}
-                  modelError={modelError}
-                  googleModels={googleModels}
-                />
-              )}
-
-              {activeTab === 'Anthropic' && (
-                <AnthropicTab
-                  isLight={isLight}
-                  showAnthropicKey={showAnthropicKey}
-                  setShowAnthropicKey={setShowAnthropicKey}
-                  isLoadingModels={isLoadingModels}
-                  modelError={modelError}
-                  anthropicModels={anthropicModels}
-                />
-              )}
-
-              {activeTab === 'Ollama' && (
-                <OllamaTab
-                  isLight={isLight}
-                  isLoadingModels={isLoadingModels}
-                  modelError={modelError}
-                  ollamaModels={ollamaModels}
-                />
-              )}
-
-              {activeTab === 'Profile' && <ProfileTab isLight={isLight} />}
-
-              {activeTab === 'Appearance' && <AppearanceTab isLight={isLight} />}
-            </motion.div>
-          </div>
+          {/* Content Area */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 p-6 min-w-[800px]">
+            <div className="w-full max-w-3xl mx-auto p-6 rounded-lg border border-border bg-card transition-all duration-300">
+              <div className="w-full">{renderTabContent()}</div>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </SidebarProvider>
 
       {/* Tooltip for theme toggle */}
       <Tooltip id="theme-tooltip" />

@@ -64,14 +64,14 @@ export const GeneralTab = ({
 
   // Update language and model when storage changes
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">{t('options_general_settings')}</h2>
-        <p className="text-sm text-muted-foreground">{t('options_general_description')}</p>
+    <div className="w-full">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">{t('options_general_settings')}</h2>
+        <p className="text-muted-foreground">{t('options_general_description')}</p>
       </div>
 
-      <div className="space-y-6">
-        <div className="grid w-full max-w-sm items-center gap-1.5">
+      <div className="space-y-6 w-full min-w-[300px]">
+        <div className="grid w-full items-center gap-1.5">
           <Label
             htmlFor="language"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -102,7 +102,7 @@ export const GeneralTab = ({
           </Select>
         </div>
 
-        <div className="grid w-full max-w-sm items-center gap-1.5">
+        <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="default-model">{t('options_default_model')}</Label>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -118,7 +118,7 @@ export const GeneralTab = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0 bg-popover border-border text-popover-foreground">
+            <PopoverContent className="w-full p-0 max-w-[400px] bg-popover border-border text-popover-foreground">
               <Command className="bg-popover">
                 <CommandInput placeholder={t('options_search_models')} className="border-input text-foreground" />
                 <CommandEmpty>{t('options_no_model_found')}</CommandEmpty>
@@ -229,7 +229,7 @@ export const GeneralTab = ({
           </Popover>
         </div>
 
-        <div className="grid w-full max-w-sm items-center gap-1.5 pt-4">
+        <div className="grid w-full items-center gap-1.5 pt-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="proxy-mode" className="text-sm font-medium leading-none">
@@ -248,6 +248,6 @@ export const GeneralTab = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

@@ -12,6 +12,7 @@ interface OpenAITabProps {
   isLoadingModels?: boolean;
   modelError?: string | null;
   openaiModels?: Array<{ name: string; displayName?: string; provider: string }>;
+  hideTitle?: boolean;
 }
 
 export const OpenAITab = ({
@@ -21,6 +22,7 @@ export const OpenAITab = ({
   isLoadingModels = false,
   modelError = null,
   openaiModels = [],
+  hideTitle = false,
 }: OpenAITabProps) => {
   const openAIKey = useStorage(openAIKeyStorage);
   const language = useStorage(defaultLanguageStorage);
@@ -35,12 +37,14 @@ export const OpenAITab = ({
   }, [language]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">{t('options_openai_settings')}</h2>
-        <p className="text-sm text-muted-foreground">{t('options_openai_description')}</p>
-      </div>
-      <div>
+    <div className="w-full min-w-[300px]">
+      {!hideTitle && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">{t('options_openai_settings')}</h2>
+          <p className="text-muted-foreground">{t('options_openai_description')}</p>
+        </div>
+      )}
+      <div className="w-full">
         <label
           htmlFor="openai-key"
           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -67,7 +71,7 @@ export const OpenAITab = ({
       </div>
 
       {/* API Key Status */}
-      <div className="mt-4">
+      <div className="mt-4 w-full">
         {isLoadingModels ? (
           <p className="text-sm text-blue-500">{t('options_validating_key')}</p>
         ) : modelError ? (
@@ -94,6 +98,6 @@ export const OpenAITab = ({
           </div>
         ) : null}
       </div>
-    </motion.div>
+    </div>
   );
 };

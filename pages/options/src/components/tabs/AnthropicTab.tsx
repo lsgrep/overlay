@@ -13,6 +13,7 @@ interface AnthropicTabProps {
   isLoadingModels: boolean;
   modelError: string | null;
   anthropicModels: Model[];
+  hideTitle?: boolean;
 }
 
 export const AnthropicTab = ({
@@ -22,6 +23,7 @@ export const AnthropicTab = ({
   isLoadingModels,
   modelError,
   anthropicModels,
+  hideTitle = false,
 }: AnthropicTabProps) => {
   const anthropicKey = useStorage(anthropicKeyStorage);
   const language = useStorage(defaultLanguageStorage);
@@ -36,11 +38,13 @@ export const AnthropicTab = ({
   }, [language]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">{t('options_anthropic_settings')}</h2>
-        <p className="text-sm text-muted-foreground">{t('options_anthropic_description')}</p>
-      </div>
+    <div className="w-full min-w-[300px]">
+      {!hideTitle && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">{t('options_anthropic_settings')}</h2>
+          <p className="text-muted-foreground">{t('options_anthropic_description')}</p>
+        </div>
+      )}
       <div>
         <label
           htmlFor="anthropic-key"
@@ -95,6 +99,6 @@ export const AnthropicTab = ({
           </div>
         ) : null}
       </div>
-    </motion.div>
+    </div>
   );
 };

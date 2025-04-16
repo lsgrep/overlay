@@ -8,11 +8,11 @@ import {
   resumeFileStorage,
   defaultLanguageStorage,
 } from '@extension/storage';
-import type { DevLocale } from '@extension/i18n';
 import { t } from '@extension/i18n';
 import { motion } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 import { Label, Textarea, Button } from '@extension/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@extension/ui/lib/ui';
 import { UserIcon, DocumentIcon, DocumentArrowUpIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 interface ProfileTabProps {
@@ -34,7 +34,7 @@ export const ProfileTab = ({ isLight }: ProfileTabProps) => {
   useEffect(() => {
     if (language) {
       // Set the locale directly from storage
-      t.devLocale = language as DevLocale;
+      t.devLocale = language;
       console.log('ProfileTab: Language set to', language);
     }
   }, [language]);
@@ -88,13 +88,13 @@ export const ProfileTab = ({ isLight }: ProfileTabProps) => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">{t('options_profile_settings')}</h2>
-        <p className="text-sm text-muted-foreground">{t('options_profile_description')}</p>
+    <div className="w-full">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-2">{t('options_profile_settings')}</h2>
+        <p className="text-muted-foreground">{t('options_profile_description')}</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 w-full min-w-[300px]">
         {/* First Name */}
         <div className="space-y-2">
           <Label
@@ -250,6 +250,6 @@ export const ProfileTab = ({ isLight }: ProfileTabProps) => {
           </Button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };

@@ -2,9 +2,9 @@ import type { Model } from '@extension/shared';
 import { useStorage } from '@extension/shared';
 import { geminiKeyStorage, defaultLanguageStorage } from '@extension/storage';
 import { motion } from 'framer-motion';
-import type { DevLocale } from '@extension/i18n';
 import { t } from '@extension/i18n';
 import { useEffect, useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@extension/ui/lib/ui';
 
 interface GoogleTabProps {
   isLight: boolean;
@@ -13,6 +13,7 @@ interface GoogleTabProps {
   isLoadingModels: boolean;
   modelError: string | null;
   googleModels: Model[];
+  hideTitle?: boolean;
 }
 
 export const GoogleTab = ({
@@ -22,6 +23,7 @@ export const GoogleTab = ({
   isLoadingModels,
   modelError,
   googleModels,
+  hideTitle = false,
 }: GoogleTabProps) => {
   const geminiKey = useStorage(geminiKeyStorage);
   const language = useStorage(defaultLanguageStorage);
@@ -29,58 +31,66 @@ export const GoogleTab = ({
   useEffect(() => {
     if (language) {
       // Set the locale directly from storage
-      t.devLocale = language as DevLocale;
+      t.devLocale = language;
       console.log('GoogleTab: Language set to', language);
     }
   }, [language]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl font-semibold tracking-tight">{t('options_google_settings')}</h2>
-        <p className="text-sm text-muted-foreground">{t('options_google_description')}</p>
-      </div>
-      <div className="space-y-6">
-        <div>
-          <label
-            htmlFor="gemini-key"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            {t('options_api_key')}
-          </label>
-          <div className="relative">
-            <input
-              id="gemini-key"
-              type={showGeminiKey ? 'text' : 'password'}
-              value={geminiKey}
-              onChange={e => geminiKeyStorage.set(e.target.value)}
-              className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
-                isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
-              }`}
-              placeholder="AI..."
-            />
-            <button
-              type="button"
-              onClick={() => setShowGeminiKey(!showGeminiKey)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              {showGeminiKey ? '👁️' : '👁️‍🗨️'}
-            </button>
-          </div>
+    <div className="w-full min-w-[300px]">
+      {!hideTitle && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-2">{t('options_google_settings')}</h2>
+          <p className="text-muted-foreground">{t('options_google_description')}</p>
         </div>
-      </div>
+      )}
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t('options_api_key')}</CardTitle>
+            <CardDescription>Configure your Google API key and Gemini model preferences</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              <input
+                id="gemini-key"
+                type={showGeminiKey ? 'text' : 'password'}
+                value={geminiKey}
+                onChange={e => geminiKeyStorage.set(e.target.value)}
+                className={`w-full p-3 pr-10 rounded-md border transition-colors focus:border-blue-500 focus:outline-none ${
+                  isLight ? 'bg-white border-black/10' : 'bg-black border-white/10'
+                }`}
+                placeholder="AI..."
+              />
+              <button
+                type="button"
+                onClick={() => setShowGeminiKey(!showGeminiKey)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                {showGeminiKey ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
 
-      {/* API Key Status */}
-      <div className="mt-4">
-        {isLoadingModels ? (
-          <p className="text-sm text-blue-500">{t('options_validating_key')}</p>
-        ) : modelError ? (
-          <p className="text-sm text-red-500">{modelError}</p>
-        ) : googleModels.length > 0 ? (
-          <div className="space-y-4">
-            <p className="text-sm text-green-500">{t('options_key_valid', googleModels.length.toString())}</p>
+            {/* API Key Status */}
+            <div className="mt-4">
+              {isLoadingModels ? (
+                <p className="text-sm text-blue-500">{t('options_validating_key')}</p>
+              ) : modelError ? (
+                <p className="text-sm text-red-500">{modelError}</p>
+              ) : googleModels.length > 0 ? (
+                <p className="text-sm text-green-500">{t('options_key_valid', googleModels.length.toString())}</p>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Models List */}
-            <div>
-              <h4 className="text-sm font-semibold mb-2 text-blue-500">{t('options_available_models')}</h4>
+        {/* Models List */}
+        {googleModels.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">{t('options_available_models')}</CardTitle>
+              <CardDescription>Available Google AI models for use with Overlay</CardDescription>
+            </CardHeader>
+            <CardContent>
               <div
                 className={`rounded-md border ${isLight ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
                 {googleModels.map(model => (
@@ -92,10 +102,10 @@ export const GoogleTab = ({
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-        ) : null}
+            </CardContent>
+          </Card>
+        )}
       </div>
-    </motion.div>
+    </div>
   );
 };
