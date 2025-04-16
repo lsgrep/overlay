@@ -1,6 +1,6 @@
 {
   "name": "chrome-extension",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Chrome extension - core settings",
   "license": "Commercial",
   "type": "module",
