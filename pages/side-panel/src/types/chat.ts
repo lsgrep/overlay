@@ -49,16 +49,16 @@ export interface ContextMenuAction {
   icon?: string; // Lucid icon name
 }
 
-import { defaultLanguageStorage } from '@extension/storage';
+import { llmResponseLanguageStorage } from '@extension/storage';
 import { getLanguageNameFromCode } from '@extension/i18n';
 
 export const getTranslateTitle = async () => {
-  const targetLang = await defaultLanguageStorage.get();
+  const targetLang = await llmResponseLanguageStorage.get();
   return `Translate to ${getLanguageNameFromCode(targetLang)}`;
 };
 
 export const getTranslatePrompt = async (text: string) => {
-  const targetLang = await defaultLanguageStorage.get();
+  const targetLang = await llmResponseLanguageStorage.get();
   return `Translate the following text to ${getLanguageNameFromCode(targetLang)}: "${text}"`;
 };
 
