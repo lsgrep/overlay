@@ -1,6 +1,6 @@
 {
   "name": "Overlay",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Overlay",
   "license": "Commercial",
   "repository": {
@@ -60,7 +60,7 @@
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.30",
     "cross-env": "^7.0.3",
     "esbuild": "^0.23.0",
     "eslint": "^9.18.0",

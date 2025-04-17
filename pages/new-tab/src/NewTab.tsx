@@ -3,7 +3,7 @@ import { overlayApi } from '@extension/shared/lib/services/api';
 import { exampleThemeStorage, defaultLanguageStorage, userPreferencesStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
 import type { DevLocale } from '@extension/i18n/lib/type';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { TaskManager } from './components/TaskManager';
 import CalendarView from './components/CalendarView';
 import { LoginGuard } from './components/LoginGuard';
@@ -33,7 +33,6 @@ const NewTab = () => {
   const defaultLanguage = useStorage(defaultLanguageStorage);
   const userPreferences = useStorage(userPreferencesStorage);
   const isLight = theme === 'light';
-  const [randomQuote, setRandomQuote] = useState({ text: '', author: '', category: '' });
 
   // Apply theme class to document element
   useEffect(() => {
@@ -109,19 +108,6 @@ const NewTab = () => {
   }, [defaultLanguage]);
 
   useEffect(() => {
-    // Type cast quotesData to our interface
-    const typedQuotesData = quotesData as unknown as QuotesData;
-    const categories = Object.keys(typedQuotesData.categories);
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const categoryQuotes = typedQuotesData.categories[randomCategory].quotes;
-    const randomQuoteData = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
-
-    setRandomQuote({
-      text: randomQuoteData.text,
-      author: randomQuoteData.author,
-      category: typedQuotesData.categories[randomCategory].name,
-    });
-
     // Set document title
     document.title = t('new_page', 'New Page');
   }, []);
@@ -186,24 +172,6 @@ const NewTab = () => {
               </div>
             </>
           </LoginGuard>
-
-          {/* Quote section - Full width below the columns - Always visible */}
-          <div className="col-span-1 lg:col-span-3 mt-8">
-            <div className="p-4 text-center relative rounded-lg border border-border bg-card">
-              <div className={`relative z-10`}>
-                <blockquote className="text-sm font-serif italic mb-2 leading-relaxed">
-                  <span className="text-foreground">"{randomQuote.text}"</span>
-                </blockquote>
-                <div className="flex justify-center items-center space-x-2">
-                  <p className="text-xs italic text-muted-foreground">— {randomQuote.author}</p>
-                  <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />
-                  <p className="text-xs uppercase tracking-widest font-light text-muted-foreground">
-                    {randomQuote.category}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

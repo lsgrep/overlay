@@ -1,0 +1,134 @@
+import React, { useEffect, useRef } from 'react';
+import { t } from '@extension/i18n';
+
+interface ChatInputProps {
+  input: string;
+  setInput: (input: string) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+  isLoading: boolean;
+  fontFamily?: string;
+  fontSize?: number;
+  draggedImages?: Array<{ url: string; altText?: string }>;
+  setDraggedImages?: (images: Array<{ url: string; altText?: string }>) => void;
+  hasActiveContext?: boolean; // New prop for MCP context indicator
+}
+
+export const ChatInput: React.FC<ChatInputProps> = ({
+  input,
+  setInput,
+  handleSubmit,
+  isLoading,
+  fontFamily = 'system-ui',
+  fontSize = 14,
+  draggedImages = [],
+  setDraggedImages,
+  hasActiveContext = false,
+}) => {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize the textarea based on content
+  useEffect(() => {
+    const textArea = textAreaRef.current;
+    if (textArea) {
+      // Reset height to auto to get the correct scrollHeight
+      textArea.style.height = 'auto';
+      // Set the height to the scrollHeight
+      textArea.style.height = `${Math.min(textArea.scrollHeight, 300)}px`;
+    }
+  }, [input]);
+
+  // Focus on load
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.focus();
+    }
+  }, []);
+
+  // Handle keypresses for submit
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Submit on Enter (without Shift) if input isn't empty
+    if (e.key === 'Enter' && !e.shiftKey && input.trim()) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
+  return (
+    <div className="p-3 border-t border-border bg-muted/30 shadow-2xl">
+      {/* Image preview area */}
+      {draggedImages && draggedImages.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {draggedImages.map((image, index) => (
+            <div key={index} className="relative group">
+              <img
+                src={image.url}
+                alt={image.altText || 'Dragged image'}
+                className="h-16 w-16 object-cover rounded-md border border-border"
+              />
+              <button
+                onClick={() => setDraggedImages?.(draggedImages.filter((_, i) => i !== index))}
+                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="flex items-end gap-2">
+        <div className="flex-1 relative">
+          {/* Context indicator icon */}
+          {hasActiveContext && (
+            <div className="absolute left-3 top-3">
+              <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs p-1 rounded-md">
+                Context Active
+              </span>
+            </div>
+          )}
+          <textarea
+            ref={textAreaRef}
+            className={`w-full p-3 pr-10 ${
+              hasActiveContext ? 'pl-[120px]' : 'pl-3'
+            } rounded-md resize-none border border-border bg-background min-h-[44px] max-h-[300px] focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary`}
+            style={{ fontFamily, fontSize }}
+            placeholder={isLoading ? t('typing') : t('typeMessageHere')}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+            rows={1}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={!input.trim() || isLoading}
+          className="bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-primary-foreground p-3 rounded-md">
+          {isLoading ? (
+            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+              />
+            </svg>
+          )}
+        </button>
+      </form>
+    </div>
+  );
+};

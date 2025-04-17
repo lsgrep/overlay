@@ -14,15 +14,15 @@ import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
 import { ModelSelector } from './components/ModelSelector';
 import type { PageContext } from './services/llm/prompts';
-import type { MessageImage } from './services/llm/types';
-
-// We're using the Task interface directly from the API module
+import type { MessageImage, MCPContextItem } from './services/llm/types';
 
 export interface Message {
   id?: string; // Unique ID for each message
   role: string;
   content: string;
   images?: MessageImage[];
+  // Add MCP context items
+  contextItems?: MCPContextItem[];
   model?: {
     name: string;
     displayName?: string;
@@ -39,6 +39,7 @@ export interface Message {
     systemMessageType?: SystemMessageType; // Type of system message for rendering
     isDeleted?: boolean; // Flag for soft deletion
     messageId?: number; // For referencing in updates
+    hasContextItems?: boolean; // Flag to indicate message has MCP context
   };
 }
 
@@ -89,6 +90,8 @@ export const ChatInterface = forwardRef<
   const [pageContext, setPageContext] = useState<PageContext | null>(null);
   const [draggedImages, setDraggedImages] = useState<Array<{ url: string; altText?: string }>>([]);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [mcpContextItems, setMcpContextItems] = useState<MCPContextItem[]>([]);
+  const [hasActiveContext, setHasActiveContext] = useState(false);
 
   // Update translations when language changes
   useEffect(() => {
@@ -121,6 +124,19 @@ export const ChatInterface = forwardRef<
       console.error('Error extracting page context:', err);
     }
 
+    // Extract MCP context if includePageContext is true
+    let extractedMcpContext: MCPContextItem[] = [];
+    if (includePageContext) {
+      try {
+        extractedMcpContext = await ChatService.extractMCPContext();
+        // Update state with extracted context
+        setMcpContextItems(extractedMcpContext);
+        setHasActiveContext(extractedMcpContext.length > 0);
+      } catch (mcpErr) {
+        console.error('Error extracting MCP context:', mcpErr);
+      }
+    }
+
     // Log if we have images to send
     if (draggedImages.length > 0) {
       console.log(`Sending ${draggedImages.length} images with message to Gemini:`, draggedImages);
@@ -139,6 +155,8 @@ export const ChatInterface = forwardRef<
         timestamp: Date.now(),
         // Always use active page URL for all user messages
         sourceUrl: activeTabUrl,
+        // Add flag for MCP context
+        hasContextItems: extractedMcpContext.length > 0,
       },
     };
 
@@ -146,6 +164,12 @@ export const ChatInterface = forwardRef<
     if (draggedImages.length > 0) {
       displayMessage.images = draggedImages;
     }
+
+    // Add MCP context items if available
+    if (extractedMcpContext.length > 0) {
+      displayMessage.contextItems = extractedMcpContext;
+    }
+
     // Add to context instead of local state
     chatContext.addMessage(displayMessage);
     setIsLoading(true);
@@ -167,6 +191,8 @@ export const ChatInterface = forwardRef<
         messages: chatContext.state.messages, // Use context messages
         // Pass images to the service if available
         images: draggedImages,
+        // Pass MCP context items
+        contextItems: extractedMcpContext,
         openaiModels,
         geminiModels,
         anthropicModels,
@@ -210,6 +236,7 @@ export const ChatInterface = forwardRef<
             pageContextIncluded: !!includePageContext,
             pageTitle: activeTabTitle, // Add page title to metadata
             images: displayMessage.images,
+            mcpContextItems: displayMessage.contextItems?.length || 0,
           },
         });
         console.log('Completion saved to database');
@@ -224,6 +251,9 @@ export const ChatInterface = forwardRef<
       setIsLoading(false);
       // Clear the draggedImages after sending the message
       setDraggedImages([]);
+      // Clear MCP context items
+      setMcpContextItems([]);
+      setHasActiveContext(false);
     }
   };
 
@@ -302,9 +332,6 @@ export const ChatInterface = forwardRef<
     }
   };
 
-  // We don't need the periodic cleanup effect anymore as we're using the context state
-  // which handles filtering deleted messages in the MessageList component
-
   // Expose methods via ref
   useImperativeHandle(ref, () => ({
     submitMessage: (text: string, includePageContext = false) =>
@@ -366,7 +393,7 @@ export const ChatInterface = forwardRef<
           },
           metadata: {
             timestamp: Date.now(),
-            isTaskList: true, // Always set to true when it's a tasks response
+            isTaskList: tasks.length > 0,
             tasks: tasks,
           },
         };
@@ -485,6 +512,23 @@ export const ChatInterface = forwardRef<
       onDrop={handleDrop}>
       <HeaderComponent />
 
+      {/* Context indicator - show when we have active MCP context */}
+      {hasActiveContext && (
+        <div className="px-3 py-2 bg-green-100 dark:bg-green-900 text-sm flex items-center justify-between">
+          <span>
+            Using page context ({mcpContextItems.length} item{mcpContextItems.length !== 1 ? 's' : ''})
+          </span>
+          <button
+            className="text-xs px-2 py-1 rounded-md bg-red-100 dark:bg-red-800 hover:bg-red-200 dark:hover:bg-red-700"
+            onClick={() => {
+              setMcpContextItems([]);
+              setHasActiveContext(false);
+            }}>
+            Clear
+          </button>
+        </div>
+      )}
+
       {/* Use context messages directly as our source of truth */}
       <MessageList
         messages={chatContext.state.messages}
@@ -522,6 +566,7 @@ export const ChatInterface = forwardRef<
         fontSize={Number(fontSize)}
         draggedImages={draggedImages}
         setDraggedImages={setDraggedImages}
+        hasActiveContext={hasActiveContext}
       />
     </div>
   );

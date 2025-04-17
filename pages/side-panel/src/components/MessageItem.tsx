@@ -421,7 +421,7 @@ export const MessageItem: React.FC<MessageItemProps> = memo(
           {/* Message content */}
           <div className="text-foreground overflow-x-auto max-w-full">
             {/* Special handling for task list messages */}
-            {isTaskList && tasks.length > 0 ? (
+            {isTaskList ? (
               <div className="max-w-full overflow-x-hidden">
                 <UnifiedTaskListView
                   tasks={tasks}

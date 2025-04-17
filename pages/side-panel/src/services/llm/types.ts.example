@@ -1,0 +1,134 @@
+import type { PageContext } from './prompts';
+
+// Model Context Protocol (MCP) types
+export interface MCPContextItem {
+  type: string;
+  content: any;
+  metadata?: Record<string, any>;
+}
+
+export interface MessageImage {
+  url: string;
+  mimeType?: string;
+}
+
+export interface Message {
+  role: string;
+  content: string;
+  /**
+   * Optional array of image data to include with the message
+   * Currently only supported by Gemini and Claude
+   */
+  images?: MessageImage[];
+  /**
+   * Optional array of Model Context Protocol (MCP) context items
+   * This provides a standardized way to include different types of context
+   * like text, images, code, etc. with the message
+   */
+  contextItems?: MCPContextItem[];
+}
+
+export interface LLMConfig {
+  temperature?: number;
+  topK?: number;
+  topP?: number;
+  maxOutputTokens?: number;
+}
+
+export type JSONSchemaType = 'STRING' | 'NUMBER' | 'INTEGER' | 'BOOLEAN' | 'ARRAY' | 'OBJECT';
+
+export interface JSONSchemaProperty {
+  type: JSONSchemaType;
+  description?: string;
+  enum?: string[];
+  items?: JSONSchemaProperty; // For ARRAY type
+  properties?: Record<string, JSONSchemaProperty>; // For OBJECT type
+  required?: string[]; // For OBJECT type
+}
+
+export interface JSONSchema {
+  type: JSONSchemaType;
+  description?: string;
+  properties?: Record<string, JSONSchemaProperty>; // For OBJECT type
+  items?: JSONSchemaProperty; // For ARRAY type
+  required?: string[]; // For OBJECT type
+}
+
+export interface StructuredOutputConfig {
+  schema?: JSONSchema;
+  /**
+   * If true, disables native structured output capabilities of the model
+   * and instead relies on post-processing the text output.
+   * This is useful for models like Gemini that have limited schema support.
+   */
+  disableNativeStructuredOutput?: boolean;
+}
+
+export interface LLMService {
+  generateCompletion(
+    messages: Message[],
+    context: string,
+    config?: LLMConfig,
+    pageContent?: PageContext,
+  ): Promise<string>;
+}
+
+// MCP context types - used for standardized context passing between UI and LLM services
+export const MCP_CONTEXT_TYPES = {
+  TEXT: 'text',
+  IMAGE: 'image',
+  CODE: 'code',
+  FILE: 'file',
+  WEBPAGE: 'webpage',
+  PDF: 'pdf',
+  SELECTION: 'selection',
+  SCREENSHOT: 'screenshot',
+  TABLE: 'table',
+};
+
+// Example MCP context transformer function
+export function transformToProviderFormat(contextItems: MCPContextItem[], provider: string): any {
+  switch (provider) {
+    case 'anthropic':
+      return transformToAnthropicFormat(contextItems);
+    case 'openai':
+      return transformToOpenAIFormat(contextItems);
+    case 'gemini':
+      return transformToGeminiFormat(contextItems);
+    default:
+      return contextItems;
+  }
+}
+
+// These would be implemented based on each provider's specific format
+function transformToAnthropicFormat(contextItems: MCPContextItem[]): any {
+  // Convert to Claude Messages API format
+  return contextItems.map(item => {
+    if (item.type === MCP_CONTEXT_TYPES.TEXT) {
+      return { type: 'text', text: item.content };
+    } else if (item.type === MCP_CONTEXT_TYPES.IMAGE) {
+      return {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: item.metadata?.mimeType || 'image/jpeg',
+          data: item.content,
+        },
+      };
+    }
+    // Handle other types
+    return null;
+  }).filter(Boolean);
+}
+
+function transformToOpenAIFormat(contextItems: MCPContextItem[]): any {
+  // Convert to OpenAI format
+  // Implementation depends on OpenAI's context format
+  return contextItems;
+}
+
+function transformToGeminiFormat(contextItems: MCPContextItem[]): any {
+  // Convert to Gemini format
+  // Implementation depends on Gemini's context format
+  return contextItems;
+}
