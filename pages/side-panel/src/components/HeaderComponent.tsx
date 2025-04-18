@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Avatar,
   AvatarFallback,
@@ -15,20 +15,28 @@ import { t } from '@extension/i18n';
 import icon from '../../../../chrome-extension/public/icon-128.png';
 import { useStorage } from '@extension/shared';
 import { exampleThemeStorage } from '@extension/storage';
-import {
-  createClient,
-  signInWithProvider,
-  signOut,
-  getCurrentUserFromStorage,
-} from '@extension/shared/lib/services/supabase';
+// Authentication is now handled via props
 
-// Using Record<string, unknown> to allow for future props
-type HeaderComponentProps = Record<string, unknown>;
+// Define the user type for better type safety
+type User = {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    full_name?: string;
+    [key: string]: unknown;
+  };
+} | null;
 
-export const HeaderComponent: FC<HeaderComponentProps> = () => {
-  const supabase = createClient();
+// Props for HeaderComponent
+interface HeaderComponentProps {
+  user: User;
+  handleSignIn: () => Promise<void>;
+  handleSignOut: () => Promise<void>;
+}
+
+export const HeaderComponent: FC<HeaderComponentProps> = ({ user, handleSignIn, handleSignOut }) => {
   const theme = useStorage(exampleThemeStorage);
-  const isLight = theme === 'light';
 
   // Apply theme class to document element
   useEffect(() => {
@@ -39,107 +47,8 @@ export const HeaderComponent: FC<HeaderComponentProps> = () => {
       htmlElement.classList.remove('dark');
     }
   }, [theme]);
-  const [user, setUser] = useState<{
-    id: string;
-    email?: string;
-    user_metadata?: {
-      avatar_url?: string;
-      full_name?: string;
-      [key: string]: unknown;
-    };
-  } | null>(null);
 
-  useEffect(() => {
-    async function getUser() {
-      try {
-        console.log('[CHAT] Getting user...');
-        // First try to get user from current session
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        console.log('[CHAT] getUser: User from session', user);
-
-        if (user) {
-          setUser(user);
-          console.log('[CHAT] User set from session', user.email);
-        } else {
-          console.log('[CHAT] No user in session, trying storage');
-          // If no session, try to get user from storage tokens
-          const storageUser = await getCurrentUserFromStorage();
-          if (storageUser) {
-            setUser(storageUser);
-            console.log('[CHAT] User set from storage', storageUser.email);
-          } else {
-            console.log('[CHAT] No user found in storage');
-          }
-        }
-      } catch (error) {
-        console.error('[CHAT] Error getting user:', error);
-      } finally {
-        // Complete
-      }
-
-      // Set up auth state change listener
-      const {
-        data: { subscription },
-      } = await supabase.auth.onAuthStateChange((event, session) => {
-        console.log('[CHAT] Auth state changed:', event, session?.user?.email);
-        setUser(session?.user ?? null);
-      });
-
-      // Clean up subscription on unmount
-      return () => {
-        console.log('[CHAT] Cleaning up auth subscription');
-        subscription.unsubscribe();
-      };
-    }
-
-    const handleAuthComplete = (message: { action: string; payload: { success: boolean } }) => {
-      console.log('[CHAT] Received message:', message);
-      if (message.action === 'authComplete' && message.payload.success) {
-        console.log('[CHAT] Auth complete message received, refreshing user');
-        // Refresh user data
-        getUser();
-      }
-    };
-
-    if (chrome?.runtime?.onMessage) {
-      console.log('[CHAT] Setting up message listener');
-      chrome.runtime.onMessage.addListener(handleAuthComplete);
-
-      // Initial user fetch
-      console.log('[CHAT] Initial user fetch');
-      getUser();
-
-      return () => {
-        console.log('[CHAT] Removing message listener');
-        chrome.runtime.onMessage.removeListener(handleAuthComplete);
-      };
-    } else {
-      console.log('[CHAT] Chrome runtime not available, fetching user directly');
-      getUser();
-    }
-  }, [supabase]);
-
-  const handleSignIn = async () => {
-    try {
-      console.log('[CHAT] Initiating sign in with GitHub');
-      await signInWithProvider('github');
-    } catch (error) {
-      console.error('[CHAT] Error signing in:', error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      console.log('[CHAT] Signing out');
-      await signOut();
-      setUser(null);
-      console.log('[CHAT] Sign out complete, user cleared');
-    } catch (error) {
-      console.error('[CHAT] Error signing out:', error);
-    }
-  };
+  // Auth handlers are now passed as props
 
   return (
     <div className="flex items-center justify-between p-2 border-b border-border bg-background text-foreground">
@@ -192,16 +101,16 @@ export const HeaderComponent: FC<HeaderComponentProps> = () => {
           size="icon"
           variant="ghost"
           className="h-8 w-8"
-          onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
-          title={isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')}>
-          {isLight ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
+          onClick={() => exampleThemeStorage.set(theme === 'light' ? 'dark' : 'light')}
+          title={t('toggleTheme', 'Toggle Theme')}>
+          {theme === 'light' ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
         </Button>
         <Button
           size="icon"
           variant="ghost"
           className="h-8 w-8"
           onClick={() => chrome.runtime.openOptionsPage()}
-          title={t('settings', 'Settings')}>
+          title={t('options_general_settings', 'Settings')}>
           <Settings className="h-4 w-4" />
         </Button>
       </div>

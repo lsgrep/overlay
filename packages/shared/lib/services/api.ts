@@ -167,7 +167,7 @@ async function makeAuthenticatedRequest<T>(endpoint: string, options: RequestIni
       }
 
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || `API request failed with status ${response.status}`);
+      throw new Error(errorData?.error || `API request failed with status ${response.status}`);
     }
 
     return await response.json();

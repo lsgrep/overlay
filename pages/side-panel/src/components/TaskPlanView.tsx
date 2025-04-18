@@ -15,13 +15,12 @@ import {
 
 interface TaskPlanViewProps {
   plan: TaskPlan;
-  isLight: boolean;
   pageContext?: PageContext;
   llmService?: LLMService;
   goal?: string;
 }
 
-export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageContext, llmService, goal }) => {
+export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, pageContext, llmService, goal }) => {
   // Create a TaskExecutor instance
   const [executor] = useState(() => {
     // Safely pass pageContext to TaskExecutor
@@ -217,21 +216,21 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
                     state.actionStatuses[action.id] === 'complete'
                   ) {
                     return (
-                      <div className={`mt-3 p-3 rounded-lg ${isLight ? 'bg-gray-100' : 'bg-gray-700'}`}>
-                        <h4 className={`text-sm font-medium mb-2 ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
+                      <div className={`mt-3 p-3 rounded-lg`}>
+                        <h4 className={`text-sm font-medium mb-2`}>
                           Extracted Data ({state.extractedData[action.id].length} items)
                         </h4>
                         <div className="space-y-2">
                           {state.extractedData[action.id].map((item, i) => (
-                            <div key={i} className={`p-2 rounded ${isLight ? 'bg-white' : 'bg-gray-800'} text-sm`}>
-                              <div className={isLight ? 'text-gray-800' : 'text-gray-200'}>{item.text}</div>
+                            <div key={i} className={`p-2 rounded text-sm`}>
+                              <div className="text-gray-200">{item.text}</div>
                               {Object.entries(item.attributes).length > 0 && (
                                 <div className="mt-1 flex flex-wrap gap-1">
                                   {/* Special highlight for LLM-extracted data */}
                                   {item.attributes.method === 'llm' && (
                                     <span
                                       className={`inline-flex items-center px-2 py-0.5 rounded text-xs
-                                      ${isLight ? 'bg-purple-100 text-purple-800' : 'bg-purple-900 text-purple-200'}`}>
+                                      bg-purple-900 text-purple-200`}>
                                       🤖 LLM Extracted
                                     </span>
                                   )}
@@ -242,12 +241,8 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
                                       className={`inline-flex items-center px-2 py-0.5 rounded text-xs
                                       ${
                                         parseFloat(item.attributes.confidence) > 0.7
-                                          ? isLight
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-green-900 text-green-200'
-                                          : isLight
-                                            ? 'bg-yellow-100 text-yellow-800'
-                                            : 'bg-yellow-900 text-yellow-200'
+                                          ? 'bg-green-900 text-green-200'
+                                          : 'bg-yellow-900 text-yellow-200'
                                       }`}>
                                       Confidence: {Number(parseFloat(item.attributes.confidence) * 100).toFixed(0)}%
                                     </span>
@@ -260,7 +255,7 @@ export const TaskPlanView: React.FC<TaskPlanViewProps> = ({ plan, isLight, pageC
                                       <span
                                         key={key}
                                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs
-                                      ${isLight ? 'bg-gray-100 text-gray-600' : 'bg-gray-600 text-gray-300'}`}>
+                                      bg-gray-600 text-gray-300`}>
                                         {key}="{value}"
                                       </span>
                                     ))}

@@ -1,15 +1,14 @@
 import type React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { CheckSquare, Square } from 'lucide-react';
+import { cn } from '@extension/ui/lib/utils';
 
 // Component for standard markdown messages
 export const MarkdownMessageContent: React.FC<{
   content: string;
-  isLight: boolean;
-}> = ({ content, isLight }) => {
+}> = ({ content }) => {
   return (
-    <div
-      className={`prose ${!isLight ? 'prose-invert' : ''} max-w-full break-words overflow-wrap-anywhere text-sm leading-relaxed`}>
+    <div className="prose max-w-full break-words overflow-wrap-anywhere text-sm leading-relaxed text-foreground">
       <ReactMarkdown
         components={{
           // Enhanced code blocks with syntax highlighting
@@ -23,14 +22,18 @@ export const MarkdownMessageContent: React.FC<{
             return !inline ? (
               <div className="relative group">
                 <pre
-                  className={`p-3 rounded-md overflow-x-auto text-xs ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'} ${match ? `language-${match[1]}` : ''}`}>
+                  className={cn(
+                    'p-3 rounded-md overflow-x-auto text-xs',
+                    'bg-muted text-foreground',
+                    match ? `language-${match[1]}` : '',
+                  )}>
                   <code className={className} {...otherProps}>
                     {children}
                   </code>
                 </pre>
                 <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    className={`p-1 rounded-md text-xs ${isLight ? 'bg-slate-300 text-slate-800 hover:bg-slate-400' : 'bg-slate-700 text-slate-100 hover:bg-slate-600'}`}
+                    className="p-1 rounded-md text-xs bg-secondary text-secondary-foreground hover:bg-secondary/80"
                     onClick={() => {
                       navigator.clipboard.writeText(String(children));
                     }}>
@@ -39,9 +42,7 @@ export const MarkdownMessageContent: React.FC<{
                 </div>
               </div>
             ) : (
-              <code
-                className={`px-1 py-0.5 rounded text-xs ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'}`}
-                {...props}>
+              <code className="px-1 py-0.5 rounded text-xs bg-muted text-foreground" {...props}>
                 {children}
               </code>
             );
@@ -49,7 +50,7 @@ export const MarkdownMessageContent: React.FC<{
           // Enhanced links
           a: ({ children, ...props }) => (
             <a
-              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              className="text-primary hover:underline font-medium"
               target="_blank"
               rel="noopener noreferrer"
               {...props}>
@@ -98,12 +99,14 @@ export const MarkdownMessageContent: React.FC<{
                     <div className="flex items-start gap-2">
                       <div className="flex-shrink-0 mt-0.5">
                         {checked ? (
-                          <CheckSquare size={18} className="text-green-500" />
+                          <CheckSquare size={18} className="text-primary" />
                         ) : (
-                          <Square size={18} className="text-gray-400" />
+                          <Square size={18} className="text-muted-foreground" />
                         )}
                       </div>
-                      <span className={`${checked ? 'line-through text-gray-500' : ''}`}>{match[2]}</span>
+                      <span className={`${checked ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
+                        {match[2]}
+                      </span>
                     </div>
                   </li>
                 );
@@ -117,7 +120,7 @@ export const MarkdownMessageContent: React.FC<{
           },
           // Enhanced headings
           h1: ({ children, ...props }) => (
-            <h1 className="text-xl font-bold mt-6 mb-2 pb-1 border-b border-gray-200 dark:border-gray-700" {...props}>
+            <h1 className="text-xl font-bold mt-6 mb-2 pb-1 border-b border-border" {...props}>
               {children}
             </h1>
           ),

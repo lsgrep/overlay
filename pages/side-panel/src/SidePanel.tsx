@@ -1,10 +1,17 @@
 // import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import { overlayApi } from '@extension/shared/lib/services/api';
-import { saveNote, deleteNote } from '@extension/shared/lib/services/supabase';
+import { overlayApi, type Task } from '@extension/shared/lib/services/api';
+import {
+  saveNote,
+  deleteNote,
+  createClient,
+  signInWithProvider,
+  signOut,
+  getCurrentUserFromStorage,
+} from '@extension/shared/lib/services/supabase';
 import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
-import { MessageCircle, Blocks, Settings } from 'lucide-react';
+import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { t } from '@extension/i18n';
 import { useChat } from './contexts/ChatContext';
@@ -18,8 +25,7 @@ import type { SystemMessageType } from './components/SystemMessageView';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
-  const defaultLanguage = useStorage(defaultLanguageStorage);
-  const isLight = theme === 'light';
+  const language = useStorage(defaultLanguageStorage);
   // Define model types
   type ModelType = { name: string; displayName?: string; provider: string };
   const [ollamaModels, setOllamaModels] = useState<ModelType[]>([]);
@@ -31,26 +37,93 @@ const SidePanel = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
   const [input, setInput] = useState('');
+  const [user, setUser] = useState<{
+    id: string;
+    email?: string;
+    user_metadata?: {
+      avatar_url?: string;
+      full_name?: string;
+      [key: string]: unknown;
+    };
+  } | null>(null);
   // Get chat context for direct manipulation
-  const { addMessage, updateMessage, deleteMessage } = useChat();
+  const { addMessage } = useChat();
   // Reference to ChatInterface methods
   const chatInterfaceRef = useRef<{
     submitMessage: (text: string, includePageContext?: boolean) => Promise<void>;
     addSystemMessage: (message: ChatMessage) => number | undefined;
     updateSystemMessage: (messageId: number, updatedMessage: Partial<ChatMessage>) => void;
   } | null>(null);
-
-  // We'll use Chrome's native notifications instead of custom UI notifications
-
-  // Update translations when language changes
+  const supabase = createClient();
   useEffect(() => {
-    if (defaultLanguage) {
-      // Set the locale directly from storage
-      // @ts-expect-error - DevLocale type not available from @extension/i18n
-      t.devLocale = defaultLanguage;
-      console.log('SidePanel: Language set to', defaultLanguage);
+    async function getUser() {
+      try {
+        console.log('[CHAT] Getting user...');
+        // First try to get user from current session
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        console.log('[CHAT] getUser: User from session', user);
+
+        if (user) {
+          setUser(user);
+          console.log('[CHAT] User set from session', user.email);
+        } else {
+          console.log('[CHAT] No user in session, trying storage');
+          // If no session, try to get user from storage tokens
+          const storageUser = await getCurrentUserFromStorage();
+          if (storageUser) {
+            setUser(storageUser);
+            console.log('[CHAT] User set from storage', storageUser.email);
+          } else {
+            console.log('[CHAT] No user found in storage');
+          }
+        }
+      } catch (error) {
+        console.error('[CHAT] Error getting user:', error);
+      } finally {
+        // Complete
+      }
+
+      // Set up auth state change listener
+      const {
+        data: { subscription },
+      } = await supabase.auth.onAuthStateChange((event, session) => {
+        console.log('[CHAT] Auth state changed:', event, session?.user?.email);
+        setUser(session?.user ?? null);
+      });
+
+      // Clean up subscription on unmount
+      return () => {
+        console.log('[CHAT] Cleaning up auth subscription');
+        subscription.unsubscribe();
+      };
     }
-  }, [defaultLanguage]);
+
+    const handleAuthComplete = (message: { action: string; payload: { success: boolean } }) => {
+      console.log('[CHAT] Received message:', message);
+      if (message.action === 'authComplete' && message.payload.success) {
+        console.log('[CHAT] Auth complete message received, refreshing user');
+        // Refresh user data
+        getUser();
+      }
+    };
+
+    if (chrome?.runtime?.onMessage) {
+      console.log('[CHAT] Setting up message listener');
+      chrome.runtime.onMessage.addListener(handleAuthComplete);
+      // Initial user fetch
+      console.log('[CHAT] Initial user fetch');
+      getUser();
+      return () => {
+        console.log('[CHAT] Removing message listener');
+        chrome.runtime.onMessage.removeListener(handleAuthComplete);
+      };
+    } else {
+      console.log('[CHAT] Chrome runtime not available, fetching user directly');
+      getUser();
+    }
+  }, [supabase]);
 
   // Apply theme class to document element
   useEffect(() => {
@@ -61,30 +134,6 @@ const SidePanel = () => {
       htmlElement.classList.remove('dark');
     }
   }, [theme]);
-
-  // Function to show Chrome notifications
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    // Create a unique ID for the notification
-    const notificationId = `overlay-note-${Date.now()}`;
-
-    // Set notification options
-    const options = {
-      type: 'basic' as chrome.notifications.TemplateType,
-      iconUrl: chrome.runtime.getURL('icon-128.png'),
-      title: type === 'success' ? t('notification_success', 'Note saved') : t('notification_error', 'Error'),
-      message: message,
-      priority: 2,
-      requireInteraction: false,
-    };
-
-    // Show the notification
-    chrome.notifications.create(notificationId, options);
-
-    // Auto-clear notification after 5 seconds
-    setTimeout(() => {
-      chrome.notifications.clear(notificationId);
-    }, 5000);
-  };
 
   // Load default model from storage
   useEffect(() => {
@@ -110,6 +159,7 @@ const SidePanel = () => {
     const handleMessage = async (message: { type: string; text?: string; actionId?: string; url?: string }) => {
       console.log('Debug: Received message:', message);
       if (!selectedModel) {
+        // need to show a system message here to let user know that it is broken
         console.log('Debug: No model selected, ignoring message');
         return;
       }
@@ -165,11 +215,6 @@ const SidePanel = () => {
               // Also show notification in side panel
               if (result.success) {
                 console.log('[SidePanel] Note saved successfully');
-                // Show success notification
-                showNotification(
-                  t('note_saved_message', 'Note saved: Your note has been saved successfully.'),
-                  'success',
-                );
                 // Update the system message to show success
                 if (chatInterfaceRef.current && messageId) {
                   // Check if we have a note ID from the save result
@@ -207,13 +252,6 @@ const SidePanel = () => {
                 }
               } else {
                 console.error('[SidePanel] Failed to save note:', result.error);
-                // Show error notification
-                showNotification(
-                  t('note_save_failed', 'Failed to save note: {error}', {
-                    error: result.error || t('generic_error', 'An error occurred while saving your note.'),
-                  }),
-                  'error',
-                );
                 // Update the system message to show error
                 if (chatInterfaceRef.current && messageId) {
                   const updatedMessage = {
@@ -251,17 +289,31 @@ const SidePanel = () => {
                 // Check if user is authenticated
                 const isAuthenticated = await overlayApi.isAuthenticated();
                 if (!isAuthenticated) {
-                  showNotification('You need to be signed in to create tasks.', 'error');
+                  // Also show a more prominent Chrome notification
+                  chrome.notifications.create({
+                    type: 'basic',
+                    iconUrl: '/icon-128.png',
+                    title: 'Authentication Required',
+                    message: 'Please sign in to create tasks.',
+                    priority: 2,
+                  });
 
-                  // Send result back to content script for toast notification
-                  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                  const activeTab = tabs[0];
-                  if (activeTab && activeTab.id) {
-                    await chrome.tabs.sendMessage(activeTab.id, {
-                      type: 'TODO_CREATE_RESULT',
-                      success: false,
-                      error: 'Authentication required. Please sign in first.',
-                    });
+                  // Try to send result back to content script for toast notification
+                  try {
+                    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                    const activeTab = tabs[0];
+                    if (activeTab && activeTab.id) {
+                      await chrome.tabs.sendMessage(activeTab.id, {
+                        type: 'TODO_CREATE_RESULT',
+                        success: false,
+                        error: 'Authentication required. Please sign in first.',
+                      });
+                      console.log('Authentication required message sent to content script');
+                    } else {
+                      console.warn('No active tab found to send notification');
+                    }
+                  } catch (err) {
+                    console.error('Failed to send message to content script:', err);
                   }
                   // Update the system message to show authentication error
                   if (chatInterfaceRef.current && messageId) {
@@ -284,14 +336,11 @@ const SidePanel = () => {
 
                 // Extract task ID from the response - Google Tasks returns nested task object
                 // Prepare for both formats: direct task object or nested {task: {...}} format
-                const taskObject = createdTask.task || createdTask;
+                const taskObject = 'task' in createdTask ? (createdTask.task as Task) : createdTask;
                 const taskId = taskObject.id;
 
                 console.log('[SidePanel] Todo created successfully:', taskObject);
                 console.log('[SidePanel] Using task ID:', taskId);
-
-                // Show success notification in side panel
-                showNotification('Todo created successfully.', 'success');
 
                 // Send success notification to content script
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -339,30 +388,38 @@ const SidePanel = () => {
                   addMessage(globalMessage);
                 }
               } catch (error) {
-                console.error('[SidePanel] Failed to create todo:', error);
-                // Show error notification
-                const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-                showNotification(`Failed to create todo: ${errorMessage}`, 'error');
-
-                // Send error notification to content script
-                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                const activeTab = tabs[0];
-                if (activeTab && activeTab.id) {
-                  await chrome.tabs.sendMessage(activeTab.id, {
-                    type: 'TODO_CREATE_RESULT',
-                    success: false,
-                    error: errorMessage,
-                  });
-                }
-                // Update the system message to show error
-                if (chatInterfaceRef.current && messageId) {
-                  const updatedMessage = {
-                    content: `Failed to create task: "${message.text}"`,
+                if ((error as Error).message == 'Google account not connected') {
+                  addMessage({
+                    id: `system-error-${Date.now()}`,
+                    role: 'system',
+                    content:
+                      'You need to connect to the Google account first. Go to [Overlay Dashboard Settings](https://overlay.one/en/dashboard/settings) to connect.' +
+                      language,
                     metadata: {
                       systemMessageType: 'error' as SystemMessageType,
                     },
-                  };
-                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                  });
+                  const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                  // Send error notification to content script
+                  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                  const activeTab = tabs[0];
+                  if (activeTab && activeTab.id) {
+                    await chrome.tabs.sendMessage(activeTab.id, {
+                      type: 'TODO_CREATE_RESULT',
+                      success: false,
+                      error: errorMessage,
+                    });
+                  }
+                  // Update the system message to show error
+                  if (chatInterfaceRef.current && messageId) {
+                    const updatedMessage = {
+                      content: `Failed to create task: "${message.text}"`,
+                      metadata: {
+                        systemMessageType: 'error' as SystemMessageType,
+                      },
+                    };
+                    chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                  }
                 }
               }
             } else {
@@ -370,7 +427,6 @@ const SidePanel = () => {
               if (message.text) {
                 const chatInput = await action.prompt(message.text);
                 if (chatInput) {
-                  console.log('Debug: Processing chat input:', chatInput);
                   // Add to message history and trigger LLM call if chatInterfaceRef is available
                   if (chatInterfaceRef.current) {
                     // For selection popup actions, don't include page context (false parameter)
@@ -390,8 +446,6 @@ const SidePanel = () => {
           } catch (error) {
             console.error('Error handling action:', error);
             console.error('[SidePanel] Error:', (error as Error).message);
-            // Show error notification
-            showNotification(`Error: ${(error as Error).message || 'An error occurred.'}`, 'error');
           }
         }
       }
@@ -414,7 +468,7 @@ const SidePanel = () => {
 
     chrome.runtime.onMessage.addListener(listener);
     return () => chrome.runtime.onMessage.removeListener(listener);
-  }, [selectedModel]);
+  }, [selectedModel, addMessage]);
 
   // Define a reusable function for fetching models
   const fetchModels = async () => {
@@ -436,13 +490,31 @@ const SidePanel = () => {
     }
   };
 
-  // Fetch models on initial mount
+  // Listen for API key changes to refresh models
+  // Define authentication handler functions
+  const handleSignIn = async () => {
+    try {
+      console.log('[CHAT] Initiating sign in with GitHub');
+      await signInWithProvider('github');
+    } catch (error) {
+      console.error('[CHAT] Error signing in:', error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      console.log('[CHAT] Signing out');
+      await signOut();
+      setUser(null);
+      console.log('[CHAT] Sign out complete, user cleared');
+    } catch (error) {
+      console.error('[CHAT] Error signing out:', error);
+    }
+  };
+
   useEffect(() => {
     fetchModels();
-  }, []);
 
-  // Listen for API key changes to refresh models
-  useEffect(() => {
     // Function to handle storage changes
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
       // Only care about changes in local storage where API keys are stored
@@ -539,7 +611,6 @@ const SidePanel = () => {
           ref={chatInterfaceRef}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
-          isLight={isLight}
           mode={mode}
           initialInput={input}
           openaiModels={openaiModels}
@@ -548,9 +619,12 @@ const SidePanel = () => {
           anthropicModels={anthropicModels}
           isLoadingModels={loading}
           modelError={error}
+          user={user}
+          handleSignIn={handleSignIn}
+          handleSignOut={handleSignOut}
         />
       </div>
-      <Toaster theme={isLight ? 'light' : 'dark'} />
+      <Toaster theme={theme} />
     </div>
   );
 };

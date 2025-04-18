@@ -27,7 +27,6 @@ export interface ModelSelectorProps {
   anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
   isLoadingModels?: boolean;
   modelError?: string | null;
-  isLight?: boolean;
 }
 
 export const ModelSelector = ({
@@ -39,7 +38,6 @@ export const ModelSelector = ({
   anthropicModels = [],
   isLoadingModels = false,
   modelError = null,
-  isLight = true,
 }: ModelSelectorProps) => {
   const [open, setOpen] = useState(false);
 

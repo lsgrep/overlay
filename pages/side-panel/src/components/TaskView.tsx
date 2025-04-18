@@ -352,7 +352,6 @@ const TaskDetailsView: React.FC<TaskDetailsViewProps> = ({ task }) => (
 // Individual task item component
 type TaskItemProps = {
   task: Task;
-  isLight: boolean;
   isExpanded: boolean;
   isEditMode: boolean;
   isLoading: boolean;
@@ -367,7 +366,6 @@ type TaskItemProps = {
 
 const TaskItem: React.FC<TaskItemProps> = ({
   task,
-  isLight,
   isExpanded,
   isEditMode,
   isLoading,
@@ -460,7 +458,7 @@ const TaskItem: React.FC<TaskItemProps> = ({
 };
 
 // Main task list component
-export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ tasks: initialTasks, isLight }) => {
+export const TaskListView: React.FC<{ tasks: Task[] }> = ({ tasks: initialTasks }) => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
@@ -569,7 +567,6 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
         <TaskItem
           key={task.id}
           task={task}
-          isLight={isLight}
           isExpanded={expandedTaskId === task.id}
           isEditMode={editMode === task.id}
           isLoading={loading[task.id] || false}
@@ -589,9 +586,8 @@ export const TaskListView: React.FC<{ tasks: Task[]; isLight: boolean }> = ({ ta
 // Component for task-based messages
 export const TaskMessageContent: React.FC<{
   tasks: Task[];
-  isLight: boolean;
-}> = ({ tasks, isLight }) => {
-  return <TaskListView tasks={tasks} isLight={isLight} />;
+}> = ({ tasks }) => {
+  return <TaskListView tasks={tasks} />;
 };
 
 export type { Task };

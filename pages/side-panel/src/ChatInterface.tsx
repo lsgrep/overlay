@@ -42,10 +42,20 @@ export interface Message {
   };
 }
 
+// User type definition
+type User = {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    avatar_url?: string;
+    full_name?: string;
+    [key: string]: unknown;
+  };
+} | null;
+
 interface ChatInterfaceProps {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
-  isLight: boolean;
   mode: 'interactive' | 'conversational';
   initialInput?: string;
   openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
@@ -54,6 +64,10 @@ interface ChatInterfaceProps {
   anthropicModels: Array<{ name: string; displayName?: string; provider: string }>;
   isLoadingModels?: boolean;
   modelError?: string | null;
+  // User state and authentication handlers
+  user: User;
+  handleSignIn: () => Promise<void>;
+  handleSignOut: () => Promise<void>;
 }
 
 export const ChatInterface = forwardRef<
@@ -67,7 +81,6 @@ export const ChatInterface = forwardRef<
   const {
     selectedModel,
     setSelectedModel,
-    isLight,
     mode,
     initialInput,
     openaiModels,
@@ -76,6 +89,9 @@ export const ChatInterface = forwardRef<
     anthropicModels,
     isLoadingModels,
     modelError,
+    user,
+    handleSignIn,
+    handleSignOut,
   } = props;
 
   const fontFamily = useStorage(fontFamilyStorage);
@@ -483,7 +499,7 @@ export const ChatInterface = forwardRef<
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}>
-      <HeaderComponent />
+      <HeaderComponent user={user} handleSignIn={handleSignIn} handleSignOut={handleSignOut} />
 
       {/* Use context messages directly as our source of truth */}
       <MessageList
@@ -491,7 +507,6 @@ export const ChatInterface = forwardRef<
         isLoading={isLoading}
         error={error}
         mode={mode}
-        isLight={isLight}
         pageContext={pageContext}
         selectedModel={selectedModel}
         fontFamily={fontFamily}
@@ -509,7 +524,6 @@ export const ChatInterface = forwardRef<
           anthropicModels={anthropicModels}
           isLoadingModels={isLoadingModels}
           modelError={modelError}
-          isLight={isLight}
         />
       </div>
 
