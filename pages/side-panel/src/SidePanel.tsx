@@ -475,7 +475,6 @@ const SidePanel = () => {
     try {
       setLoading(true);
       setError('');
-
       const { anthropic, ollama, gemini, openai } = await ModelService.fetchAllModels();
       setAnthropicModels(anthropic);
       setOllamaModels(ollama);
@@ -572,7 +571,7 @@ const SidePanel = () => {
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.5 }}
               onClick={() => window.open('https://overlay.one', '_blank')}
-              title={t('visit_overlay_website', 'Visit Overlay Website')}>
+              title={'Visit Overlay Website'}>
               <motion.img
                 src={chrome.runtime.getURL('icon-128.png')}
                 alt="Overlay"

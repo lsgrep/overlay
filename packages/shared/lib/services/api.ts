@@ -29,6 +29,20 @@ export interface CompletionResponse {
   message: string;
 }
 
+interface ModelInfo {
+  name: string;
+  displayName?: string;
+  provider: string;
+}
+
+interface ModelsResponse {
+  openai?: ModelInfo[];
+  anthropic?: ModelInfo[];
+  gemini?: ModelInfo[];
+  ollama?: ModelInfo[];
+  [key: string]: ModelInfo[] | undefined;
+}
+
 // Base URL for Overlay API
 const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
 // const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
@@ -212,6 +226,25 @@ export const overlayApi = {
     return makeAuthenticatedRequest<void>(`/tasks/lists?id=${listId}`, {
       method: 'DELETE',
     });
+  },
+
+  async getModels(): Promise<ModelInfo[]> {
+    const response = await makeAuthenticatedRequest<ModelsResponse>('/chat/models');
+
+    // If no response, return empty array
+    if (!response) return [];
+
+    // Convert the provider-based structure to a flat array of models
+    const allModels: ModelInfo[] = [];
+
+    // Process each provider's models
+    Object.values(response).forEach(models => {
+      if (models && Array.isArray(models)) {
+        allModels.push(...models);
+      }
+    });
+
+    return allModels;
   },
 
   /**
