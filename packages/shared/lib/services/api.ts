@@ -414,6 +414,55 @@ export const overlayApi = {
   },
 
   /**
+   * Generate a completion using the server-side LLM services
+   * @param input The user's input text
+   * @param selectedModel The model to use for completion
+   * @param options Additional options for the completion
+   * @returns The completion response with the generated text
+   */
+  async generateCompletion(
+    input: string,
+    selectedModel: string,
+    options: {
+      mode?: 'interactive' | 'conversational';
+      pageContext?: {
+        url: string;
+        title: string;
+        content: string;
+        [key: string]: unknown;
+      };
+      messages?: Array<{
+        role: 'system' | 'user' | 'assistant';
+        content: string;
+        images?: Array<{ url: string; original_url?: string }>;
+      }>;
+      images?: Array<{ url: string; original_url?: string }>;
+      defaultLanguage?: string;
+    } = {},
+  ): Promise<{ response: string; model: ModelInfo; questionId: string }> {
+    const {
+      mode = 'conversational',
+      pageContext = { url: '', title: '', content: '' },
+      messages = [],
+      images = [],
+      defaultLanguage = 'en',
+    } = options;
+
+    return makeAuthenticatedRequest('/api/chat/completion', {
+      method: 'POST',
+      body: JSON.stringify({
+        input,
+        selectedModel,
+        mode,
+        pageContext,
+        messages,
+        images,
+        defaultLanguage,
+      }),
+    });
+  },
+
+  /**
    * Get user preferences including theme, default task list, etc.
    * @returns User preferences with success status and preference data
    */
