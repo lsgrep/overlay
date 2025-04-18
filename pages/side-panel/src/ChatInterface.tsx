@@ -513,7 +513,7 @@ export const ChatInterface = forwardRef<
       />
 
       <div className="px-3 py-2 border-t border-border bg-background">
-        <CloudModelSelector selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
+        <CloudModelSelector selectedModel={selectedModel} setSelectedModel={setSelectedModel} user={user} />
       </div>
 
       <ChatInput

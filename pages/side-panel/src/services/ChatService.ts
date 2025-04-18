@@ -1,27 +1,9 @@
 import type { PageContext } from './llm/prompts/types';
 import { PromptManager } from './llm/prompt';
-import { AnthropicService } from './llm/anthropic';
-import { GeminiService } from './llm/gemini';
-import { OpenAIService } from './llm/openai';
-import { OllamaService } from './llm/ollama';
-import type { LLMService, MessageImage } from './llm/types';
+import type { Message, MessageImage } from './llm/types';
+// Import from shared package using relative path
+import { overlayApi } from '../../../../packages/shared/lib/services/api';
 import { llmResponseLanguageStorage } from '@extension/storage';
-interface Message {
-  role: string;
-  content: string;
-  images?: MessageImage[];
-  model?: {
-    name: string;
-    displayName?: string;
-    provider: string;
-  };
-  metadata?: {
-    questionId?: string;
-    originalQuestion?: string;
-    extractedData?: Record<string, unknown>;
-    timestamp?: number;
-  };
-}
 
 interface ModelInfo {
   name: string;
@@ -43,7 +25,7 @@ interface ChatOptions {
   defaultLanguage?: string;
 }
 
-const API_URL = 'http://localhost:11434/api/chat';
+// API_URL is no longer needed since we're using the shared API
 
 export class ChatService {
   static async extractPageContent(): Promise<PageContext & { isPdf?: boolean }> {
@@ -167,6 +149,9 @@ export class ChatService {
       enhancedMode: true,
       preferredLanguage,
     };
+    if (pageContext == null || pageContext.content == null) {
+      pageContext = await ChatService.extractPageContent();
+    }
 
     // Generate prompt using PromptManager
     const prompt = PromptManager.generateContext(mode, pageContext, modelInfo, promptOptions);
@@ -174,13 +159,11 @@ export class ChatService {
 
     // Prepare messages for the selected model
     const questionId = Date.now().toString();
+    // Create user message with content
     const userMessage: Message = {
       role: 'user',
       content: input,
-      metadata: {
-        questionId,
-        timestamp: Date.now(),
-      },
+      // Include images if available - metadata is handled by the API now
     };
 
     // Add images to the message if available and using a provider that supports images
@@ -195,110 +178,66 @@ export class ChatService {
 
     const chatMessages = messages.concat(userMessage);
 
-    let response: string = '';
-    let llmService: LLMService;
-
+    // Use the shared API service for generating completions
     try {
-      // Check for extension context validity at the beginning
-      if (typeof chrome !== 'undefined' && chrome?.runtime?.lastError) {
-        console.error('Chrome runtime error detected at start:', chrome.runtime.lastError);
-        throw new Error(`Extension context error: ${chrome.runtime.lastError.message}`);
-      }
+      // Log the parameters being sent to the API
+      console.log('Calling API with parameters:', {
+        input,
+        selectedModel,
+        messages: chatMessages,
+        pageContext,
+        images,
+        mode,
+      });
 
-      if (selectedModel.startsWith('claude')) {
-        // Preserve images when mapping messages for Anthropic
-        const anthropicMessages = chatMessages.map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'assistant',
-          content: msg.content,
-          images: msg.images, // Pass the images to the Anthropic service
-        }));
-        llmService = new AnthropicService(selectedModel);
-        response = await llmService.generateCompletion(anthropicMessages, prompt, undefined, pageContext);
-      } else if (selectedModel.includes('gemini')) {
-        const geminiService = new GeminiService(selectedModel);
-        const modelName = selectedModel.replace('models/', '');
-        const model = {
-          name: selectedModel,
-          provider: 'gemini',
-          displayName: modelName.charAt(0).toUpperCase() + modelName.slice(1),
-        };
+      // Format messages to ensure they match the expected API format
+      const typedMessages = chatMessages.map(msg => ({
+        role:
+          msg.role === 'user' || msg.role === 'assistant' || msg.role === 'system'
+            ? (msg.role as 'user' | 'assistant' | 'system')
+            : 'user',
+        content: msg.content,
+        images: msg.images,
+      }));
 
-        try {
-          // If this appears to be a task planning request, use the specialized method
-          if (mode === 'interactive' && pageContext) {
-            try {
-              console.log('about to generate task plan:', input, pageContext);
+      // Call the shared API service's generateCompletion method
+      const result = await overlayApi.generateCompletion(prompt, selectedModel, {
+        mode: mode as 'interactive' | 'conversational',
+        pageContext: {
+          url: pageContext.url || '',
+          title: pageContext.title || '',
+          content: pageContext.content || '',
+        },
+        messages: typedMessages,
+        images,
+        defaultLanguage: preferredLanguage,
+      });
 
-              // Use the task planning functionality
-              const taskPlan = await geminiService.generateTaskPlan(input, pageContext);
+      console.log('API response:', result);
 
-              // Format the response for the chat interface
-              response = taskPlan;
-              console.log('Generated task plan:', taskPlan);
-            } catch (planError) {
-              console.error('Task planning failed, falling back to standard completion:', planError);
-              // Fall back to standard completion if task planning fails
-              response = await geminiService.generateCompletion(chatMessages, prompt, undefined, pageContext);
-            }
-          } else {
-            // Use standard completion for regular queries
-            response = await geminiService.generateCompletion(chatMessages, prompt, undefined, pageContext);
-          }
+      // Extract the model information from the result
+      const modelInfo = result.model || {
+        name: selectedModel,
+        provider: selectedModel.startsWith('gpt')
+          ? 'openai'
+          : selectedModel.startsWith('claude')
+            ? 'anthropic'
+            : selectedModel.includes('gemini')
+              ? 'gemini'
+              : 'ollama',
+        displayName: selectedModel,
+      };
 
-          return {
-            response,
-            model,
-            questionId,
-          };
-        } catch (geminiError) {
-          console.error('Error in Gemini processing:', geminiError);
-          // Check if this is an extension context error
-          // Properly type the error
-          const error = geminiError as Error;
-          if (error.message?.includes('Extension context')) {
-            throw geminiError; // Re-throw to be caught by outer handler
-          }
-          // Otherwise return a friendly error message
-          return {
-            response: 'An error occurred while processing your request with Gemini. Please try again.',
-            model,
-            questionId,
-          };
-        }
-      } else if (selectedModel.startsWith('gpt')) {
-        try {
-          llmService = new OpenAIService(selectedModel);
-          response = await llmService.generateCompletion(chatMessages, prompt);
-        } catch (openaiError) {
-          console.error('OpenAI service error:', openaiError);
-          response = 'Error communicating with OpenAI. Please try again later.';
-        }
-      } else {
-        try {
-          llmService = new OllamaService(selectedModel, API_URL);
-          response = await llmService.generateCompletion(chatMessages, prompt, undefined);
-        } catch (ollamaError) {
-          console.error('Ollama service error:', ollamaError);
-          response = 'Error communicating with Ollama. Please ensure the Ollama service is running and try again.';
-        }
-      }
-    } catch (globalError) {
-      // Global error handler for any unexpected errors
-      console.error('Global error in submitMessage:', globalError);
-      // Handle error object gracefully
-      const error = globalError as Error;
-      if (error.message?.includes('Extension context invalidated')) {
-        response =
-          'The extension context was invalidated. Please reload the extension or refresh the page and try again.';
-      } else {
-        response = 'I encountered an unexpected error. Please try again or reload the extension.';
-      }
-    }
+      // Return the response with model information and question ID
+      return {
+        response: result.response,
+        model: modelInfo,
+        questionId: result.questionId || questionId,
+      };
+    } catch (error) {
+      console.error('Error generating completion through API:', error);
 
-    console.log('Debug: Response:', response);
-
-    // If we've already returned from the Gemini branch, we don't need to continue
-    if (response) {
+      // Find the model in the available models or create a fallback
       const model = [...openaiModels, ...geminiModels, ...anthropicModels, ...ollamaModels].find(
         model => model.name === selectedModel,
       ) || {
@@ -313,45 +252,13 @@ export class ChatService {
         displayName: selectedModel,
       };
 
-      try {
-        // Final check for extension context validity before returning
-        if (typeof chrome !== 'undefined' && chrome?.runtime?.lastError) {
-          console.error('Chrome runtime error before return:', chrome.runtime.lastError);
-          throw new Error(`Extension context error: ${chrome.runtime.lastError.message}`);
-        }
-
-        return {
-          response,
-          model,
-          questionId,
-        };
-      } catch (finalError) {
-        console.error('Error in final response preparation:', finalError);
-        // If we encounter an extension context error at the end, still return something useful
-        return {
-          response:
-            'The extension context was invalidated. Please reload the extension or refresh the page and try again.',
-          model,
-          questionId,
-        };
-      }
+      // Return an error message with the model info
+      return {
+        response:
+          error instanceof Error ? error.message : 'An error occurred while generating a response. Please try again.',
+        model,
+        questionId,
+      };
     }
-
-    // Add final return statement to ensure all code paths return a value
-    return {
-      response: 'Could not generate a response. Please try again.',
-      model: {
-        name: selectedModel,
-        provider: selectedModel.startsWith('gpt')
-          ? 'openai'
-          : selectedModel.startsWith('claude')
-            ? 'anthropic'
-            : selectedModel.includes('gemini')
-              ? 'gemini'
-              : 'ollama',
-        displayName: selectedModel,
-      },
-      questionId,
-    };
   }
 }

@@ -438,26 +438,39 @@ export const overlayApi = {
       }>;
       images?: Array<{ url: string; original_url?: string }>;
       defaultLanguage?: string;
+      generateOnly?: boolean;
+      completionId?: string;
     } = {},
-  ): Promise<{ response: string; model: ModelInfo; questionId: string }> {
+  ): Promise<{ response: string; model: ModelInfo; questionId: string; completion_id?: string }> {
     const {
       mode = 'conversational',
       pageContext = { url: '', title: '', content: '' },
       messages = [],
       images = [],
       defaultLanguage = 'en',
+      generateOnly = false,
+      completionId,
     } = options;
 
-    return makeAuthenticatedRequest('/api/chat/completion', {
+    // Create a user message with the input if not already in messages
+    const userMessage = { role: 'user' as const, content: input };
+    const allMessages = messages.length > 0 ? messages : [userMessage];
+
+    return makeAuthenticatedRequest('/chat/completion', {
       method: 'POST',
       body: JSON.stringify({
-        input,
-        selectedModel,
+        messages: allMessages,
+        context: '', // Default empty context
+        config: {}, // Default empty config
+        pageContent: pageContext,
+        model_name: selectedModel,
+        generate_only: generateOnly,
+        completion_id: completionId,
         mode,
-        pageContext,
-        messages,
-        images,
-        defaultLanguage,
+        metadata: { images },
+        prompt_content: input,
+        source_url: pageContext?.url || '',
+        default_language: defaultLanguage,
       }),
     });
   },

@@ -15,9 +15,14 @@ interface ModelInfo {
 interface CloudModelSelectorProps {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
+  user: {
+    id: string;
+    email?: string;
+    user_metadata?: { avatar_url?: string; full_name?: string; [key: string]: unknown };
+  } | null;
 }
 
-export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selectedModel, setSelectedModel }) => {
+export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selectedModel, setSelectedModel, user }) => {
   // State for storing models
   const [openaiModels, setOpenaiModels] = useState<ModelInfo[]>([]);
   const [geminiModels, setGeminiModels] = useState<ModelInfo[]>([]);
@@ -106,6 +111,14 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
   useEffect(() => {
     fetchModels();
   }, [fetchModels]);
+
+  // Refetch models when user changes (login/logout)
+  useEffect(() => {
+    if (fetchModels) {
+      console.log('[CloudModelSelector] User state changed, refetching models');
+      fetchModels();
+    }
+  }, [user, fetchModels]);
 
   // Handle model selection changes
   const handleModelChange = useCallback(

@@ -389,16 +389,6 @@ const SidePanel = () => {
                 }
               } catch (error) {
                 if ((error as Error).message == 'Google account not connected') {
-                  addMessage({
-                    id: `system-error-${Date.now()}`,
-                    role: 'system',
-                    content:
-                      'You need to connect to the Google account first. Go to [Overlay Dashboard Settings](https://overlay.one/en/dashboard/settings) to connect.' +
-                      language,
-                    metadata: {
-                      systemMessageType: 'error' as SystemMessageType,
-                    },
-                  });
                   const errorMessage = error instanceof Error ? error.message : 'An error occurred';
                   // Send error notification to content script
                   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -413,7 +403,10 @@ const SidePanel = () => {
                   // Update the system message to show error
                   if (chatInterfaceRef.current && messageId) {
                     const updatedMessage = {
-                      content: `Failed to create task: "${message.text}"`,
+                      content:
+                        `Failed to create task: \n` +
+                        `You need to connect to the Google account first. \n` +
+                        `Go to [Overlay Dashboard Settings](https://overlay.one/${language}/dashboard/settings) to connect.`,
                       metadata: {
                         systemMessageType: 'error' as SystemMessageType,
                       },
