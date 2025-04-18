@@ -1,6 +1,6 @@
 // import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
-import { overlayApi } from '@extension/shared/lib/services/api';
+import { overlayApi, type Task } from '@extension/shared/lib/services/api';
 import {
   saveNote,
   deleteNote,
@@ -47,7 +47,7 @@ const SidePanel = () => {
     };
   } | null>(null);
   // Get chat context for direct manipulation
-  const { addMessage, updateMessage, deleteMessage } = useChat();
+  const { addMessage } = useChat();
   // Reference to ChatInterface methods
   const chatInterfaceRef = useRef<{
     submitMessage: (text: string, includePageContext?: boolean) => Promise<void>;
@@ -135,29 +135,6 @@ const SidePanel = () => {
     }
   }, [theme]);
 
-  // Function to show Chrome notifications
-  const showNotification = (message: string, type: 'success' | 'error') => {
-    // Create a unique ID for the notification
-    const notificationId = `overlay-note-${Date.now()}`;
-    // Set notification options
-    const options = {
-      type: 'basic' as chrome.notifications.TemplateType,
-      iconUrl: chrome.runtime.getURL('icon-128.png'),
-      title: type === 'success' ? t('notification_success', 'Note saved') : t('notification_error', 'Error'),
-      message: message,
-      priority: 2,
-      requireInteraction: false,
-    };
-
-    // Show the notification
-    chrome.notifications.create(notificationId, options);
-
-    // Auto-clear notification after 5 seconds
-    setTimeout(() => {
-      chrome.notifications.clear(notificationId);
-    }, 5000);
-  };
-
   // Load default model from storage
   useEffect(() => {
     const loadDefaultModel = async () => {
@@ -238,11 +215,6 @@ const SidePanel = () => {
               // Also show notification in side panel
               if (result.success) {
                 console.log('[SidePanel] Note saved successfully');
-                // Show success notification
-                showNotification(
-                  t('note_saved_message', 'Note saved: Your note has been saved successfully.'),
-                  'success',
-                );
                 // Update the system message to show success
                 if (chatInterfaceRef.current && messageId) {
                   // Check if we have a note ID from the save result
@@ -280,13 +252,6 @@ const SidePanel = () => {
                 }
               } else {
                 console.error('[SidePanel] Failed to save note:', result.error);
-                // Show error notification
-                showNotification(
-                  t('note_save_failed', 'Failed to save note: {error}', {
-                    error: result.error || t('generic_error', 'An error occurred while saving your note.'),
-                  }),
-                  'error',
-                );
                 // Update the system message to show error
                 if (chatInterfaceRef.current && messageId) {
                   const updatedMessage = {
@@ -324,17 +289,31 @@ const SidePanel = () => {
                 // Check if user is authenticated
                 const isAuthenticated = await overlayApi.isAuthenticated();
                 if (!isAuthenticated) {
-                  showNotification('You need to be signed in to create tasks.', 'error');
+                  // Also show a more prominent Chrome notification
+                  chrome.notifications.create({
+                    type: 'basic',
+                    iconUrl: '/icon-128.png',
+                    title: 'Authentication Required',
+                    message: 'Please sign in to create tasks.',
+                    priority: 2,
+                  });
 
-                  // Send result back to content script for toast notification
-                  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                  const activeTab = tabs[0];
-                  if (activeTab && activeTab.id) {
-                    await chrome.tabs.sendMessage(activeTab.id, {
-                      type: 'TODO_CREATE_RESULT',
-                      success: false,
-                      error: 'Authentication required. Please sign in first.',
-                    });
+                  // Try to send result back to content script for toast notification
+                  try {
+                    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                    const activeTab = tabs[0];
+                    if (activeTab && activeTab.id) {
+                      await chrome.tabs.sendMessage(activeTab.id, {
+                        type: 'TODO_CREATE_RESULT',
+                        success: false,
+                        error: 'Authentication required. Please sign in first.',
+                      });
+                      console.log('Authentication required message sent to content script');
+                    } else {
+                      console.warn('No active tab found to send notification');
+                    }
+                  } catch (err) {
+                    console.error('Failed to send message to content script:', err);
                   }
                   // Update the system message to show authentication error
                   if (chatInterfaceRef.current && messageId) {
@@ -357,14 +336,11 @@ const SidePanel = () => {
 
                 // Extract task ID from the response - Google Tasks returns nested task object
                 // Prepare for both formats: direct task object or nested {task: {...}} format
-                const taskObject = createdTask.task || createdTask;
+                const taskObject = 'task' in createdTask ? (createdTask.task as Task) : createdTask;
                 const taskId = taskObject.id;
 
                 console.log('[SidePanel] Todo created successfully:', taskObject);
                 console.log('[SidePanel] Using task ID:', taskId);
-
-                // Show success notification in side panel
-                showNotification('Todo created successfully.', 'success');
 
                 // Send success notification to content script
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -412,30 +388,37 @@ const SidePanel = () => {
                   addMessage(globalMessage);
                 }
               } catch (error) {
-                console.error('[SidePanel] Failed to create todo:', error);
-                // Show error notification
-                const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-                showNotification(`Failed to create todo: ${errorMessage}`, 'error');
-
-                // Send error notification to content script
-                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                const activeTab = tabs[0];
-                if (activeTab && activeTab.id) {
-                  await chrome.tabs.sendMessage(activeTab.id, {
-                    type: 'TODO_CREATE_RESULT',
-                    success: false,
-                    error: errorMessage,
-                  });
-                }
-                // Update the system message to show error
-                if (chatInterfaceRef.current && messageId) {
-                  const updatedMessage = {
-                    content: `Failed to create task: "${message.text}"`,
+                if ((error as Error).message == 'Google account not connected') {
+                  addMessage({
+                    id: `system-error-${Date.now()}`,
+                    role: 'system',
+                    content:
+                      'You need to connect to the Google account first. Go to [Overlay Dashboard Settings](https://overlay.one/en/dashboard/settings) to connect.',
                     metadata: {
                       systemMessageType: 'error' as SystemMessageType,
                     },
-                  };
-                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                  });
+                  const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+                  // Send error notification to content script
+                  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                  const activeTab = tabs[0];
+                  if (activeTab && activeTab.id) {
+                    await chrome.tabs.sendMessage(activeTab.id, {
+                      type: 'TODO_CREATE_RESULT',
+                      success: false,
+                      error: errorMessage,
+                    });
+                  }
+                  // Update the system message to show error
+                  if (chatInterfaceRef.current && messageId) {
+                    const updatedMessage = {
+                      content: `Failed to create task: "${message.text}"`,
+                      metadata: {
+                        systemMessageType: 'error' as SystemMessageType,
+                      },
+                    };
+                    chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                  }
                 }
               }
             } else {
@@ -443,7 +426,6 @@ const SidePanel = () => {
               if (message.text) {
                 const chatInput = await action.prompt(message.text);
                 if (chatInput) {
-                  console.log('Debug: Processing chat input:', chatInput);
                   // Add to message history and trigger LLM call if chatInterfaceRef is available
                   if (chatInterfaceRef.current) {
                     // For selection popup actions, don't include page context (false parameter)
@@ -463,8 +445,6 @@ const SidePanel = () => {
           } catch (error) {
             console.error('Error handling action:', error);
             console.error('[SidePanel] Error:', (error as Error).message);
-            // Show error notification
-            showNotification(`Error: ${(error as Error).message || 'An error occurred.'}`, 'error');
           }
         }
       }

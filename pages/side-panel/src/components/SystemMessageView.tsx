@@ -4,6 +4,7 @@ import { ArrowPathIcon } from '@heroicons/react/24/solid';
 import { Task } from '@extension/shared/lib/services/api';
 import { UnifiedTaskItem } from './UnifiedTaskView';
 import { UnifiedNoteView } from './UnifiedNoteView';
+import { MarkdownMessageContent } from './MarkdownMessageContent';
 import icon from '../../../../chrome-extension/public/icon-128.png';
 
 // Define types for the system message
@@ -94,7 +95,7 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = memo(
 
             {/* Message content styled like LoadingMessage */}
             <div className="flex-1 p-3 mr-5 ml-0 bg-destructive/5 border border-destructive/20 rounded-tl-lg rounded-bl-lg rounded-br-lg">
-              <p className="text-sm text-destructive">{content}</p>
+              <MarkdownMessageContent content={content} />
             </div>
           </div>
         </div>
@@ -113,7 +114,7 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = memo(
 
             {/* Message content styled like LoadingMessage */}
             <div className="flex-1 p-3 mr-5 ml-0 bg-muted/20 border border-border rounded-tl-lg rounded-bl-lg rounded-br-lg">
-              <p className="text-sm text-foreground">{content}</p>
+              <MarkdownMessageContent content={content} />
             </div>
           </div>
         </div>
@@ -271,7 +272,7 @@ export const SystemMessageView: React.FC<SystemMessageViewProps> = memo(
 
           {/* Message content styled like other messages */}
           <div className="flex-1 p-3 mr-5 ml-0 bg-muted/20 border border-border rounded-tl-lg rounded-bl-lg rounded-br-lg">
-            <p className="text-sm text-foreground">{content}</p>
+            <MarkdownMessageContent content={content} isLight={isLight} />
           </div>
         </div>
       </div>
