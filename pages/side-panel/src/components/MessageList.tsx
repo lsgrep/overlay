@@ -40,7 +40,6 @@ interface MessageListProps {
   isLoading: boolean;
   error: string | null;
   mode: 'interactive' | 'conversational';
-  isLight: boolean;
   pageContext: PageContext | null;
   selectedModel: string;
   fontFamily: string;
@@ -54,7 +53,6 @@ export const MessageList: React.FC<MessageListProps> = ({
   isLoading,
   error,
   mode,
-  isLight,
   pageContext,
   selectedModel,
   fontFamily,
@@ -152,7 +150,6 @@ export const MessageList: React.FC<MessageListProps> = ({
                 id: messageId, // Ensure ID is set for the component
               }}
               index={index}
-              isLight={isLight}
               mode={mode}
               pageContext={pageContext}
               selectedModel={selectedModel}

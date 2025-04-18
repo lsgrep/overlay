@@ -26,7 +26,6 @@ export interface UnifiedNoteProps {
   content: string;
   timestamp: number;
   sourceUrl?: string;
-  isLight?: boolean;
   onUpdate?: (id: string, content: string, sourceUrl?: string) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   onCopy?: () => void;
@@ -34,7 +33,7 @@ export interface UnifiedNoteProps {
 }
 
 export const UnifiedNoteView: React.FC<UnifiedNoteProps> = memo(
-  ({ id, content, timestamp, sourceUrl, isLight = true, onUpdate, onDelete, onCopy, contentVersion = 0 }) => {
+  ({ id, content, timestamp, sourceUrl, onUpdate, onDelete, onCopy, contentVersion = 0 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [editedContent, setEditedContent] = useState(content);
@@ -236,11 +235,10 @@ UnifiedNoteView.displayName = 'UnifiedNoteView';
 // Note list component
 export const UnifiedNoteListView: React.FC<{
   notes: NoteType[] | { id?: string; content: string; timestamp: number; sourceUrl?: string }[];
-  isLight?: boolean;
   onUpdate?: (id: string, content: string, sourceUrl?: string) => Promise<void>;
   onDelete?: (id: string) => Promise<void>;
   contentVersion?: number;
-}> = memo(({ notes, isLight = true, onUpdate, onDelete, contentVersion = 0 }) => {
+}> = memo(({ notes, onUpdate, onDelete, contentVersion = 0 }) => {
   // Render empty state
   if (notes.length === 0) {
     return (
@@ -270,7 +268,6 @@ export const UnifiedNoteListView: React.FC<{
               content={note.content}
               timestamp={note.timestamp || note.created_at || Date.now()}
               sourceUrl={note.sourceUrl || note.source_url}
-              isLight={isLight}
               onUpdate={onUpdate}
               onDelete={onDelete}
               contentVersion={contentVersion}

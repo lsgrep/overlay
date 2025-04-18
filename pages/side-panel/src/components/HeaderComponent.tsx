@@ -37,7 +37,6 @@ interface HeaderComponentProps {
 
 export const HeaderComponent: FC<HeaderComponentProps> = ({ user, handleSignIn, handleSignOut }) => {
   const theme = useStorage(exampleThemeStorage);
-  const isLight = theme === 'light';
 
   // Apply theme class to document element
   useEffect(() => {
@@ -102,16 +101,16 @@ export const HeaderComponent: FC<HeaderComponentProps> = ({ user, handleSignIn, 
           size="icon"
           variant="ghost"
           className="h-8 w-8"
-          onClick={() => exampleThemeStorage.set(isLight ? 'dark' : 'light')}
-          title={isLight ? t('switch_to_dark', 'Switch to Dark Mode') : t('switch_to_light', 'Switch to Light Mode')}>
-          {isLight ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
+          onClick={() => exampleThemeStorage.set(theme === 'light' ? 'dark' : 'light')}
+          title={t('toggleTheme', 'Toggle Theme')}>
+          {theme === 'light' ? <MoonIcon className="h-4 w-4" /> : <SunIcon className="h-4 w-4" />}
         </Button>
         <Button
           size="icon"
           variant="ghost"
           className="h-8 w-8"
           onClick={() => chrome.runtime.openOptionsPage()}
-          title={t('settings', 'Settings')}>
+          title={t('options_general_settings', 'Settings')}>
           <Settings className="h-4 w-4" />
         </Button>
       </div>

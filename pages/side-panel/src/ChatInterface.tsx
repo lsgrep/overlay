@@ -56,7 +56,6 @@ type User = {
 interface ChatInterfaceProps {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
-  isLight: boolean;
   mode: 'interactive' | 'conversational';
   initialInput?: string;
   openaiModels: Array<{ name: string; displayName?: string; provider: string }>;
@@ -82,7 +81,6 @@ export const ChatInterface = forwardRef<
   const {
     selectedModel,
     setSelectedModel,
-    isLight,
     mode,
     initialInput,
     openaiModels,
@@ -509,7 +507,6 @@ export const ChatInterface = forwardRef<
         isLoading={isLoading}
         error={error}
         mode={mode}
-        isLight={isLight}
         pageContext={pageContext}
         selectedModel={selectedModel}
         fontFamily={fontFamily}
@@ -527,7 +524,6 @@ export const ChatInterface = forwardRef<
           anthropicModels={anthropicModels}
           isLoadingModels={isLoadingModels}
           modelError={modelError}
-          isLight={isLight}
         />
       </div>
 

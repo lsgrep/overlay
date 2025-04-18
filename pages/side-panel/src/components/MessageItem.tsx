@@ -46,7 +46,6 @@ interface Message {
 interface MessageItemProps {
   message: Message;
   index: number;
-  isLight: boolean;
   mode: 'interactive' | 'conversational';
   pageContext: PageContext | null;
   selectedModel: string;
@@ -56,13 +55,8 @@ interface MessageItemProps {
   onUpdate?: (updates: Partial<Message>) => void;
 }
 
-// Common props for the message content components
-interface MessageContentProps {
-  isLight: boolean;
-}
-
 // Props for the interactive message content component
-interface InteractiveContentProps extends MessageContentProps {
+interface InteractiveContentProps {
   message: Message;
 }
 
@@ -159,7 +153,7 @@ const MessageHeader: React.FC<{
 };
 
 // Component for interactive message content (JSON handling)
-const InteractiveMessageContent: React.FC<InteractiveContentProps> = ({ message, isLight }) => {
+const InteractiveMessageContent: React.FC<InteractiveContentProps> = ({ message }) => {
   return (
     <div className="space-y-2 max-w-full">
       {(() => {
@@ -169,15 +163,14 @@ const InteractiveMessageContent: React.FC<InteractiveContentProps> = ({ message,
 
           // Just format as JSON
           return (
-            <pre
-              className={`whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm ${isLight ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-100'}`}>
+            <pre className={`whitespace-pre-wrap break-words overflow-x-auto p-2 rounded text-sm`}>
               {JSON.stringify(parsedJson, null, 2)}
             </pre>
           );
         } catch (error) {
           console.error('Error parsing as JSON:', error);
           // If not JSON at all, render as markdown
-          return <MarkdownMessageContent content={message.content} isLight={isLight} />;
+          return <MarkdownMessageContent content={message.content} />;
         }
       })()}
     </div>
@@ -186,7 +179,7 @@ const InteractiveMessageContent: React.FC<InteractiveContentProps> = ({ message,
 
 // Main MessageItem component using the specialized components
 export const MessageItem: React.FC<MessageItemProps> = memo(
-  ({ message, index, isLight, mode, fontFamily, fontSize, chatInterfaceRef, onUpdate }) => {
+  ({ message, index, mode, fontFamily, fontSize, onUpdate }) => {
     const [contentVersion, setContentVersion] = useState(0);
     const { updateMessage, deleteMessage } = useChat();
 
@@ -261,7 +254,6 @@ export const MessageItem: React.FC<MessageItemProps> = memo(
             sourceUrl,
             metadata: message.metadata,
           }}
-          isLight={isLight}
           onCopy={() => {
             navigator.clipboard.writeText(message.content);
             console.log('Copied to clipboard');
@@ -425,7 +417,6 @@ export const MessageItem: React.FC<MessageItemProps> = memo(
               <div className="max-w-full overflow-x-hidden">
                 <UnifiedTaskListView
                   tasks={tasks}
-                  isLight={isLight}
                   messageId={message.id} // Pass message ID for direct context updates
                   onUpdate={async task => {
                     try {
@@ -539,7 +530,7 @@ export const MessageItem: React.FC<MessageItemProps> = memo(
                 />
               </div>
             ) : mode === 'interactive' && message.role === 'assistant' ? (
-              <InteractiveMessageContent message={message} isLight={isLight} />
+              <InteractiveMessageContent message={message} />
             ) : (
               <>
                 {/* Display images if they exist in the message */}
@@ -564,7 +555,7 @@ export const MessageItem: React.FC<MessageItemProps> = memo(
                     </div>
                   </div>
                 )}
-                <MarkdownMessageContent content={message.content} isLight={isLight} />
+                <MarkdownMessageContent content={message.content} />
               </>
             )}
           </div>

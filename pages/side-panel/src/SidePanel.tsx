@@ -9,7 +9,7 @@ import {
   signOut,
   getCurrentUserFromStorage,
 } from '@extension/shared/lib/services/supabase';
-import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
+import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
@@ -25,7 +25,7 @@ import type { SystemMessageType } from './components/SystemMessageView';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
-  const isLight = theme === 'light';
+  const language = useStorage(defaultLanguageStorage);
   // Define model types
   type ModelType = { name: string; displayName?: string; provider: string };
   const [ollamaModels, setOllamaModels] = useState<ModelType[]>([]);
@@ -393,7 +393,8 @@ const SidePanel = () => {
                     id: `system-error-${Date.now()}`,
                     role: 'system',
                     content:
-                      'You need to connect to the Google account first. Go to [Overlay Dashboard Settings](https://overlay.one/en/dashboard/settings) to connect.',
+                      'You need to connect to the Google account first. Go to [Overlay Dashboard Settings](https://overlay.one/en/dashboard/settings) to connect.' +
+                      language,
                     metadata: {
                       systemMessageType: 'error' as SystemMessageType,
                     },
@@ -610,7 +611,6 @@ const SidePanel = () => {
           ref={chatInterfaceRef}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
-          isLight={isLight}
           mode={mode}
           initialInput={input}
           openaiModels={openaiModels}
@@ -624,7 +624,7 @@ const SidePanel = () => {
           handleSignOut={handleSignOut}
         />
       </div>
-      <Toaster theme={isLight ? 'light' : 'dark'} />
+      <Toaster theme={theme} />
     </div>
   );
 };

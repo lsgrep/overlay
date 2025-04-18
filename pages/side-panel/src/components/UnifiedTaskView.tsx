@@ -196,7 +196,6 @@ const DateQuickButtons: React.FC<DateQuickButtonsProps> = ({ selectedDate, onSel
 
 export interface UnifiedTaskItemProps {
   task: Task;
-  isLight: boolean;
   onUpdate?: (task: Task) => Promise<void>;
   onDelete?: (taskId: string) => Promise<void>;
   onToggleComplete?: (taskId: string, completed: boolean) => Promise<void>;
@@ -223,7 +222,7 @@ export const UnifiedTaskItem: React.FC<UnifiedTaskItemProps> = memo(props => {
     due: props.dueDate,
   };
 
-  const { isLight, onUpdate, onDelete, onToggleComplete, onCopy, contentVersion = 0 } = props;
+  const { onUpdate, onDelete, onToggleComplete, onCopy, contentVersion = 0 } = props;
 
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -569,13 +568,12 @@ UnifiedTaskItem.displayName = 'UnifiedTaskItem';
 // Task list component
 export const UnifiedTaskListView: React.FC<{
   tasks: Task[];
-  isLight: boolean;
   onUpdate?: (task: Task) => Promise<void>;
   onDelete?: (taskId: string) => Promise<void>;
   onToggleComplete?: (taskId: string, completed: boolean) => Promise<void>;
   contentVersion?: number; // Used to force re-render when content changes
   messageId?: string; // ID of the parent message for context updates
-}> = memo(({ tasks, isLight, onUpdate, onDelete, onToggleComplete, contentVersion = 0, messageId }) => {
+}> = memo(({ tasks, onUpdate, onDelete, onToggleComplete, contentVersion = 0, messageId }) => {
   // We don't use context directly here, we use the callbacks
   // This component is called by MessageItem which already uses the context
   // Render empty state
@@ -597,7 +595,6 @@ export const UnifiedTaskListView: React.FC<{
         <div className="flex justify-center" key={task.id}>
           <UnifiedTaskItem
             task={task}
-            isLight={isLight}
             onUpdate={onUpdate}
             onDelete={onDelete}
             onToggleComplete={onToggleComplete}
