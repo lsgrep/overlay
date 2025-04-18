@@ -55,6 +55,10 @@ const manifest = withSidePanel({
       resources: ['new-tab/*'],
       matches: ['<all_urls>'],
     },
+    {
+      resources: ['*.js', '*.css', '*.svg', 'icon-128.png', 'icon-34.png'],
+      matches: ['*://*/*'],
+    },
   ],
   options_page: 'options/index.html',
   background: {
@@ -65,9 +69,10 @@ const manifest = withSidePanel({
     default_popup: 'popup/index.html',
     default_icon: 'icon-34.png',
   },
-  chrome_url_overrides: {
-    newtab: 'new-tab/index.html',
-  },
+  // Commented out to disable new tab override
+  // chrome_url_overrides: {
+  //   newtab: 'new-tab/index.html',
+  // },
   icons: {
     128: 'icon-128.png',
   },
@@ -86,12 +91,6 @@ const manifest = withSidePanel({
     },
   ],
   devtools_page: 'devtools/index.html',
-  web_accessible_resources: [
-    {
-      resources: ['*.js', '*.css', '*.svg', 'icon-128.png', 'icon-34.png'],
-      matches: ['*://*/*'],
-    },
-  ],
 });
 
 export default manifest;

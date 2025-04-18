@@ -1,10 +1,17 @@
 // import '@src/SidePanel.css';
 import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@extension/shared';
 import { overlayApi } from '@extension/shared/lib/services/api';
-import { saveNote, deleteNote } from '@extension/shared/lib/services/supabase';
-import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
+import {
+  saveNote,
+  deleteNote,
+  createClient,
+  signInWithProvider,
+  signOut,
+  getCurrentUserFromStorage,
+} from '@extension/shared/lib/services/supabase';
+import { exampleThemeStorage, defaultModelStorage } from '@extension/storage';
 import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
-import { MessageCircle, Blocks, Settings } from 'lucide-react';
+import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { t } from '@extension/i18n';
 import { useChat } from './contexts/ChatContext';
@@ -18,7 +25,6 @@ import type { SystemMessageType } from './components/SystemMessageView';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
-  const defaultLanguage = useStorage(defaultLanguageStorage);
   const isLight = theme === 'light';
   // Define model types
   type ModelType = { name: string; displayName?: string; provider: string };
@@ -31,6 +37,15 @@ const SidePanel = () => {
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'interactive' | 'conversational'>('conversational');
   const [input, setInput] = useState('');
+  const [user, setUser] = useState<{
+    id: string;
+    email?: string;
+    user_metadata?: {
+      avatar_url?: string;
+      full_name?: string;
+      [key: string]: unknown;
+    };
+  } | null>(null);
   // Get chat context for direct manipulation
   const { addMessage, updateMessage, deleteMessage } = useChat();
   // Reference to ChatInterface methods
@@ -39,18 +54,76 @@ const SidePanel = () => {
     addSystemMessage: (message: ChatMessage) => number | undefined;
     updateSystemMessage: (messageId: number, updatedMessage: Partial<ChatMessage>) => void;
   } | null>(null);
-
-  // We'll use Chrome's native notifications instead of custom UI notifications
-
-  // Update translations when language changes
+  const supabase = createClient();
   useEffect(() => {
-    if (defaultLanguage) {
-      // Set the locale directly from storage
-      // @ts-expect-error - DevLocale type not available from @extension/i18n
-      t.devLocale = defaultLanguage;
-      console.log('SidePanel: Language set to', defaultLanguage);
+    async function getUser() {
+      try {
+        console.log('[CHAT] Getting user...');
+        // First try to get user from current session
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        console.log('[CHAT] getUser: User from session', user);
+
+        if (user) {
+          setUser(user);
+          console.log('[CHAT] User set from session', user.email);
+        } else {
+          console.log('[CHAT] No user in session, trying storage');
+          // If no session, try to get user from storage tokens
+          const storageUser = await getCurrentUserFromStorage();
+          if (storageUser) {
+            setUser(storageUser);
+            console.log('[CHAT] User set from storage', storageUser.email);
+          } else {
+            console.log('[CHAT] No user found in storage');
+          }
+        }
+      } catch (error) {
+        console.error('[CHAT] Error getting user:', error);
+      } finally {
+        // Complete
+      }
+
+      // Set up auth state change listener
+      const {
+        data: { subscription },
+      } = await supabase.auth.onAuthStateChange((event, session) => {
+        console.log('[CHAT] Auth state changed:', event, session?.user?.email);
+        setUser(session?.user ?? null);
+      });
+
+      // Clean up subscription on unmount
+      return () => {
+        console.log('[CHAT] Cleaning up auth subscription');
+        subscription.unsubscribe();
+      };
     }
-  }, [defaultLanguage]);
+
+    const handleAuthComplete = (message: { action: string; payload: { success: boolean } }) => {
+      console.log('[CHAT] Received message:', message);
+      if (message.action === 'authComplete' && message.payload.success) {
+        console.log('[CHAT] Auth complete message received, refreshing user');
+        // Refresh user data
+        getUser();
+      }
+    };
+
+    if (chrome?.runtime?.onMessage) {
+      console.log('[CHAT] Setting up message listener');
+      chrome.runtime.onMessage.addListener(handleAuthComplete);
+      // Initial user fetch
+      console.log('[CHAT] Initial user fetch');
+      getUser();
+      return () => {
+        console.log('[CHAT] Removing message listener');
+        chrome.runtime.onMessage.removeListener(handleAuthComplete);
+      };
+    } else {
+      console.log('[CHAT] Chrome runtime not available, fetching user directly');
+      getUser();
+    }
+  }, [supabase]);
 
   // Apply theme class to document element
   useEffect(() => {
@@ -66,7 +139,6 @@ const SidePanel = () => {
   const showNotification = (message: string, type: 'success' | 'error') => {
     // Create a unique ID for the notification
     const notificationId = `overlay-note-${Date.now()}`;
-
     // Set notification options
     const options = {
       type: 'basic' as chrome.notifications.TemplateType,
@@ -110,6 +182,7 @@ const SidePanel = () => {
     const handleMessage = async (message: { type: string; text?: string; actionId?: string; url?: string }) => {
       console.log('Debug: Received message:', message);
       if (!selectedModel) {
+        // need to show a system message here to let user know that it is broken
         console.log('Debug: No model selected, ignoring message');
         return;
       }
@@ -414,7 +487,7 @@ const SidePanel = () => {
 
     chrome.runtime.onMessage.addListener(listener);
     return () => chrome.runtime.onMessage.removeListener(listener);
-  }, [selectedModel]);
+  }, [selectedModel, addMessage]);
 
   // Define a reusable function for fetching models
   const fetchModels = async () => {
@@ -436,13 +509,31 @@ const SidePanel = () => {
     }
   };
 
-  // Fetch models on initial mount
+  // Listen for API key changes to refresh models
+  // Define authentication handler functions
+  const handleSignIn = async () => {
+    try {
+      console.log('[CHAT] Initiating sign in with GitHub');
+      await signInWithProvider('github');
+    } catch (error) {
+      console.error('[CHAT] Error signing in:', error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      console.log('[CHAT] Signing out');
+      await signOut();
+      setUser(null);
+      console.log('[CHAT] Sign out complete, user cleared');
+    } catch (error) {
+      console.error('[CHAT] Error signing out:', error);
+    }
+  };
+
   useEffect(() => {
     fetchModels();
-  }, []);
 
-  // Listen for API key changes to refresh models
-  useEffect(() => {
     // Function to handle storage changes
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
       // Only care about changes in local storage where API keys are stored
@@ -548,6 +639,9 @@ const SidePanel = () => {
           anthropicModels={anthropicModels}
           isLoadingModels={loading}
           modelError={error}
+          user={user}
+          handleSignIn={handleSignIn}
+          handleSignOut={handleSignOut}
         />
       </div>
       <Toaster theme={isLight ? 'light' : 'dark'} />
