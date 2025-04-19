@@ -420,10 +420,10 @@ const SidePanel = () => {
                 if (chatInput) {
                   // Add to message history and trigger LLM call if chatInterfaceRef is available
                   if (chatInterfaceRef.current) {
-                    // For selection popup actions, don't include page context (false parameter)
-                    // Only note creation should include page context, which is handled separately above
-                    console.log('Debug: Submitting selection popup message without page context');
-                    chatInterfaceRef.current.submitMessage(chatInput, false);
+                    // For selection popup actions, we need to include page context (true parameter)
+                    // This ensures the message gets processed properly in the sidebar
+                    console.log('Debug: Submitting selection popup message with page context');
+                    chatInterfaceRef.current.submitMessage(chatInput, true);
                   } else {
                     // Fallback to old behavior if ref isn't available
                     console.log('Debug: ChatInterface ref not available, setting input text only');

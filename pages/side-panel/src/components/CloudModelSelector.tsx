@@ -70,8 +70,13 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
       }
 
       // Ollama only can be fetched locally
-      const ollamaModels = await ModelService.fetchOllamaModels();
-      setOllamaModels(ollamaModels.sort(sortByDisplayName));
+      try {
+        const ollamaModels = await ModelService.fetchOllamaModels();
+        setOllamaModels(ollamaModels.sort(sortByDisplayName));
+      } catch (error) {
+        console.error('[CloudModelSelector] Error fetching Ollama models:', error);
+        setOllamaModels([]);
+      }
 
       // Set model selection logic
       if (!selectedModel && models?.length > 0) {

@@ -160,6 +160,9 @@ export const ChatInterface = forwardRef<
     if (draggedImages.length > 0) {
       displayMessage.images = draggedImages;
     }
+
+    // Process message first to ensure it's not dropped
+    console.log('Adding message to chat context:', displayMessage);
     // Add to context instead of local state
     chatContext.addMessage(displayMessage);
     setIsLoading(true);
