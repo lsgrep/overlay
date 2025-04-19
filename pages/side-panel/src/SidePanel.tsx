@@ -254,7 +254,7 @@ const SidePanel = () => {
                 // Update the system message to show error
                 if (chatInterfaceRef.current && messageId) {
                   const updatedMessage = {
-                    content: t('note_save_failed_message', 'Failed to save note: "{text}"', { text: message.text }),
+                    content: `Failed to save note: ${result.error}`,
                     metadata: {
                       systemMessageType: 'error' as SystemMessageType,
                     },
@@ -284,135 +284,134 @@ const SidePanel = () => {
                 // Add the loading system message and store its ID
                 messageId = chatInterfaceRef.current.addSystemMessage(loadingMessage);
               }
-              try {
-                // Check if user is authenticated
-                const isAuthenticated = await overlayApi.isAuthenticated();
-                if (!isAuthenticated) {
-                  // Also show a more prominent Chrome notification
-                  chrome.notifications.create({
-                    type: 'basic',
-                    iconUrl: '/icon-128.png',
-                    title: 'Authentication Required',
-                    message: 'Please sign in to create tasks.',
-                    priority: 2,
-                  });
 
-                  // Try to send result back to content script for toast notification
-                  try {
-                    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                    const activeTab = tabs[0];
-                    if (activeTab && activeTab.id) {
-                      await chrome.tabs.sendMessage(activeTab.id, {
-                        type: 'TODO_CREATE_RESULT',
-                        success: false,
-                        error: 'Authentication required. Please sign in first.',
-                      });
-                      console.log('Authentication required message sent to content script');
-                    } else {
-                      console.warn('No active tab found to send notification');
-                    }
-                  } catch (err) {
-                    console.error('Failed to send message to content script:', err);
-                  }
-                  // Update the system message to show authentication error
-                  if (chatInterfaceRef.current && messageId) {
-                    const updatedMessage = {
-                      content: `Authentication required. Please sign in first.`,
-                      metadata: {
-                        systemMessageType: 'error' as SystemMessageType,
-                      },
-                    };
-                    chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
-                  }
-                  return;
-                }
-
-                // Create a task using the selected text as title and get the created task data
-                const apiResponse = await overlayApi.createTask({
-                  title: message.text,
-                  notes: `Created from: ${sourceUrl}`,
+              // Check if user is authenticated
+              const isAuthenticated = await overlayApi.isAuthenticated();
+              if (!isAuthenticated) {
+                // Also show a more prominent Chrome notification
+                chrome.notifications.create({
+                  type: 'basic',
+                  iconUrl: '/icon-128.png',
+                  title: 'Authentication Required',
+                  message: 'Please sign in to create tasks.',
+                  priority: 2,
                 });
 
-                // Extract task ID from the response - Google Tasks returns nested task object
-                // Prepare for both formats: direct task object or nested {task: {...}} format
-                const taskObject = apiResponse.data;
-                const taskId = taskObject?.id;
-
-                console.log('[SidePanel] Todo created successfully:', taskObject);
-                console.log('[SidePanel] Using task ID:', taskId);
-
-                // Send success notification to content script
-                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                const activeTab = tabs[0];
-                if (activeTab && activeTab.id) {
-                  await chrome.tabs.sendMessage(activeTab.id, {
-                    type: 'TODO_CREATE_RESULT',
-                    success: true,
-                  });
-                  console.log('[SidePanel] Sent todo creation result to content script');
-                }
-
-                // Update the system message to show success
-                if (chatInterfaceRef.current && messageId) {
-                  const updatedMessage = {
-                    content: message.text,
-                    metadata: {
-                      systemMessageType: 'task' as SystemMessageType,
-                      id: taskId, // Use the extracted task ID
-                      notes: `Created from: ${sourceUrl}`,
-                      completed: false,
-                    },
-                  };
-
-                  // Update through ChatInterface ref (local state)
-                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
-
-                  // Also update through context (global state)
-                  const globalMessage = {
-                    id: `system-task-${taskId}`, // More descriptive message ID using correct task ID
-                    role: 'system',
-                    content: message.text,
-                    metadata: {
-                      systemMessageType: 'task' as SystemMessageType,
-                      id: taskId, // Use the extracted task ID
-                      notes: `Created from: ${sourceUrl}`,
-                      completed: false,
-                      sourceUrl: sourceUrl,
-                      timestamp: messageId,
-                    },
-                  };
-
-                  // Add to global context and log for debugging
-                  console.log('Adding task to global context:', globalMessage.id, 'with taskId:', taskId);
-                  addMessage(globalMessage);
-                }
-              } catch (error) {
-                if ((error as Error).message == 'Google account not connected') {
-                  const errorMessage = error instanceof Error ? error.message : 'An error occurred';
-                  // Send error notification to content script
+                // Try to send result back to content script for toast notification
+                try {
                   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
                   const activeTab = tabs[0];
                   if (activeTab && activeTab.id) {
                     await chrome.tabs.sendMessage(activeTab.id, {
                       type: 'TODO_CREATE_RESULT',
                       success: false,
-                      error: errorMessage,
+                      error: 'Authentication required. Please sign in first.',
                     });
+                    console.log('Authentication required message sent to content script');
+                  } else {
+                    console.warn('No active tab found to send notification');
                   }
-                  // Update the system message to show error
-                  if (chatInterfaceRef.current && messageId) {
-                    const updatedMessage = {
-                      content:
-                        `Failed to create task: \n` +
-                        `You need to connect to the Google account first. \n` +
-                        `Go to [Overlay Dashboard Settings](https://overlay.one/${language}/dashboard/settings) to connect.`,
-                      metadata: {
-                        systemMessageType: 'error' as SystemMessageType,
-                      },
-                    };
-                    chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
-                  }
+                } catch (err) {
+                  console.error('Failed to send message to content script:', err);
                 }
+                // Update the system message to show authentication error
+                if (chatInterfaceRef.current && messageId) {
+                  const updatedMessage = {
+                    content: `Authentication required. Please sign in first.`,
+                    metadata: {
+                      systemMessageType: 'error' as SystemMessageType,
+                    },
+                  };
+                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                }
+                return;
+              }
+
+              // Create a task using the selected text as title and get the created task data
+              const apiResponse = await overlayApi.createTask({
+                title: message.text,
+                notes: `Created from: ${sourceUrl}`,
+              });
+
+              if (!apiResponse.success) {
+                // Send error notification to content script
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                const activeTab = tabs[0];
+                if (activeTab && activeTab.id) {
+                  await chrome.tabs.sendMessage(activeTab.id, {
+                    type: 'TODO_CREATE_RESULT',
+                    success: false,
+                    error: apiResponse.error?.message,
+                  });
+                  console.log('Error message sent to content script');
+                } else {
+                  console.warn('No active tab found to send notification');
+                }
+                // Update the system message to show error
+                if (chatInterfaceRef.current && messageId) {
+                  const updatedMessage = {
+                    content: `Error creating task: ${apiResponse.error?.message}`,
+                    metadata: {
+                      systemMessageType: 'error' as SystemMessageType,
+                    },
+                  };
+                  chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+                }
+                return;
+              }
+
+              // Extract task ID from the response - Google Tasks returns nested task object
+              // Prepare for both formats: direct task object or nested {task: {...}} format
+              const taskObject = apiResponse.data;
+              const taskId = taskObject?.id;
+
+              console.log('[SidePanel] Todo created successfully:', taskObject);
+              console.log('[SidePanel] Using task ID:', taskId);
+
+              // Send success notification to content script
+              const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+              const activeTab = tabs[0];
+              if (activeTab && activeTab.id) {
+                await chrome.tabs.sendMessage(activeTab.id, {
+                  type: 'TODO_CREATE_RESULT',
+                  success: apiResponse.success,
+                });
+                console.log('[SidePanel] Sent todo creation result to content script');
+              }
+
+              // Update the system message to show success
+              if (chatInterfaceRef.current && messageId) {
+                const updatedMessage = {
+                  content: message.text,
+                  metadata: {
+                    systemMessageType: 'task' as SystemMessageType,
+                    id: taskId, // Use the extracted task ID
+                    notes: `Created from: ${sourceUrl}`,
+                    completed: false,
+                  },
+                };
+
+                // Update through ChatInterface ref (local state)
+                chatInterfaceRef.current.updateSystemMessage(messageId, updatedMessage);
+
+                // Also update through context (global state)
+                const globalMessage = {
+                  id: `system-task-${taskId}`, // More descriptive message ID using correct task ID
+                  role: 'system',
+                  content: message.text,
+                  metadata: {
+                    systemMessageType: 'task' as SystemMessageType,
+                    id: taskId, // Use the extracted task ID
+                    notes: `Created from: ${sourceUrl}`,
+                    completed: false,
+                    sourceUrl: sourceUrl,
+                    timestamp: messageId,
+                  },
+                };
+
+                // Add to global context and log for debugging
+                console.log('Adding task to global context:', globalMessage.id, 'with taskId:', taskId);
+                addMessage(globalMessage);
               }
             } else {
               // Handle other actions as before
@@ -505,7 +504,6 @@ const SidePanel = () => {
 
   useEffect(() => {
     fetchModels();
-
     // Function to handle storage changes
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
       // Only care about changes in local storage where API keys are stored
