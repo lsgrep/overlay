@@ -29,6 +29,20 @@ export interface CompletionResponse {
   message: string;
 }
 
+interface ModelInfo {
+  name: string;
+  displayName?: string;
+  provider: string;
+}
+
+interface ModelsResponse {
+  openai?: ModelInfo[];
+  anthropic?: ModelInfo[];
+  gemini?: ModelInfo[];
+  ollama?: ModelInfo[];
+  [key: string]: ModelInfo[] | undefined;
+}
+
 // Base URL for Overlay API
 const OVERLAY_API_BASE_URL = 'https://overlay.one/api';
 // const OVERLAY_API_BASE_URL = 'http://localhost:3000/api';
@@ -214,6 +228,25 @@ export const overlayApi = {
     });
   },
 
+  async getModels(): Promise<ModelInfo[]> {
+    const response = await makeAuthenticatedRequest<ModelsResponse>('/chat/models');
+
+    // If no response, return empty array
+    if (!response) return [];
+
+    // Convert the provider-based structure to a flat array of models
+    const allModels: ModelInfo[] = [];
+
+    // Process each provider's models
+    Object.values(response).forEach(models => {
+      if (models && Array.isArray(models)) {
+        allModels.push(...models);
+      }
+    });
+
+    return allModels;
+  },
+
   /**
    * Get tasks from a specified list or the default list
    * @param listId The ID of the task list to fetch tasks from (optional, uses default if not provided)
@@ -377,6 +410,68 @@ export const overlayApi = {
     return makeAuthenticatedRequest<CompletionResponse>('/completions', {
       method: 'POST',
       body: JSON.stringify(completionData),
+    });
+  },
+
+  /**
+   * Generate a completion using the server-side LLM services
+   * @param input The user's input text
+   * @param selectedModel The model to use for completion
+   * @param options Additional options for the completion
+   * @returns The completion response with the generated text
+   */
+  async generateCompletion(
+    input: string,
+    selectedModel: string,
+    options: {
+      mode?: 'interactive' | 'conversational';
+      pageContext?: {
+        url: string;
+        title: string;
+        content: string;
+        [key: string]: unknown;
+      };
+      messages?: Array<{
+        role: 'system' | 'user' | 'assistant';
+        content: string;
+        images?: Array<{ url: string; original_url?: string }>;
+      }>;
+      images?: Array<{ url: string; original_url?: string }>;
+      defaultLanguage?: string;
+      generateOnly?: boolean;
+      completionId?: string;
+    } = {},
+  ): Promise<{ response: string; model: ModelInfo; questionId: string; completion_id?: string }> {
+    const {
+      mode = 'conversational',
+      pageContext = { url: '', title: '', content: '' },
+      messages = [],
+      images = [],
+      defaultLanguage = 'en',
+      generateOnly = false,
+      completionId,
+    } = options;
+
+    // Create a user message with the input if not already in messages
+    const userMessage = { role: 'user' as const, content: input };
+    const allMessages = messages.length > 0 ? messages : [userMessage];
+
+    return makeAuthenticatedRequest('/chat/completion', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: allMessages,
+        context: '', // Default empty context
+        config: {}, // Default empty config
+        pageContent: pageContext,
+        model_name: selectedModel,
+        generate_only: generateOnly,
+        completion_id: completionId,
+        mode,
+        metadata: { images },
+        prompt_content: input,
+        source_url: pageContext?.url || '',
+        default_language: defaultLanguage,
+      }),
     });
   },
 

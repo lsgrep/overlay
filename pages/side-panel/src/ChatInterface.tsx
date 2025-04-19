@@ -12,7 +12,7 @@ import { HeaderComponent } from './components/HeaderComponent';
 import { MessageList } from './components/MessageList';
 import { ChatInput } from './components/ChatInput';
 import { ChatService } from './services/ChatService';
-import { ModelSelector } from './components/ModelSelector';
+import { CloudModelSelector } from './components/CloudModelSelector';
 import type { PageContext } from './services/llm/prompts';
 import type { MessageImage } from './services/llm/types';
 
@@ -87,8 +87,6 @@ export const ChatInterface = forwardRef<
     geminiModels,
     ollamaModels,
     anthropicModels,
-    isLoadingModels,
-    modelError,
     user,
     handleSignIn,
     handleSignOut,
@@ -515,16 +513,7 @@ export const ChatInterface = forwardRef<
       />
 
       <div className="px-3 py-2 border-t border-border bg-background">
-        <ModelSelector
-          selectedModel={selectedModel}
-          setSelectedModel={setSelectedModel}
-          openaiModels={openaiModels}
-          geminiModels={geminiModels}
-          ollamaModels={ollamaModels}
-          anthropicModels={anthropicModels}
-          isLoadingModels={isLoadingModels}
-          modelError={modelError}
-        />
+        <CloudModelSelector selectedModel={selectedModel} setSelectedModel={setSelectedModel} user={user} />
       </div>
 
       <ChatInput
