@@ -173,32 +173,16 @@ async function getLocalStorage(key: string): Promise<string | null> {
  * Make an authenticated request to the Overlay API
  */
 async function makeAuthenticatedRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  try {
-    const headers = await getAuthHeaders();
+  const headers = await getAuthHeaders();
 
-    const response = await fetch(`${OVERLAY_API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        ...options.headers,
-        ...headers,
-      },
-    });
-
-    if (!response.ok) {
-      // Handle common error cases
-      if (response.status === 401) {
-        throw new Error('Authentication failed. Please sign in again.');
-      }
-
-      const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.error || `API request failed with status ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('[API] Request failed:', error);
-    throw error;
-  }
+  const response = await fetch(`${OVERLAY_API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      ...options.headers,
+      ...headers,
+    },
+  });
+  return await response.json();
 }
 
 /**

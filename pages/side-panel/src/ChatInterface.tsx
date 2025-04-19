@@ -343,26 +343,13 @@ export const ChatInterface = forwardRef<
     // Check for /tasks command
     if (inputTrimmed === '/tasks') {
       setIsLoading(true);
-      try {
-        // Get tasks from API
-        const resp: APIResponse<Task[]> = await overlayApi.getTasks(undefined);
-        const tasks = resp.data || [];
-        console.log('Tasks:', tasks);
+      // Get tasks from API
+      const resp: APIResponse<Task[]> = await overlayApi.getTasks(undefined);
+      const tasks = resp.data || [];
+      console.log('Tasks:', tasks);
+      console.log('API response:', resp);
 
-        // Create a formatted tasks message using checkbox markdown syntax
-        // This serves as fallback content for clients that don't support our enhanced UI
-        let tasksContent = '### Your Tasks\n\n';
-        if (tasks.length === 0) {
-          tasksContent += 'You have no tasks in your list.';
-        } else {
-          tasks.forEach(task => {
-            // Use checkbox markdown syntax: - [ ] or - [x]
-            const checkboxStatus = task.status === 'completed' ? '[x]' : '[ ]';
-            const dueDate = task.due ? ` (Due: ${overlayApi.formatDate(task.due)})` : '';
-            tasksContent += `- ${checkboxStatus} ${task.title}${dueDate}\n`;
-          });
-        }
-
+      if (resp.success) {
         // Add user message to context
         const userMessage = {
           id: `user-tasks-${Date.now()}`,
@@ -383,7 +370,7 @@ export const ChatInterface = forwardRef<
         const responseMessage = {
           id: `assistant-tasks-${Date.now()}`,
           role: 'assistant',
-          content: tasksContent,
+          content: '',
           model: {
             name: 'Tasks',
             provider: 'overlay',
@@ -395,8 +382,8 @@ export const ChatInterface = forwardRef<
           },
         };
         chatContext.addMessage(responseMessage);
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
+      } else {
+        // error response
         // Add user message to context
         const userMessage = {
           id: `user-tasks-error-${Date.now()}`,
@@ -412,7 +399,7 @@ export const ChatInterface = forwardRef<
         const errorMessage = {
           id: `assistant-tasks-error-${Date.now()}`,
           role: 'assistant',
-          content: 'Error fetching tasks. Please make sure you are authenticated.',
+          content: 'Error fetching tasks. ' + resp.error?.message,
           model: {
             name: 'system',
             provider: 'overlay',
@@ -423,10 +410,9 @@ export const ChatInterface = forwardRef<
           },
         };
         chatContext.addMessage(errorMessage);
-      } finally {
-        setIsLoading(false);
-        setInput('');
       }
+      setIsLoading(false);
+      setInput('');
     } else {
       // Normal message handling
       await submitMessageProgrammatically(input, true);
