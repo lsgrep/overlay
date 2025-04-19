@@ -209,24 +209,27 @@ export const ChatInterface = forwardRef<
 
       // Save completion to database using the API
       try {
-        await overlayApi.createCompletion({
-          prompt_content: displayMessage.content,
-          response_content: response,
-          source_url: activeTabUrl,
-          question_id: questionId,
-          model_name: model.name,
-          model_provider: model.provider,
-          model_display_name: model.displayName,
-          mode: mode,
-          prompt_timestamp: displayMessage.metadata?.timestamp ? displayMessage.metadata.timestamp.toString() : null,
-          response_timestamp: responseTimestamp.toString(),
-          metadata: {
-            pageContextIncluded: !!includePageContext,
-            pageTitle: activeTabTitle, // Add page title to metadata
-            images: displayMessage.images,
-          },
-        });
-        console.log('Completion saved to database');
+        if (model.provider === 'ollama') {
+          // Ollama completions are handled differently
+          await overlayApi.createCompletion({
+            prompt_content: displayMessage.content,
+            response_content: response,
+            source_url: activeTabUrl,
+            question_id: questionId,
+            model_name: model.name,
+            model_provider: model.provider,
+            model_display_name: model.displayName,
+            mode: mode,
+            prompt_timestamp: displayMessage.metadata?.timestamp ? displayMessage.metadata.timestamp.toString() : null,
+            response_timestamp: responseTimestamp.toString(),
+            metadata: {
+              pageContextIncluded: !!includePageContext,
+              pageTitle: activeTabTitle, // Add page title to metadata
+              images: displayMessage.images,
+            },
+          });
+          console.log('Completion saved to database');
+        }
       } catch (saveError) {
         // Don't break the chat flow if saving fails
         console.error('Error saving completion to database:', saveError);
