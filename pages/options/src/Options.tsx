@@ -338,7 +338,7 @@ const Options = () => {
                 <SidebarGroupLabel>Language Models</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    <SidebarMenuItem>
+                    {/* <SidebarMenuItem>
                       <SidebarMenuButton
                         onClick={() => {
                           setActiveTab('LLM');
@@ -348,8 +348,8 @@ const Options = () => {
                         <OpenAIIcon className="w-5 h-5" />
                         <span>OpenAI</span>
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
+                    </SidebarMenuItem> */}
+                    {/* <SidebarMenuItem>
                       <SidebarMenuButton
                         onClick={() => {
                           setActiveTab('LLM');
@@ -359,8 +359,8 @@ const Options = () => {
                         <GeminiIcon className="w-5 h-5" />
                         <span>Google AI</span>
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
+                    </SidebarMenuItem> */}
+                    {/* <SidebarMenuItem>
                       <SidebarMenuButton
                         onClick={() => {
                           setActiveTab('LLM');
@@ -370,7 +370,7 @@ const Options = () => {
                         <AnthropicIcon className="w-5 h-5" />
                         <span>Anthropic</span>
                       </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    </SidebarMenuItem> */}
                     <SidebarMenuItem>
                       <SidebarMenuButton
                         onClick={() => {
