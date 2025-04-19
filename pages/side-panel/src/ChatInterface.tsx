@@ -3,7 +3,7 @@ import { useStorage } from '@extension/shared';
 import { fontFamilyStorage, fontSizeStorage, defaultLanguageStorage } from '@extension/storage';
 import { t } from '@extension/i18n';
 // Import is now handled through overlayApi
-import { overlayApi, type Task } from '@extension/shared/lib/services/api';
+import { overlayApi, type APIResponse, type Task } from '@extension/shared/lib/services/api';
 import type { SystemMessageType } from './components/SystemMessageView';
 import { useChat } from './contexts/ChatContext';
 
@@ -209,24 +209,27 @@ export const ChatInterface = forwardRef<
 
       // Save completion to database using the API
       try {
-        await overlayApi.createCompletion({
-          prompt_content: displayMessage.content,
-          response_content: response,
-          source_url: activeTabUrl,
-          question_id: questionId,
-          model_name: model.name,
-          model_provider: model.provider,
-          model_display_name: model.displayName,
-          mode: mode,
-          prompt_timestamp: displayMessage.metadata?.timestamp ? displayMessage.metadata.timestamp.toString() : null,
-          response_timestamp: responseTimestamp.toString(),
-          metadata: {
-            pageContextIncluded: !!includePageContext,
-            pageTitle: activeTabTitle, // Add page title to metadata
-            images: displayMessage.images,
-          },
-        });
-        console.log('Completion saved to database');
+        if (model.provider === 'ollama') {
+          // Ollama completions are handled differently
+          await overlayApi.createCompletion({
+            prompt_content: displayMessage.content,
+            response_content: response,
+            source_url: activeTabUrl,
+            question_id: questionId,
+            model_name: model.name,
+            model_provider: model.provider,
+            model_display_name: model.displayName,
+            mode: mode,
+            prompt_timestamp: displayMessage.metadata?.timestamp ? displayMessage.metadata.timestamp.toString() : null,
+            response_timestamp: responseTimestamp.toString(),
+            metadata: {
+              pageContextIncluded: !!includePageContext,
+              pageTitle: activeTabTitle, // Add page title to metadata
+              images: displayMessage.images,
+            },
+          });
+          console.log('Completion saved to database');
+        }
       } catch (saveError) {
         // Don't break the chat flow if saving fails
         console.error('Error saving completion to database:', saveError);
@@ -342,7 +345,9 @@ export const ChatInterface = forwardRef<
       setIsLoading(true);
       try {
         // Get tasks from API
-        const tasks: Task[] = await overlayApi.getTasks(undefined);
+        const resp: APIResponse<Task[]> = await overlayApi.getTasks(undefined);
+        const tasks = resp.data || [];
+        console.log('Tasks:', tasks);
 
         // Create a formatted tasks message using checkbox markdown syntax
         // This serves as fallback content for clients that don't support our enhanced UI
@@ -357,7 +362,7 @@ export const ChatInterface = forwardRef<
             tasksContent += `- ${checkboxStatus} ${task.title}${dueDate}\n`;
           });
         }
-        // Add a system message with the tasks
+
         // Add user message to context
         const userMessage = {
           id: `user-tasks-${Date.now()}`,
@@ -369,7 +374,12 @@ export const ChatInterface = forwardRef<
         };
         chatContext.addMessage(userMessage);
 
-        // Add response message to context
+        // Add response message to context with tasks data
+        console.log('Creating task message with:', {
+          taskCount: tasks.length,
+          firstTask: tasks.length > 0 ? tasks[0] : null,
+        });
+
         const responseMessage = {
           id: `assistant-tasks-${Date.now()}`,
           role: 'assistant',
@@ -380,14 +390,13 @@ export const ChatInterface = forwardRef<
           },
           metadata: {
             timestamp: Date.now(),
-            isTaskList: true, // Always set to true when it's a tasks response
-            tasks: tasks,
+            isTaskList: true, // Important: This flag signals the UI to render task view
+            tasks: tasks, // Include the full tasks array
           },
         };
         chatContext.addMessage(responseMessage);
       } catch (error) {
         console.error('Error fetching tasks:', error);
-
         // Add user message to context
         const userMessage = {
           id: `user-tasks-error-${Date.now()}`,

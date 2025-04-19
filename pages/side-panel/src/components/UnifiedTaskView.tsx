@@ -572,8 +572,7 @@ export const UnifiedTaskListView: React.FC<{
   onDelete?: (taskId: string) => Promise<void>;
   onToggleComplete?: (taskId: string, completed: boolean) => Promise<void>;
   contentVersion?: number; // Used to force re-render when content changes
-  messageId?: string; // ID of the parent message for context updates
-}> = memo(({ tasks, onUpdate, onDelete, onToggleComplete, contentVersion = 0, messageId }) => {
+}> = memo(({ tasks, onUpdate, onDelete, onToggleComplete, contentVersion = 0 }) => {
   // We don't use context directly here, we use the callbacks
   // This component is called by MessageItem which already uses the context
   // Render empty state
