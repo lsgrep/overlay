@@ -160,6 +160,11 @@ export const ChatProvider: React.FC<{
     dispatch({ type: 'DELETE_MESSAGE', payload: id });
   }, []);
 
+  // Clear all messages
+  const clearMessages = useCallback(() => {
+    dispatch({ type: 'SET_MESSAGES', payload: [] });
+  }, []);
+
   const value: ChatContextValue = {
     state,
     config,
@@ -168,6 +173,7 @@ export const ChatProvider: React.FC<{
     updateMessage,
     deleteMessage,
     addMessage,
+    clearMessages,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

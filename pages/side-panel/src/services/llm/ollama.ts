@@ -1,5 +1,5 @@
 import type { LLMConfig, LLMService, Message } from './types';
-
+import type { PageContext } from './prompts';
 export class OllamaService implements LLMService {
   private modelName: string;
   private apiUrl: string;
@@ -46,7 +46,12 @@ export class OllamaService implements LLMService {
     return undefined;
   }
 
-  async generateCompletion(messages: Message[], context: string, config?: LLMConfig): Promise<string> {
+  async generateCompletion(
+    messages: Message[],
+    context: string,
+    config?: LLMConfig,
+    pageContext?: PageContext,
+  ): Promise<string> {
     const mode = 'conversational';
     const requestBody: any = {
       model: this.modelName,

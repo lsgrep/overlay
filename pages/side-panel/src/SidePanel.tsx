@@ -3,14 +3,13 @@ import { useStorage, withErrorBoundary, withSuspense, ModelService } from '@exte
 import { overlayApi, type Task } from '@extension/shared/lib/services/api';
 import {
   saveNote,
-  deleteNote,
   createClient,
   signInWithProvider,
   signOut,
   getCurrentUserFromStorage,
 } from '@extension/shared/lib/services/supabase';
 import { exampleThemeStorage, defaultModelStorage, defaultLanguageStorage } from '@extension/storage';
-import { Label, ToggleGroup, ToggleGroupItem } from '@extension/ui';
+import { ToggleGroup, ToggleGroupItem } from '@extension/ui';
 import { MessageCircle, Blocks } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { t } from '@extension/i18n';
@@ -47,7 +46,7 @@ const SidePanel = () => {
     };
   } | null>(null);
   // Get chat context for direct manipulation
-  const { addMessage } = useChat();
+  const { addMessage, clearMessages } = useChat();
   // Reference to ChatInterface methods
   const chatInterfaceRef = useRef<{
     submitMessage: (text: string, includePageContext?: boolean) => Promise<void>;
@@ -329,15 +328,15 @@ const SidePanel = () => {
                 }
 
                 // Create a task using the selected text as title and get the created task data
-                const createdTask = await overlayApi.createTask({
+                const apiResponse = await overlayApi.createTask({
                   title: message.text,
                   notes: `Created from: ${sourceUrl}`,
                 });
 
                 // Extract task ID from the response - Google Tasks returns nested task object
                 // Prepare for both formats: direct task object or nested {task: {...}} format
-                const taskObject = 'task' in createdTask ? (createdTask.task as Task) : createdTask;
-                const taskId = taskObject.id;
+                const taskObject = apiResponse.data;
+                const taskId = taskObject?.id;
 
                 console.log('[SidePanel] Todo created successfully:', taskObject);
                 console.log('[SidePanel] Using task ID:', taskId);
@@ -553,6 +552,33 @@ const SidePanel = () => {
       htmlElement.classList.remove('dark');
     }
   }, [theme]);
+
+  // Listen for visibility changes to clear chat when sidebar closes
+  useEffect(() => {
+    // Track previous visibility state
+    let wasVisible = !document.hidden;
+
+    const handleVisibilityChange = () => {
+      const isVisible = !document.hidden;
+
+      // If transitioning from visible to hidden (sidebar is closing)
+      if (!isVisible && wasVisible) {
+        console.log('Sidebar is closing, clearing messages');
+        clearMessages();
+      }
+
+      // Update tracking state
+      wasVisible = isVisible;
+    };
+
+    // Add event listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Clean up
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [clearMessages]);
 
   return (
     <div className="flex flex-col h-screen bg-background">

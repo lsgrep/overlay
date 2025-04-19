@@ -1,8 +1,8 @@
 import type { PageContext } from './llm/prompts/types';
 import { PromptManager } from './llm/prompt';
-import type { Message, MessageImage } from './llm/types';
+import type { LLMConfig, Message, MessageImage } from './llm/types';
 // Import from shared package using relative path
-import { overlayApi } from '../../../../packages/shared/lib/services/api';
+import { CompletionData, overlayApi } from '../../../../packages/shared/lib/services/api';
 import { llmResponseLanguageStorage } from '@extension/storage';
 import { OllamaService } from './llm/ollama';
 import { createModelInfo } from '../../../../packages/shared/lib/utils/model-utils';
@@ -33,32 +33,38 @@ export class ChatService {
   static async extractPageContent(): Promise<PageContext & { isPdf?: boolean }> {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      const currentContent = '';
+      let currentContent = '';
       let isPdf = false;
 
       if (tab?.id) {
-        // First check if the page is a PDF
-        const [isPdfResult] = await chrome.scripting.executeScript({
+        // Extract page content and check if it's a PDF in a single operation
+        const [pageData] = await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           func: () => {
-            // Check URL for PDF extension
+            // Check if the page is a PDF
             const isPdfByUrl = window.location.href.toLowerCase().endsWith('.pdf');
-
-            // Check content type in meta tags
             const contentTypeMeta = document.querySelector('meta[content="application/pdf"]');
-
-            // Check if the embed or object tag with PDF type exists
             const pdfEmbed = document.querySelector('embed[type="application/pdf"]');
             const pdfObject = document.querySelector('object[type="application/pdf"]');
-
-            // Check document content type if available
             const contentTypeHeader = document.contentType === 'application/pdf';
+            const isPdf = isPdfByUrl || !!contentTypeMeta || !!pdfEmbed || !!pdfObject || contentTypeHeader;
 
-            return isPdfByUrl || !!contentTypeMeta || !!pdfEmbed || !!pdfObject || contentTypeHeader;
+            // Get document content regardless of PDF status
+            const content = document.body?.textContent || '';
+
+            return { isPdf, content };
           },
         });
 
-        isPdf = isPdfResult?.result || false;
+        if (pageData?.result) {
+          isPdf = pageData.result.isPdf;
+          currentContent = pageData.result.content;
+
+          // For PDFs, add a note that we're analyzing the document
+          if (isPdf) {
+            currentContent = '[PDF content - Overlay is analyzing this document]';
+          }
+        }
       }
 
       const ctx = {
@@ -97,6 +103,7 @@ export class ChatService {
     response: string;
     model: ModelInfo;
     questionId: string;
+    completion?: CompletionData;
   }> {
     console.log('Debug: Submitting chat:', { input, selectedModel, mode });
     console.log('current model:', selectedModel);
@@ -111,35 +118,12 @@ export class ChatService {
           model => model.name === selectedModel,
         ) || createModelInfo(selectedModel);
 
-      // Create an action context for enhanced interactive mode
-      const actionContext = {
-        sessionId: Date.now().toString(),
-        previousActions: messages
-          .filter(msg => msg.role === 'assistant')
-          .slice(-3)
-          .map(msg => {
-            try {
-              const json = JSON.parse(msg.content);
-              return json.task_type || 'unknown';
-            } catch {
-              // If parsing fails, assume it's a conversational message
-              return 'conversational';
-            }
-          }),
-        availableTools: ['navigation', 'extraction', 'search', 'interaction'],
-        userPreferences: {
-          language: defaultLanguage,
-          autoExecute: true,
-        },
-      };
-
       // Get the preferred language from storage (default to provided defaultLanguage if not set)
       const preferredLanguage = (await llmResponseLanguageStorage.get()) || defaultLanguage;
 
       // Generate prompt using PromptManager with enhanced options
       const promptOptions = {
         goal: input,
-        actionContext,
         truncateContent: true,
         includeMetadata: true,
         maxContentLength: 10000,
@@ -152,9 +136,9 @@ export class ChatService {
         pageContext = await ChatService.extractPageContent();
       }
 
+      console.log('Page context:', pageContext);
+
       // Generate prompt using PromptManager
-      const prompt = PromptManager.generateContext(mode, pageContext, modelInfo, promptOptions);
-      console.log('Debug: Generated prompt:', prompt);
 
       // Create user message with content
       const userMessage: Message = {
@@ -196,14 +180,16 @@ export class ChatService {
 
       // Generate completion based on model provider
       let result;
+      let config: LLMConfig;
 
       // Handle Ollama models separately since they use local API
       if (modelInfo.provider === 'ollama') {
         const API_URL = 'http://localhost:11434/api/chat';
         const llmService = new OllamaService(selectedModel, API_URL);
-
         try {
-          result = await llmService.generateCompletion(chatMessages, prompt, undefined);
+          const prompt = PromptManager.generateContext(mode, pageContext, modelInfo, promptOptions);
+          console.log('Debug: Generated prompt:', prompt);
+          result = await llmService.generateCompletion(chatMessages, prompt, config, pageContext);
         } catch (ollamaError) {
           console.error('Ollama service error:', ollamaError);
           return {
@@ -214,17 +200,15 @@ export class ChatService {
         }
       } else {
         // Use cloud models via API
-        result = await overlayApi.generateCompletion(prompt, selectedModel, {
-          mode: mode as 'interactive' | 'conversational',
-          pageContext: {
-            url: pageContext.url || '',
-            title: pageContext.title || '',
-            content: pageContext.content || '',
-          },
-          messages: typedMessages,
-          images,
-          defaultLanguage: preferredLanguage,
-        });
+        // Ensure pageContext has all required properties for the API
+        const apiPageContext = {
+          url: pageContext.url || '',
+          title: pageContext.title || '',
+          content: pageContext.content || '',
+          isPdf: pageContext.isPdf,
+          ...pageContext,
+        };
+        result = await overlayApi.generateCompletion(modelInfo, typedMessages, promptOptions, apiPageContext, config);
       }
 
       console.log('API response:', result);
@@ -240,9 +224,10 @@ export class ChatService {
       } else {
         // Handle case where result is an object with properties
         return {
-          response: result.response,
-          model: result.model || modelInfo,
-          questionId: result.questionId || questionId,
+          response: result.data?.response || '',
+          completion: result.data?.completion,
+          model: modelInfo,
+          questionId: questionId,
         };
       }
     } catch (error) {

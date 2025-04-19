@@ -44,30 +44,10 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
 
       console.log('[CloudModelSelector] Fetching models from API using getModels...');
       // Explicitly call the getModels function from overlayApi
-      const models = await overlayApi.getModels();
-      console.log('[CloudModelSelector] Fetched models:', models);
-
-      // Categorize models by provider
-      const openai: ModelInfo[] = [];
-      const gemini: ModelInfo[] = [];
-      const anthropic: ModelInfo[] = [];
-
-      models.forEach((model: ModelInfo) => {
-        switch (model.provider.toLowerCase()) {
-          case 'openai':
-            openai.push(model);
-            break;
-          case 'gemini':
-            gemini.push(model);
-            break;
-          case 'anthropic':
-            anthropic.push(model);
-            break;
-          default:
-            console.warn(`[CloudModelSelector] Unrecognized provider: ${model.provider}`);
-            break;
-        }
-      });
+      const resp = await overlayApi.getModels();
+      const { gemini, openai, anthropic } = resp.data || {};
+      console.log('[CloudModelSelector] Fetched models:', { gemini, openai, anthropic });
+      const models: ModelInfo[] = [];
 
       // Sort models alphabetically by displayName within each provider group
       const sortByDisplayName = (a: ModelInfo, b: ModelInfo) => {
@@ -75,18 +55,26 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
         const nameB = b.displayName || b.name;
         return nameA.localeCompare(nameB);
       };
-
-      // Update state with categorized and sorted models
-      setOpenaiModels(openai.sort(sortByDisplayName));
-      setGeminiModels(gemini.sort(sortByDisplayName));
-      setAnthropicModels(anthropic.sort(sortByDisplayName));
+      // Categorize models by provider
+      if (openai) {
+        models.push(...openai);
+        setOpenaiModels(openai.sort(sortByDisplayName));
+      }
+      if (gemini) {
+        models.push(...gemini);
+        setGeminiModels(gemini.sort(sortByDisplayName));
+      }
+      if (anthropic) {
+        models.push(...anthropic);
+        setAnthropicModels(anthropic.sort(sortByDisplayName));
+      }
 
       // Ollama only can be fetched locally
       const ollamaModels = await ModelService.fetchOllamaModels();
       setOllamaModels(ollamaModels.sort(sortByDisplayName));
 
       // Set model selection logic
-      if (!selectedModel && models.length > 0) {
+      if (!selectedModel && models?.length > 0) {
         // First try to use the stored default model if it exists in available models
         if (defaultModel && models.some(model => model.name === defaultModel)) {
           console.log(`[CloudModelSelector] Using stored default model: ${defaultModel}`);

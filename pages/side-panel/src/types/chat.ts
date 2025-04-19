@@ -120,4 +120,5 @@ export interface ChatContextValue {
   updateMessage: (id: string, updates: Partial<Message>) => void;
   deleteMessage: (id: string) => void;
   addMessage: (message: Message) => void;
+  clearMessages: () => void;
 }

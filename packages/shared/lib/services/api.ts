@@ -6,6 +6,16 @@ export interface CompletionMetadata {
   [key: string]: unknown;
 }
 
+export interface APIResponse<T = any> {
+  success: false;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+    status: number;
+  };
+  data?: T;
+}
 export interface CompletionData {
   completion_id?: string;
   uid?: string;
@@ -228,23 +238,10 @@ export const overlayApi = {
     });
   },
 
-  async getModels(): Promise<ModelInfo[]> {
-    const response = await makeAuthenticatedRequest<ModelsResponse>('/chat/models');
-
-    // If no response, return empty array
-    if (!response) return [];
-
-    // Convert the provider-based structure to a flat array of models
-    const allModels: ModelInfo[] = [];
-
-    // Process each provider's models
-    Object.values(response).forEach(models => {
-      if (models && Array.isArray(models)) {
-        allModels.push(...models);
-      }
-    });
-
-    return allModels;
+  async getModels(): Promise<APIResponse<{ gemini: ModelInfo[]; openai: ModelInfo[]; anthropic: ModelInfo[] }>> {
+    return await makeAuthenticatedRequest<
+      APIResponse<{ gemini: ModelInfo[]; openai: ModelInfo[]; anthropic: ModelInfo[] }>
+    >('/chat/models');
   },
 
   /**
@@ -252,20 +249,19 @@ export const overlayApi = {
    * @param listId The ID of the task list to fetch tasks from (optional, uses default if not provided)
    * @returns An array of task objects
    */
-  async getTasks(listId: string | undefined) {
+  async getTasks(listId: string | undefined): Promise<APIResponse<Task[]>> {
     // Add cache busting parameter to prevent browser caching
     const cacheBuster = `_t=${Date.now()}`;
     const path = listId ? `/tasks?listId=${listId}&${cacheBuster}` : `/tasks?${cacheBuster}`;
-    const response = await makeAuthenticatedRequest<{ tasks: Task[] }>(path);
-    return response.tasks || [];
+    return await makeAuthenticatedRequest<APIResponse<Task[]>>(path);
   },
 
   /**
    * Create a new task
    * @param taskData Data for the new task
    */
-  async createTask(taskData: CreateTaskData) {
-    return makeAuthenticatedRequest<Task>('/tasks', {
+  async createTask(taskData: CreateTaskData): Promise<APIResponse<Task>> {
+    return makeAuthenticatedRequest<APIResponse<Task>>('/tasks', {
       method: 'POST',
       body: JSON.stringify({
         listId: taskData.listId,
@@ -282,7 +278,7 @@ export const overlayApi = {
    * @param taskData The new task data
    * @param listId The ID of the list containing the task (optional, uses default if not provided)
    */
-  async updateTask(taskId: string, taskData: Partial<Task>, listId: string) {
+  async updateTask(taskId: string, taskData: Partial<Task>, listId: string): Promise<APIResponse<Task>> {
     // Make sure we're using the correct task ID field
     // The API uses 'taskId' field from the Task object for the actual Google Tasks API ID
     const actualTaskIdToUse = taskData.taskId || taskId;
@@ -295,8 +291,7 @@ export const overlayApi = {
     };
 
     console.log('Sending task update with data:', payload);
-
-    return makeAuthenticatedRequest<Task>(`/tasks?listId=${listId}&taskId=${actualTaskIdToUse}`, {
+    return makeAuthenticatedRequest<APIResponse<Task>>(`/tasks?listId=${listId}&taskId=${actualTaskIdToUse}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
     });
@@ -307,12 +302,12 @@ export const overlayApi = {
    * @param taskId The ID of the task to delete
    * @param listId The ID of the list containing the task
    */
-  async deleteTask(taskId: string, listId: string) {
+  async deleteTask(taskId: string, listId: string): Promise<APIResponse<void>> {
     let path = `/tasks?taskId=${taskId}`;
     if (listId) {
       path += `&listId=${listId}`;
     }
-    return makeAuthenticatedRequest<void>(path, {
+    return makeAuthenticatedRequest<APIResponse<void>>(path, {
       method: 'DELETE',
       body: JSON.stringify({
         taskId,
@@ -327,16 +322,8 @@ export const overlayApi = {
    * @param endDate End date in ISO format
    * @returns An array of calendar event objects
    */
-  async getCalendarEvents(startDate: string, endDate: string): Promise<CalendarEvent[]> {
-    try {
-      const response = await makeAuthenticatedRequest<{ events: CalendarEvent[] }>(
-        `/events?start=${startDate}&end=${endDate}`,
-      );
-      return response.events || [];
-    } catch (error) {
-      console.error('[API] Error fetching calendar events:', error);
-      return [];
-    }
+  async getCalendarEvents(startDate: string, endDate: string): Promise<APIResponse<CalendarEvent[]>> {
+    return await makeAuthenticatedRequest<APIResponse<CalendarEvent[]>>(`/events?start=${startDate}&end=${endDate}`);
   },
 
   /**
@@ -344,17 +331,11 @@ export const overlayApi = {
    * @param days Number of days to look ahead (default: 7)
    * @returns An array of upcoming calendar events
    */
-  async getUpcomingEvents(days: number = 7): Promise<CalendarEvent[]> {
-    try {
-      const today = new Date();
-      const endDate = new Date();
-      endDate.setDate(today.getDate() + days);
-
-      return this.getCalendarEvents(today.toISOString(), endDate.toISOString());
-    } catch (error) {
-      console.error('[API] Error fetching upcoming events:', error);
-      return [];
-    }
+  async getUpcomingEvents(days: number = 7): Promise<APIResponse<CalendarEvent[]>> {
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(today.getDate() + days);
+    return this.getCalendarEvents(today.toISOString(), endDate.toISOString());
   },
 
   /**
@@ -415,62 +396,63 @@ export const overlayApi = {
 
   /**
    * Generate a completion using the server-side LLM services
-   * @param input The user's input text
-   * @param selectedModel The model to use for completion
-   * @param options Additional options for the completion
+   * @param model The model info object containing name, provider, and display name
+   * @param messages Array of messages in the conversation
+   * @param promptOptions Options for prompt generation
+   * @param pageContext Context about the current page
    * @returns The completion response with the generated text
    */
   async generateCompletion(
-    input: string,
-    selectedModel: string,
-    options: {
-      mode?: 'interactive' | 'conversational';
-      pageContext?: {
-        url: string;
-        title: string;
-        content: string;
-        [key: string]: unknown;
-      };
-      messages?: Array<{
-        role: 'system' | 'user' | 'assistant';
-        content: string;
-        images?: Array<{ url: string; original_url?: string }>;
-      }>;
+    modelInfo: ModelInfo,
+    messages: Array<{
+      role: 'system' | 'user' | 'assistant';
+      content: string;
       images?: Array<{ url: string; original_url?: string }>;
-      defaultLanguage?: string;
+    }>,
+    promptOptions: {
+      goal?: string;
+      truncateContent?: boolean;
+      includeMetadata?: boolean;
+      maxContentLength?: number;
+      enhancedMode?: boolean;
+      preferredLanguage?: string;
       generateOnly?: boolean;
-      completionId?: string;
+      mode?: 'interactive' | 'conversational';
     } = {},
-  ): Promise<{ response: string; model: ModelInfo; questionId: string; completion_id?: string }> {
-    const {
-      mode = 'conversational',
-      pageContext = { url: '', title: '', content: '' },
-      messages = [],
-      images = [],
-      defaultLanguage = 'en',
-      generateOnly = false,
-      completionId,
-    } = options;
-
-    // Create a user message with the input if not already in messages
-    const userMessage = { role: 'user' as const, content: input };
-    const allMessages = messages.length > 0 ? messages : [userMessage];
-
-    return makeAuthenticatedRequest('/chat/completion', {
+    pageContext: {
+      url: string;
+      title: string;
+      content: string;
+      isPdf?: boolean;
+      [key: string]: unknown;
+    },
+    config?: {
+      temperature?: number;
+      topK?: number;
+      topP?: number;
+      maxOutputTokens?: number;
+    },
+  ): Promise<
+    APIResponse<{
+      response: string;
+      message: string;
+      completion?: CompletionData;
+    }>
+  > {
+    return await makeAuthenticatedRequest<
+      APIResponse<{
+        response: string;
+        message: string;
+        completion?: CompletionData;
+      }>
+    >('/chat/completion', {
       method: 'POST',
       body: JSON.stringify({
-        messages: allMessages,
-        context: '', // Default empty context
-        config: {}, // Default empty config
-        pageContent: pageContext,
-        model_name: selectedModel,
-        generate_only: generateOnly,
-        completion_id: completionId,
-        mode,
-        metadata: { images },
-        prompt_content: input,
-        source_url: pageContext?.url || '',
-        default_language: defaultLanguage,
+        modelInfo,
+        messages,
+        promptOptions,
+        pageContext,
+        config,
       }),
     });
   },
