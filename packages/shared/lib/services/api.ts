@@ -1,4 +1,6 @@
-import { chromeStorageKeys } from './supabase';
+import { User } from '@supabase/supabase-js';
+import { GENERAL_ERROR_CODES } from './error-codes';
+import { chromeStorageKeys, createClient, getCurrentUserFromStorage, Note } from './supabase';
 
 // Completion interfaces
 export interface CompletionMetadata {
@@ -6,13 +8,13 @@ export interface CompletionMetadata {
   [key: string]: unknown;
 }
 
-export interface APIResponse<T = any> {
-  success: false;
+export interface APIResponse<T = unknown> {
+  success: boolean;
   error?: {
     code: string;
     message: string;
-    details?: any;
-    status: number;
+    details?: unknown;
+    status?: number;
   };
   data?: T;
 }
@@ -174,7 +176,6 @@ async function getLocalStorage(key: string): Promise<string | null> {
  */
 async function makeAuthenticatedRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const headers = await getAuthHeaders();
-
   const response = await fetch(`${OVERLAY_API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
@@ -193,9 +194,8 @@ export const overlayApi = {
    * Get all task lists for the authenticated user
    * @returns An array of task list objects
    */
-  async getTaskLists(): Promise<TaskList[]> {
-    const response = await makeAuthenticatedRequest<{ taskLists: TaskList[] }>('/tasks/lists');
-    return response.taskLists || [];
+  async getTaskLists(): Promise<APIResponse<TaskList[]>> {
+    return await makeAuthenticatedRequest<APIResponse<TaskList[]>>('/tasks/lists');
   },
 
   /**
@@ -203,8 +203,8 @@ export const overlayApi = {
    * @param data Data for the new task list
    * @returns The created task list
    */
-  async createTaskList(data: CreateTaskListData): Promise<TaskList> {
-    return makeAuthenticatedRequest<TaskList>('/tasks/lists', {
+  async createTaskList(data: CreateTaskListData): Promise<APIResponse<TaskList>> {
+    return await makeAuthenticatedRequest<APIResponse<TaskList>>('/tasks/lists', {
       method: 'POST',
       body: JSON.stringify({
         title: data.title,
@@ -216,8 +216,8 @@ export const overlayApi = {
    * Delete a task list
    * @param listId The ID of the task list to delete
    */
-  async deleteTaskList(listId: string): Promise<void> {
-    return makeAuthenticatedRequest<void>(`/tasks/lists?id=${listId}`, {
+  async deleteTaskList(listId: string): Promise<APIResponse<void>> {
+    return await makeAuthenticatedRequest<APIResponse<void>>(`/tasks/lists?id=${listId}`, {
       method: 'DELETE',
     });
   },
@@ -245,7 +245,7 @@ export const overlayApi = {
    * @param taskData Data for the new task
    */
   async createTask(taskData: CreateTaskData): Promise<APIResponse<Task>> {
-    return makeAuthenticatedRequest<APIResponse<Task>>('/tasks', {
+    return await makeAuthenticatedRequest<APIResponse<Task>>('/tasks', {
       method: 'POST',
       body: JSON.stringify({
         listId: taskData.listId,
@@ -482,6 +482,39 @@ export const overlayApi = {
     } catch (error) {
       console.error('[API] Error setting default task list:', error);
       return { success: false, error: (error as Error).message, data: null };
+    }
+  },
+  async getCurrentUser(): Promise<User | null> {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return await getCurrentUserFromStorage();
+    }
+    return user;
+  },
+
+  async createNote(content: string, source: string, tags?: string[]): Promise<APIResponse<Note>> {
+    const user = await this.getCurrentUser();
+    if (user) {
+      const { saveNote } = await import('./supabase');
+      const { data, success, error } = await saveNote(user, content, source, tags);
+      return {
+        success,
+        data: data ?? undefined,
+        error: error ? { code: GENERAL_ERROR_CODES.SERVER_ERROR, message: error?.message } : undefined,
+      };
+    } else {
+      return {
+        success: false,
+        error: {
+          code: GENERAL_ERROR_CODES.AUTH_UNAUTHORIZED,
+          message: 'User not authenticated',
+          status: 401,
+        },
+        data: undefined,
+      };
     }
   },
 };

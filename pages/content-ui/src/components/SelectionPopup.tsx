@@ -288,9 +288,9 @@ export default function SelectionPopup() {
     if (!action || !selectedText) return;
 
     // Open side panel for all actions except take-note
-    if (actionId !== 'take-note') {
-      await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
-    }
+
+    await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
+    await chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
 
     // Send the action to the side panel
     setTimeout(async () => {
@@ -319,9 +319,8 @@ export default function SelectionPopup() {
           showToast('Failed to send note', 'error');
         }
       }
+      setVisible(false);
     }, 500);
-
-    setVisible(false);
   };
 
   return (

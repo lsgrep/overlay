@@ -1,4 +1,4 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient, User } from '@supabase/supabase-js';
 import type { Database, Json } from '../database.types';
 
 // Replace with your Supabase project URL and anon key
@@ -190,44 +190,38 @@ export type Note = Database['public']['Tables']['notes']['Row'];
  * @param tags Optional tags for the note
  * @returns The saved note data or null if there was an error
  */
-export async function saveNote(content: string, source: string, tags?: string[]) {
-  try {
-    const user = await getCurrentUserFromStorage();
-    if (!user) {
-      console.error('[SUPABASE] Cannot save note: User not authenticated');
-      return { success: false, error: 'User not authenticated' };
-    }
+export async function saveNote(
+  user: User,
+  content: string,
+  source: string,
+  tags?: string[],
+): Promise<{ success: boolean; data: Note | null; error?: Error }> {
+  console.log('[SUPABASE] Saving note:', { content, source, tags, user });
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('notes')
+    .insert([
+      {
+        user_id: user.id,
+        content,
+        source_url: source,
+        tags: tags || [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        title: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
+        is_archived: false,
+        is_favorite: false,
+        metadata: null,
+      } as Database['public']['Tables']['notes']['Insert'],
+    ])
+    .select();
 
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from('notes')
-      .insert([
-        {
-          user_id: user.id,
-          content,
-          source_url: source,
-          tags: tags || [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          title: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
-          is_archived: false,
-          is_favorite: false,
-          metadata: null,
-        } as Database['public']['Tables']['notes']['Insert'],
-      ])
-      .select();
-
-    if (error) {
-      console.error('[SUPABASE] Error saving note:', error);
-      return { success: false, error: error.message };
-    }
-
-    console.log('[SUPABASE] Note saved successfully:', data);
-    return { success: true, data };
-  } catch (error) {
-    console.error('[SUPABASE] Error in saveNote:', error);
-    return { success: false, error: (error as Error).message };
+  if (error) {
+    console.error('[SUPABASE] Error saving note:', error);
+    return { success: false, data: null, error };
   }
+  console.log('[SUPABASE] Note saved successfully:', data);
+  return { success: true, data: data[0] as Note, error: undefined };
 }
 
 /**

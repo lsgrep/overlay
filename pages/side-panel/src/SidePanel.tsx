@@ -24,7 +24,6 @@ import type { SystemMessageType } from './components/SystemMessageView';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
-  const language = useStorage(defaultLanguageStorage);
   // Define model types
   type ModelType = { name: string; displayName?: string; provider: string };
   const [ollamaModels, setOllamaModels] = useState<ModelType[]>([]);
@@ -57,31 +56,10 @@ const SidePanel = () => {
   useEffect(() => {
     async function getUser() {
       try {
-        console.log('[CHAT] Getting user...');
-        // First try to get user from current session
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        console.log('[CHAT] getUser: User from session', user);
-
-        if (user) {
-          setUser(user);
-          console.log('[CHAT] User set from session', user.email);
-        } else {
-          console.log('[CHAT] No user in session, trying storage');
-          // If no session, try to get user from storage tokens
-          const storageUser = await getCurrentUserFromStorage();
-          if (storageUser) {
-            setUser(storageUser);
-            console.log('[CHAT] User set from storage', storageUser.email);
-          } else {
-            console.log('[CHAT] No user found in storage');
-          }
-        }
+        const user = await overlayApi.getCurrentUser();
+        setUser(user);
       } catch (error) {
         console.error('[CHAT] Error getting user:', error);
-      } finally {
-        // Complete
       }
 
       // Set up auth state change listener
@@ -192,8 +170,8 @@ const SidePanel = () => {
                 messageId = chatInterfaceRef.current.addSystemMessage(loadingMessage);
               }
               // Save the note
-              const result = await saveNote(message.text, sourceUrl);
-
+              const result = await overlayApi.createNote(message.text, sourceUrl);
+              console.log('Note save result:', result);
               // Send result back to content script for toast notification
               try {
                 // Get the active tab to send message back to content script
@@ -203,9 +181,8 @@ const SidePanel = () => {
                   await chrome.tabs.sendMessage(activeTab.id, {
                     type: 'NOTE_SAVE_RESULT',
                     success: result.success,
-                    error: result.error,
+                    error: result.error?.message,
                   });
-                  console.log('[SidePanel] Sent note save result to content script');
                 }
               } catch (msgError) {
                 console.error('[SidePanel] Error sending message to content script:', msgError);
@@ -213,12 +190,10 @@ const SidePanel = () => {
 
               // Also show notification in side panel
               if (result.success) {
-                console.log('[SidePanel] Note saved successfully');
                 // Update the system message to show success
                 if (chatInterfaceRef.current && messageId) {
                   // Check if we have a note ID from the save result
-                  const noteId = result.data?.[0]?.id;
-
+                  const noteId = result.data?.id;
                   const updatedMessage = {
                     content: message.text,
                     metadata: {
@@ -286,8 +261,8 @@ const SidePanel = () => {
               }
 
               // Check if user is authenticated
-              const isAuthenticated = await overlayApi.isAuthenticated();
-              if (!isAuthenticated) {
+              const user = await overlayApi.getCurrentUser();
+              if (!user) {
                 // Also show a more prominent Chrome notification
                 chrome.notifications.create({
                   type: 'basic',
@@ -538,18 +513,6 @@ const SidePanel = () => {
       chrome.storage.onChanged.removeListener(handleStorageChange);
     };
   }, []);
-
-  // We're using Chrome's native notifications instead of a custom component
-
-  useEffect(() => {
-    // Apply theme class to the document element
-    const htmlElement = document.documentElement;
-    if (theme === 'dark') {
-      htmlElement.classList.add('dark');
-    } else {
-      htmlElement.classList.remove('dark');
-    }
-  }, [theme]);
 
   // Listen for visibility changes to clear chat when sidebar closes
   useEffect(() => {

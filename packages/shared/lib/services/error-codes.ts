@@ -143,3 +143,10 @@ export const USER_PREFERENCES_ERROR_CODES = {
   UPDATE_FAILED: 'user_preferences_update_failed',
   INVALID_FORMAT: 'user_preferences_invalid_format',
 };
+
+// most commonly used error codes, need to guide users to resolve them
+export const essentialErrorCodes = [
+  GENERAL_ERROR_CODES.AUTH_UNAUTHORIZED,
+  GENERAL_ERROR_CODES.SERVER_ERROR,
+  GOOGLE_ERROR_CODES.AUTH_NOT_FOUND,
+];

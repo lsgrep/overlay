@@ -200,30 +200,47 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       return; // Stop if panel couldn't be opened
     }
 
-    console.log(`Side panel open initiated for window ${windowId}. Sending action message...`);
+    console.log(`Side panel open initiated for window ${windowId}. Will send action message after delay...`);
 
-    // --- Send Message (Immediately After Initiating Open) ---
-    // Send the action details to the runtime (potentially the side panel or other listeners)
-    chrome.runtime.sendMessage(
-      {
-        type: 'CONTEXT_MENU_ACTION',
-        actionId,
-        text: selectionText,
-        url: pageUrl, // Pass the page URL
-      },
-      () => {
-        // This callback checks if the message was *sent* successfully.
-        // It doesn't guarantee it was *received* (the side panel might still be loading).
-        if (chrome.runtime.lastError) {
-          // This is often expected if the side panel isn't open or ready to listen yet. Log as warning.
-          console.warn(
-            `Sending CONTEXT_MENU_ACTION failed (panel might not be listening yet): ${chrome.runtime.lastError.message}`,
-          );
-        } else {
-          console.log('CONTEXT_MENU_ACTION message sent successfully.');
-        }
-      },
-    );
+    // --- Add a delay before sending message to allow the side panel to initialize ---
+    // Use a retry mechanism with increasing delays
+    const messageData = {
+      type: 'CONTEXT_MENU_ACTION',
+      actionId,
+      text: selectionText,
+      url: pageUrl, // Pass the page URL
+    };
+
+    const sendMessageWithRetry = (attempt = 0, maxAttempts = 3) => {
+      // Exponential backoff: 500ms, 1000ms, 2000ms...
+      const delay = Math.min(500 * Math.pow(2, attempt), 5000);
+
+      console.log(`Attempt ${attempt + 1}/${maxAttempts}: Sending message after ${delay}ms delay`);
+
+      setTimeout(() => {
+        chrome.runtime.sendMessage(messageData, () => {
+          if (chrome.runtime.lastError) {
+            console.warn(
+              `Attempt ${attempt + 1}/${maxAttempts}: Sending CONTEXT_MENU_ACTION failed: ${chrome.runtime.lastError.message}`,
+            );
+
+            // Retry if we haven't reached the maximum attempts
+            if (attempt < maxAttempts - 1) {
+              console.log(`Retrying message send (${attempt + 2}/${maxAttempts})...`);
+              sendMessageWithRetry(attempt + 1, maxAttempts);
+            } else {
+              console.error('Maximum retry attempts reached. Message might not have been delivered.');
+              // Could implement a fallback mechanism here
+            }
+          } else {
+            console.log(`Attempt ${attempt + 1}/${maxAttempts}: CONTEXT_MENU_ACTION message sent successfully.`);
+          }
+        });
+      }, delay);
+    };
+
+    // Start the retry process
+    sendMessageWithRetry();
   });
 });
 
@@ -243,16 +260,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Respond with failure if needed by the content script
         try {
           sendResponse({ success: false, error: chrome.runtime.lastError.message });
-        } catch (e) {
-          console.warn('Could not send error response back for OPEN_SIDE_PANEL');
+        } catch (error) {
+          console.warn('Could not send error response back for OPEN_SIDE_PANEL:', error);
         }
       } else {
         console.log(`Side panel opened successfully via message for window ${windowId}.`);
         // Respond with success
         try {
           sendResponse({ success: true });
-        } catch (e) {
-          console.warn('Could not send success response back for OPEN_SIDE_PANEL');
+        } catch (error) {
+          console.warn('Could not send success response back for OPEN_SIDE_PANEL:', error);
         }
       }
     });
