@@ -4,6 +4,7 @@ import { ModelSelector } from './ModelSelector';
 import { overlayApi } from '@extension/shared/lib/services/api'; // Import overlayApi which contains getModels
 import { defaultModelStorage } from '@extension/storage';
 import { useStorage } from '@extension/shared';
+import { ModelService } from '@extension/shared/lib/services/models';
 
 // Define the model info interface
 interface ModelInfo {
@@ -50,7 +51,6 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
       const openai: ModelInfo[] = [];
       const gemini: ModelInfo[] = [];
       const anthropic: ModelInfo[] = [];
-      const ollama: ModelInfo[] = [];
 
       models.forEach((model: ModelInfo) => {
         switch (model.provider.toLowerCase()) {
@@ -62,9 +62,6 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
             break;
           case 'anthropic':
             anthropic.push(model);
-            break;
-          case 'ollama':
-            ollama.push(model);
             break;
           default:
             console.warn(`[CloudModelSelector] Unrecognized provider: ${model.provider}`);
@@ -83,7 +80,10 @@ export const CloudModelSelector: React.FC<CloudModelSelectorProps> = ({ selected
       setOpenaiModels(openai.sort(sortByDisplayName));
       setGeminiModels(gemini.sort(sortByDisplayName));
       setAnthropicModels(anthropic.sort(sortByDisplayName));
-      setOllamaModels(ollama.sort(sortByDisplayName));
+
+      // Ollama only can be fetched locally
+      const ollamaModels = await ModelService.fetchOllamaModels();
+      setOllamaModels(ollamaModels.sort(sortByDisplayName));
 
       // Set model selection logic
       if (!selectedModel && models.length > 0) {
